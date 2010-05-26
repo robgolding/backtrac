@@ -1,0 +1,3 @@
+*.pyc
+cecil/settings/local.py.template
+cecil/dev.db
