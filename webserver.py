@@ -21,6 +21,8 @@ from django.core.handlers.wsgi import WSGIHandler
 # configuration as we need to set the DJANGO_SETTINGS_MODULE
 # environment variable which comes from the config.
 
+from translogger import TransLogger
+
 # Global variable!
 options = None
 
@@ -98,6 +100,7 @@ class Runner:
             app = AdminMediaHandler(WSGIHandler())
         else:
             app = WSGIHandler()
+        app = TransLogger(app)
         self.server = Server((options.IP_ADDRESS, options.PORT),
                              app, options.SERVER_THREADS, options.SERVER_NAME)
         if options.SSL:
@@ -172,6 +175,10 @@ if __name__ == "__main__":
         formatter = logging.Formatter('%(name)-12s: %(levelname)-8s %(message)s')
         console.setFormatter(formatter)
         log.addHandler(console)
+    
+    from cecil.apps.backups.utils import resubmit_all
+    
+    resubmit_all()
     
     if options.RUN_AS_DAEMON:
         log.info("Run as daemon")
