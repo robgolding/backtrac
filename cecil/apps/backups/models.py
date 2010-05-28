@@ -1,7 +1,5 @@
 from django.db import models
 
-from cecil.apps.events.models import Event
-
 BACKUP_EVENT_TYPE_CHOICES = (
 	('started', 'Backup started'),
 	('finished', 'Backup finished'),
