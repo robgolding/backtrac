@@ -90,5 +90,4 @@ INSTALLED_APPS = (
 	
 	# cecil apps
 	'cecil.apps.backups',
-	'cecil.apps.events',
 )
