@@ -1,5 +1,7 @@
 from django.db import models
 
+import tasks
+
 BACKUP_EVENT_TYPE_CHOICES = (
 	('started', 'Backup started'),
 	('finished', 'Backup finished'),
@@ -14,6 +16,11 @@ class Backup(models.Model):
 	interval = models.BigIntegerField()
 	active = models.BooleanField(default=True)
 	task_id = models.CharField(max_length=36, null=True, blank=True, editable=False)
+	
+	def save(self, resubmit=True, *args, **kwargs):
+		super(Backup, self).save(*args, **kwargs)
+		if resubmit:
+			tasks.resubmit_backup(self)
 	
 	def __unicode__(self):
 		return self.name
