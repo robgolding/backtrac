@@ -22,13 +22,19 @@ class Backup(models.Model):
 		if resubmit:
 			tasks.resubmit_backup(self)
 	
+	def is_running(self):
+		return self.events.latest().type == 'started'
+	
 	def __unicode__(self):
 		return self.name
 
 class BackupEvent(models.Model):
-	backup = models.ForeignKey(Backup)
+	backup = models.ForeignKey(Backup, related_name='events')
 	type = models.CharField(max_length=20, choices=BACKUP_EVENT_TYPE_CHOICES)
 	occured_at = models.DateTimeField(auto_now_add=True)
 	
 	def __unicode__(self):
 		return '%s: %s' % (self.get_type_display(), self.backup)
+	
+	class Meta:
+		get_latest_by = 'occured_at'
