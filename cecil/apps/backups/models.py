@@ -1,6 +1,6 @@
 from django.db import models
 
-import tasks
+import fields, tasks
 
 BACKUP_EVENT_TYPE_CHOICES = (
 	('started', 'Backup started'),
@@ -13,17 +13,27 @@ class Backup(models.Model):
 	host = models.CharField(max_length=200)
 	directory = models.CharField(max_length=255)
 	next_run = models.DateTimeField()
-	interval = models.BigIntegerField()
+	interval = fields.TimedeltaField()
 	active = models.BooleanField(default=True)
 	task_id = models.CharField(max_length=36, null=True, blank=True, editable=False)
 	
-	def save(self, resubmit=True, *args, **kwargs):
+	def save(self, resubmit=False, *args, **kwargs):
 		super(Backup, self).save(*args, **kwargs)
 		if resubmit:
 			tasks.resubmit_backup(self)
 	
 	def is_running(self):
-		return self.events.latest().type == 'started'
+		try:
+			return self.events.latest().type == 'started'
+		except BackupEvent.DoesNotExist:
+			return False
+	
+	def get_status(self):
+		if self.is_running():
+			return 'running'
+		else:
+			return 'idle'
+	get_status.short_description = 'Status'
 	
 	def __unicode__(self):
 		return self.name
