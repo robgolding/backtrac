@@ -1,7 +1,7 @@
 from django.db import models
 from django.db.models.signals import post_save
 
-from cecil.apps.schedules.models import Schedule
+from cecil.apps.schedules.models import Schedule, Rule
 
 import fields, tasks
 
@@ -21,7 +21,7 @@ class Backup(models.Model):
 	host = models.CharField(max_length=200)
 	directory = models.CharField(max_length=255)
 	active = models.BooleanField(default=True)
-	schedule = models.ForeignKey(Schedule)
+	schedule = models.ForeignKey(Schedule, related_name='backups')
 	task_id = models.CharField(max_length=36, null=True, editable=False)
 	
 	def save(self, resubmit=True, *args, **kwargs):
@@ -55,3 +55,15 @@ class BackupEvent(models.Model):
 	
 	class Meta:
 		get_latest_by = 'occured_at'
+
+def resubmit_backup(sender, instance, **kwargs):
+	if sender == Schedule:
+		backups = instance.backups.all()
+	elif sender == Rule:
+		backups = instance.schedule.backups.all()
+	else:
+		return
+	for backup in backups:
+		tasks.resubmit_backup(backup)
+
+post_save.connect(resubmit_backup)
