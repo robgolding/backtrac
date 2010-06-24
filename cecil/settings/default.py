@@ -87,12 +87,14 @@ INSTALLED_APPS = (
 	'django.contrib.messages',
 	'django.contrib.admin',
 	'django.contrib.admindocs',
+	'django.contrib.contenttypes',
 	
 	# 3rd party apps
 	'celery',
 	
 	# cecil apps
 	'cecil.apps.backups',
+	'cecil.apps.schedules',
 )
 
 

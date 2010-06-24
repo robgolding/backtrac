@@ -9,10 +9,12 @@ def resubmit_backup(backup, clear_old_task=True):
 	if clear_old_task and backup.task_id is not None:
 		revoke(backup.task_id)
 	
-	while backup.next_run <= datetime.datetime.now():
-		backup.next_run += datetime.timedelta(seconds=backup.interval)
+	next = backup.schedule.get_next_occurrence()
 	
-	r = execute_backup.apply_async(args=[backup.id], eta=backup.next_run)
+	if not next:
+		return
+	
+	r = execute_backup.apply_async(args=[backup.id], eta=next)
 	backup.task_id = r.task_id
 	backup.save(resubmit=False)
 	
