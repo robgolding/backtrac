@@ -94,10 +94,3 @@ INSTALLED_APPS = (
 	# cecil apps
 	'cecil.apps.backups',
 )
-
-
-BROKER_HOST = "localhost"
-BROKER_PORT = 5672
-BROKER_USER = "celery"
-BROKER_PASSWORD = "celery"
-BROKER_VHOST = "backtrac"
