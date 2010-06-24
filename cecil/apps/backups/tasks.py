@@ -15,10 +15,8 @@ def resubmit_backup(backup, clear_old_task=True):
 		return
 	
 	r = execute_backup.apply_async(args=[backup.id], eta=next)
-	backup.task_id = r.task_id
-	backup.save(resubmit=False)
 	
-	return (backup.task_id, backup.next_run)
+	return (backup.task_id, next)
 
 @task()
 def execute_backup(backup_id, **kwargs):

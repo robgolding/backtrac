@@ -47,8 +47,8 @@ class Rule(models.Model):
 	
 	def get_rrule_object(self):
 		frequency = eval('rrule.%s' % self.frequency)
-		return rrule(frequency, interval=self.interval,
-						dtstart=self.schedule.start)
+		return rrule.rrule(frequency, interval=self.interval,
+						dtstart=self.schedule.start_date)
 	
 	def get_next_occurrence(self):
 		return self.get_rrule_object().after(datetime.datetime.now())

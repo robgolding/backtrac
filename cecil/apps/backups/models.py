@@ -24,7 +24,7 @@ class Backup(models.Model):
 	schedule = models.ForeignKey(Schedule)
 	task_id = models.CharField(max_length=36, null=True, editable=False)
 	
-	def save(self, resubmit=False, *args, **kwargs):
+	def save(self, resubmit=True, *args, **kwargs):
 		super(Backup, self).save(*args, **kwargs)
 		if resubmit:
 			tasks.resubmit_backup(self)
