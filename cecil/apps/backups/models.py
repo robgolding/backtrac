@@ -2,6 +2,7 @@ from django.db import models
 from django.db.models.signals import post_save
 
 from cecil.apps.schedules.models import Schedule, Rule
+from cecil.apps.clients.models import Client
 
 import fields, tasks
 
@@ -18,8 +19,7 @@ class Backup(models.Model):
 	execute this backup next.
 	"""
 	name = models.CharField(max_length=200, unique=True)
-	host = models.CharField(max_length=200)
-	directory = models.CharField(max_length=255)
+	client = models.ForeignKey(Client)
 	active = models.BooleanField(default=True)
 	schedule = models.ForeignKey(Schedule, related_name='backups')
 	task_id = models.CharField(max_length=36, null=True, editable=False)
@@ -44,6 +44,13 @@ class Backup(models.Model):
 	
 	def __unicode__(self):
 		return self.name
+
+class BackupPath(models.Model):
+	backup = models.ForeignKey(Backup, related_name='paths')
+	path = models.CharField(max_length=255)
+	
+	def __unicode__(self):
+		return self.path
 
 class BackupEvent(models.Model):
 	backup = models.ForeignKey(Backup, related_name='events')
