@@ -5,6 +5,8 @@ PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
+SERVE_STATIC = False
+
 ADMINS = (
 	('Rob Golding', 'rob@robgolding.com'),
 )
