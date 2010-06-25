@@ -97,6 +97,7 @@ INSTALLED_APPS = (
 	'celery',
 	
 	# cecil apps
+	'cecil.apps.core',
 	'cecil.apps.backups',
 	'cecil.apps.clients',
 	'cecil.apps.schedules',
