@@ -61,7 +61,7 @@ STATIC_URL = '/media/'
 # URL prefix for admin media -- CSS, JavaScript and images. Make sure to use a
 # trailing slash.
 # Examples: "http://foo.com/media/", "/media/".
-ADMIN_MEDIA_PREFIX = '/media/'
+ADMIN_MEDIA_PREFIX = '/media/admin/'
 
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
@@ -81,6 +81,18 @@ ROOT_URLCONF = 'cecil.urls'
 
 TEMPLATE_DIRS = (
 	os.path.join(PATH, 'templates'),
+)
+
+TEMPLATE_CONTEXT_PROCESSORS = (
+	# default Django template context processors
+	'django.core.context_processors.auth',
+	'django.core.context_processors.debug',
+	'django.core.context_processors.i18n',
+	'django.core.context_processors.media',
+	'django.contrib.messages.context_processors.messages',
+	
+	# custom template context processors
+	'cecil.apps.core.context_processors.static_url',
 )
 
 INSTALLED_APPS = (
