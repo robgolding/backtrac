@@ -1,7 +1,7 @@
 /* General */
 
 html, body {
-	background-color: #fff;
+	background-color: #f5f5f5;
 	font: 14px georgia,times,serif;
 	height: 100%;
 	min-height: 100%;
@@ -197,14 +197,14 @@ code { font-family: 'Courier New', Courier, monospace; color: #333; font-size: 0
 }
 
 #nav-primary ul li a:hover {
-	background-color: #fff;
+	background-color: #f5f5f5;
 	text-decoration: none;
 }
 
 body#dashboard #nav-primary ul li.dashboard a,
 body#backups #nav-primary ul li.backups a,
 body#clients #nav-primary ul li.clients a {
-	background-color: #fff;
+	background-color: #f5f5f5;
 }
 
 /* Forms */
@@ -226,7 +226,7 @@ form.standard-form input[type=text], form.standard-form input[type=password] {
 /* Sections */
 
 section {
-	background-color: #eee;
+	background-color: #fff;
 	-webkit-box-shadow: 3px 3px 2px #999;
 }
 
@@ -277,5 +277,5 @@ body>footer {
 }
 
 body>footer #copyright {
-	padding: 10px;
+	padding: 10px 0;
 }
