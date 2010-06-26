@@ -8,13 +8,12 @@
 				<table class="backup_list">
 					<thead>
 						<tr>
-							<th>ID</th><th>Name</th><th>Client</th><th>Status</th><th>Active</th>
+							<th>Name</th><th>Client</th><th>Status</th><th>Active</th>
 						</tr>
 					</thead>
 					<tbody>
 					{% for backup in object_list %}
 						<tr class="{% cycle 'odd' 'even' %}">
-							<td>{{ backup.id }}</td>
 							<td>{{ backup.name }}</td>
 							<td>{{ backup.client.hostname }}</td>
 							<td>{{ backup.get_status|capfirst }}</td>

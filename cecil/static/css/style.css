@@ -61,7 +61,6 @@ code { font-family: 'Courier New', Courier, monospace; color: #333; font-size: 0
 	padding: 0;
 	position: relative;
 	background-color: #fff;
-/*	border-bottom: 3px solid #ddd;*/
 }
 
 #masthead {
@@ -93,16 +92,7 @@ code { font-family: 'Courier New', Courier, monospace; color: #333; font-size: 0
 	color: auto;
 }
 
-#masthead span {
-	display: block;
-	clear: left;
-	text-indent: 44px;
-	font-size: 22px;
-	font-family: "Museo300Regular", sans-serif;
-	color: #BD1550;
-}
-
-/* General menu-type styled (lists, links etc.) */
+/* General menu-type styles (lists, links etc.) */
 
 .menu ul {
 	list-display: none;
@@ -255,21 +245,25 @@ section p, section table {
 /* Backups */
 
 table.backup_list thead th {
-	background-color: #ccc;
+	background: none;
+	border-bottom: 2px #3f7a09 solid;
+	color: #3f7a09;
+	font-weight: bold;
+	font-size: 17px;
+	padding: 7px 15px;
+	font-family: Helvetica, sans-serif;
 }
 
 table.backup_list tbody td {
-	padding: 7px 5px;
-	border-bottom: 1px solid #ccc;
-	background: none !important;
-}
-
-table.backup_list tbody tr.odd td {
-	background-color: #cffa99;
+	padding: 2px 20px;
+	font-size: 14px;
+	border-bottom: 1px solid #bbb;
+	color: #444444;
+	height: 30px;
 }
 
 table.backup_list tbody tr.even td {
-	background-color: #effeb9;
+	background: #cfd9c3;
 }
 
 /* Footer */
