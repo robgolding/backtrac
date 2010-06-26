@@ -1,0 +1,266 @@
+/* General */
+
+html, body {
+	background-color: #fff;
+	font: 14px georgia,times,serif;
+	height: 100%;
+	min-height: 100%;
+	width: 100%;
+	color: #444;
+	font-weight: 300;
+	font-size: 100%;
+}
+
+#wrap {
+	min-height: 100%;
+}
+
+#main {
+	overflow: auto;
+	padding-top: 20px;
+	padding-bottom: 50px;  /* footer height + some extra */
+}
+
+/*Opera footer Fix*/
+body:before {
+	content: "";
+	height: 100%;
+	float: left;
+	width: 0;
+	margin-top: -32767px;/* thank you Erik J - negate effect of float*/
+}
+
+p {
+	line-height: 1.5em;
+}
+
+#main a:link, #main a:visited {
+	color: #3163B4;
+	text-decoration: none;
+}
+
+#main a:hover {
+	text-decoration: underline;
+}
+
+
+pre { font-family: 'andale mono', 'lucida console', monospace; font-size: 14px; line-height: 1.5; color: #000; overflow: auto; background-color: #efefff; border-top: 1px solid #ccc; border-bottom: 3px solid #ccc; padding: 10px 20px; }
+
+code { font-family: 'Courier New', Courier, monospace; color: #333; font-size: 0.8em; }
+
+.error {
+	color: #cc0404;
+}
+
+/* Masthead */
+
+#masthead-wrap {
+	overflow: hidden;
+	width: 100%;
+	margin: 0;
+	padding: 0;
+	position: relative;
+	background-color: #fff;
+/*	border-bottom: 3px solid #ddd;*/
+}
+
+#masthead {
+	width: 960px;
+	height: 70px;
+	overflow: hidden;
+	margin: 0 auto;
+	padding: 0;
+	position: relative;
+}
+
+#masthead h1 {
+	margin: 10px 10px 0 10px;
+	float: left;
+	font-size: 50px;
+	width: 430px;
+	font-weight: 100;
+}
+
+#masthead h1 a, #masthead h1 a:visited, #masthead h1 a:hover {
+	display: block;
+	color: #666;
+	text-shadow: #fff 1px 1px;
+	text-decoration: none;
+}
+
+#masthead h1 a:hover {
+	text-decoration: none;
+	color: auto;
+}
+
+#masthead span {
+	display: block;
+	clear: left;
+	text-indent: 44px;
+	font-size: 22px;
+	font-family: "Museo300Regular", sans-serif;
+	color: #BD1550;
+}
+
+/* General menu-type styled (lists, links etc.) */
+
+.menu ul {
+	list-display: none;
+	margin: 0;
+	padding: 0;
+}
+
+.menu ul li {
+	list-style: none;
+	display: block;
+	float: left;
+	margin: 0;
+	padding: 7px 18px;
+}
+
+.menu a:link, .menu a:visited {
+	color: #3163B4;
+	text-decoration: none;
+}
+
+.menu a:hover {
+	text-decoration: underline;
+}
+
+/* Non-authenticated box */
+
+#non-auth-box {
+	float: right;
+	margin: 36px 150px 0 0;
+}
+
+#non-auth-box ul li {
+	border-left: 1px solid #ddd;
+}
+
+#non-auth-box ul li:first-child {
+	border-left: 0;
+}
+
+/* User box */
+
+#userbox {
+	margin: 0;
+	position: absolute;
+	top: 0;
+	right: 0;
+	background-color: #f8f8f8;
+	border: 1px solid #ccc;
+	-webkit-border-bottom-left-radius: 5px;
+	-moz-border-radius-bottomleft: 5px;
+	-webkit-border-bottom-right-radius: 5px;
+	-moz-border-radius-bottomright: 5px;
+	border-bottom-left-radius: 5px;
+	border-bottom-right-radius: 5px;
+	border-top: none;
+	color: #333;
+}
+
+#userbox ul li {
+	border-left: 1px solid #ddd;
+}
+
+#userbox ul li:first-child {
+	border-left: 0;
+}
+
+/* Navigation */
+
+#nav-bar {
+	margin: 0;
+	position: relative;
+	background-color: #7fba49;
+	overflow: hidden;
+}
+
+#nav-primary {
+	width: 960px;
+	margin: 0 auto;
+	padding: 0;
+}
+
+#nav-primary ul {
+	list-display: none;
+	margin: 0;
+	padding: 0;
+}
+
+#nav-primary ul li {
+	list-style: none;
+	float: left;
+	margin: 0;
+	padding: 15px 0 0 0;
+}
+
+#nav-primary ul li a {
+	display: block;
+	padding: 7px 18px;
+	background-color: #afda79;
+	margin: 0;
+	margin-left: 5px;
+	color: #333;
+}
+
+#nav-primary ul li a:hover {
+	background-color: #fff;
+	text-decoration: none;
+}
+
+body#dashboard #nav-primary ul li.dashboard a,
+body#backups #nav-primary ul li.backups a,
+body#clients #nav-primary ul li.clients a {
+	background-color: #fff;
+}
+
+/* Forms */
+
+form.standard-form label {
+	font-weight: normal;
+}
+
+form.standard-form input, form.standard-form textarea {
+	font-size: 16px;
+	padding: 5px;
+}
+
+form.standard-form input[type=text], form.standard-form input[type=password] {
+	padding: 5px;
+	width: 300px;
+}
+
+/* Sections */
+
+section {
+	background-color: #eee;
+	-webkit-box-shadow: 3px 3px 2px #999;
+}
+
+section h1 {
+	color: #444;
+	background-color: #afda79;
+	font-size: 22px;
+	padding: 7px 15px;
+}
+
+section p {
+	padding-left: 15px;
+}
+
+/* Footer */
+
+body>footer {
+	border-top: 1px solid #aaa;
+	position: relative;
+	margin-top: -41px; /* negative value of footer height */
+	height: 40px;
+	clear: both;
+}
+
+body>footer #copyright {
+	padding: 10px;
+}

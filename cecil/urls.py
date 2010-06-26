@@ -3,10 +3,17 @@ from django.conf.urls.defaults import *
 from django.contrib import admin
 admin.autodiscover()
 
+from cecil.apps.core import views
+
 urlpatterns = patterns('',
 	(r'^admin/doc/', include('django.contrib.admindocs.urls')),
 	
 	(r'^admin/', include(admin.site.urls)),
+	
+	url(r'^$', views.index, name='index'),
+	
+	url(r'^dashboard/$', views.dashboard, name='dashboard'),
+	
 )
 
 from django.conf import settings

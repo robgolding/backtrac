@@ -1,0 +1,64 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Backtrac Backup System</title>
+	<link rel="stylesheet" href="{{ STATIC_URL }}css/blueprint/screen.css" type="text/css" media="screen, projection">
+	<link rel="stylesheet" href="{{ STATIC_URL }}css/blueprint/print.css" type="text/css" media="print">
+	<!--[if lt IE 8]><link rel="stylesheet" href="{{ STATIC_URL }}css/blueprint/ie.css" type="text/css" media="screen, projection"><![endif]-->
+	<link rel="stylesheet" href="{{ STATIC_URL }}css/style.css" type="text/css" media="screen, projection">
+	<!--[if IE]><script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+</head>
+<body id="{% block page_id %}{% endblock page_id %}">
+	<div id="wrap"> 
+		<div id="masthead-wrap">
+			<header id="masthead">
+				<h1><a href="{% url index %}">backtrac</a></h1>
+				{% if user.is_authenticated %}
+					<div id="userbox" class="menu">
+						<ul>
+							<li class="username">{% if user.get_full_name %}{{ user.get_full_name }} ({{ user.username }}){% else %}{{ user.username }}{% endif %}</li>
+							{% if user.is_superuser %}
+								<li><a href="{% url admin:index %}">Admin</a></li>
+							{% endif %}
+							<li><a href="">Logout</a></li>
+						</ul>
+					</div>
+				{% else %}
+					<div id="non-auth-box" class="menu">
+						<ul>
+							<li><a href="">Login</a></li>
+						</ul>
+					</div>
+				{% endif %}
+			</header>
+		</div><!-- end #masthead_wrap -->
+		<div id="nav-bar" class="clearfix">
+			<div id="nav-primary" class="menu">
+				<ul>
+					<li class="dashboard"><a href="">Dashboard</a></li>
+					<li class="backups"><a href="">Backups</a></li>
+					<li class="clients"><a href="">Clients</a></li>
+				</ul>
+			</div>
+		</div>
+		<div id="main">
+		{% block messages %}
+			{% if messages %}
+				<div id="messages" class="container">
+					{% for message in messages %}
+						<div class="message span-24">
+							<p {% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</p>
+						</div>
+					{% endfor %}
+				</div>
+			{% endif %}
+		{% endblock messages %}
+		{% block content %}{% endblock content %}
+		</div><!-- end #main -->
+	</div><!-- end #wrap -->
+	<footer>
+		<div id="copyright">&copy; Backtrac Backup System 2010</div>
+	</footer>
+</body>
+</html>
