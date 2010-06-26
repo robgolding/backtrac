@@ -1,9 +1,9 @@
 from django.contrib import admin
 
-from models import Client
+from models import Host
 
-class ClientAdmin(admin.ModelAdmin):
+class HostAdmin(admin.ModelAdmin):
 	list_display = ('id', 'hostname',)
 	list_display_links = ('id', 'hostname',)
 
-admin.site.register(Client, ClientAdmin)
+admin.site.register(Host, HostAdmin)
