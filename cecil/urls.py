@@ -14,6 +14,8 @@ urlpatterns = patterns('',
 	
 	url(r'^dashboard/$', views.dashboard, name='dashboard'),
 	
+	(r'^backups/$', include('cecil.apps.backups.urls')),
+	
 )
 
 from django.conf import settings

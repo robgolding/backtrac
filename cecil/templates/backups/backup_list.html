@@ -1,0 +1,38 @@
+{% extends 'backups/base.html' %}
+
+{% block content %}
+	<div class="container">
+		<section class="span-18">
+			<h1>Backups</h1>
+			{% if object_list %}
+				<table class="backup_list">
+					<thead>
+						<tr>
+							<th>ID</th><th>Name</th><th>Client</th><th>Status</th><th>Active</th>
+						</tr>
+					</thead>
+					<tbody>
+					{% for backup in object_list %}
+						<tr class="{% cycle 'odd' 'even' %}">
+							<td>{{ backup.id }}</td>
+							<td>{{ backup.name }}</td>
+							<td>{{ backup.client.hostname }}</td>
+							<td>{{ backup.get_status|capfirst }}</td>
+							<td>{% if backup.active %}Yes{% else %}No{% endif %}</td>
+						</tr>
+					{% endfor %}
+					</tbody>
+				</table>
+			{% else %}
+				<p>There are no backups at present.</p>
+			{% endif %}
+		</section>
+		
+		<section class="span-6 last">
+			<h1>Recent Events</h1>
+			<p>
+				Stuff that's just happened...
+			</p>
+		</section>
+	</div>
+{% endblock %}

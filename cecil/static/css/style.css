@@ -247,8 +247,29 @@ section h1 {
 	padding: 7px 15px;
 }
 
-section p {
+section p, section table {
 	padding-left: 15px;
+	padding-right: 15px;
+}
+
+/* Backups */
+
+table.backup_list thead th {
+	background-color: #ccc;
+}
+
+table.backup_list tbody td {
+	padding: 7px 5px;
+	border-bottom: 1px solid #ccc;
+	background: none !important;
+}
+
+table.backup_list tbody tr.odd td {
+	background-color: #cffa99;
+}
+
+table.backup_list tbody tr.even td {
+	background-color: #effeb9;
 }
 
 /* Footer */
