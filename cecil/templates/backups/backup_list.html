@@ -9,16 +9,15 @@
 					<table class="backup_list">
 						<thead>
 							<tr>
-								<th>Name</th><th>Client</th><th>Status</th><th>Active</th>
+								<th>Name</th><th>Client</th><th>Status</th>
 							</tr>
 						</thead>
 						<tbody>
 						{% for backup in object_list %}
-							<tr class="{% cycle 'odd' 'even' %}">
+							<tr class="{% cycle 'odd' 'even' %}{% if not backup.active %} inactive{% endif %}">
 								<td>{{ backup.name }}</td>
 								<td>{{ backup.client.hostname }}</td>
 								<td>{{ backup.get_status|capfirst }}</td>
-								<td>{% if backup.active %}Yes{% else %}No{% endif %}</td>
 							</tr>
 						{% endfor %}
 						</tbody>

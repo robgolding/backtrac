@@ -36,7 +36,9 @@ class Backup(models.Model):
 			return False
 	
 	def get_status(self):
-		if self.is_running():
+		if not self.active:
+			return 'inactive'
+		elif self.is_running():
 			return 'running'
 		else:
 			return 'idle'

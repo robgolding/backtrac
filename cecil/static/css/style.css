@@ -300,11 +300,10 @@ table.backup_list thead th {
 }
 
 table.backup_list tbody td {
-	padding: 2px 20px;
-	font-size: 14px;
+	padding: 10px 20px;
+	font-size: 15px;
 	border-bottom: 1px solid #bbb;
 	color: #444444;
-	height: 30px;
 }
 
 table.backup_list tbody tr.even td {
@@ -312,7 +311,11 @@ table.backup_list tbody tr.even td {
 	background: none;
 }
 
-/* Footer */
+table.backup_list tbody tr.inactive td {
+	background: #ddd;
+}
+
+ /* Footer */
 
 body>footer {
 	border-top: 1px solid #aaa;
