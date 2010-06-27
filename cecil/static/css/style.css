@@ -283,6 +283,11 @@ section h1 {
 	padding: 7px 15px;
 }
 
+section h2 {
+	color: #444;
+	font-size: 20px;
+}
+
 section div.content {
 	padding: 0 15px 15px;
 }

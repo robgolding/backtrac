@@ -1,0 +1,30 @@
+{% extends 'backups/base.html' %}
+
+{% block content %}
+	<div class="container">
+		<section class="span-18">
+			<h1>{{ object.name }}</h1>
+			<div class="content clearfix">
+				<h2>Details</h2>
+				<p>
+					<strong>Client:</strong> {{ object.client.hostname }}<br />
+					<strong>Status:</strong> {{ object.get_status|capfirst }}<br />
+					<strong>Next run:</strong> {% if object.active %}{{ object.schedule.get_next_occurrence }}{% else %}N/A{% endif %}<br />
+				</p>
+				<hr />
+				<h2>Recent Events</h2>
+				<p>
+					A list of recent events...
+				</p>
+			</div>
+		</section>
+		<section class="span-6 last">
+			<h1>Actions</h1>
+			<div class="content">
+				<p>
+					Actions for this backup...
+				</p>
+			</div>
+		</section>
+	</div>
+{% endblock %}

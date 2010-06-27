@@ -29,6 +29,10 @@ class Backup(models.Model):
 		if resubmit:
 			tasks.resubmit_backup(self)
 	
+	@models.permalink
+	def get_absolute_url(self):
+		return ('backups_backup_detail', [self.id])
+	
 	def is_running(self):
 		try:
 			return self.events.latest().type == 'started'
