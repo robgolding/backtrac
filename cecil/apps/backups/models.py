@@ -4,7 +4,7 @@ from django.db.models.signals import post_save
 from cecil.apps.schedules.models import Schedule, Rule
 from cecil.apps.hosts.models import Host
 
-import fields, tasks
+import tasks
 
 BACKUP_EVENT_TYPE_CHOICES = (
 	('started', 'Backup started'),

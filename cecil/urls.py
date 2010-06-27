@@ -14,7 +14,7 @@ urlpatterns = patterns('',
 	
 	url(r'^dashboard/$', views.dashboard, name='dashboard'),
 	
-	(r'^backups/$', include('cecil.apps.backups.urls')),
+	(r'^backups/', include('cecil.apps.backups.urls')),
 	
 )
 
