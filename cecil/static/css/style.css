@@ -317,7 +317,13 @@ table.backup_list tbody tr.even td {
 }
 
 table.backup_list tbody tr.inactive td {
-	background: #ddd;
+	background: #eee;
+	color: #aaa;
+}
+
+table.backup_list tbody tr.inactive a:link,
+table.backup_list tbody tr.inactive a:visited {
+	color: #6193e4!important;
 }
 
  /* Footer */
