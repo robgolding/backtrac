@@ -6,10 +6,11 @@
 			<h1>Create a Backup</h1>
 			<div class="content clearfix">
 				<form action="" method="post" class="standard-form">{% csrf_token %}
-					{% for error in form.non_field_errors %}
+					<h2>Backup Details</h2>
+					{% for error in backup_form.non_field_errors %}
 						<p class="error">{{ error }}</p>
 					{% endfor %}
-					{% for field in form %}
+					{% for field in backup_form %}
 						{% if field.is_hidden %}
 							{{ field }}
 						{% else %}
@@ -23,6 +24,47 @@
 								</div>
 							</div>
 						{% endif %}
+					{% endfor %}
+					<hr />
+					<h2>Schedule Details</h2>
+					{% for error in schedule_form.non_field_errors %}
+						<p class="error">{{ error }}</p>
+					{% endfor %}
+					{% for error in rule_formset.non_field_errors %}
+						<p class="error">{{ error }}</p>
+					{% endfor %}
+					{% for field in schedule_form %}
+						{% if field.is_hidden %}
+							{{ field }}
+						{% else %}
+							<div class="field-wrapper clearfix">
+								{{ field.label_tag }}<br />
+								<div class="field">{{ field }}</div>
+								<div class="field-errors">	
+									{% if field.errors %}
+										<span class="error">{{ field.errors.0 }}</span>
+									{% endif %}
+								</div>
+							</div>
+						{% endif %}
+					{% endfor %}
+					{{ rule_formset.management_form }}
+					{% for form in rule_formset.forms %}
+						{% for field in form %}
+							{% if field.is_hidden %}
+								{{ field }}
+							{% else %}
+								<div class="field-wrapper clearfix">
+									{{ field.label_tag }}<br />
+									<div class="field">{{ field }}</div>
+									<div class="field-errors">	
+										{% if field.errors %}
+											<span class="error">{{ field.errors.0 }}</span>
+										{% endif %}
+									</div>
+								</div>
+							{% endif %}
+						{% endfor %}
 					{% endfor %}
 					<input type="submit" value="Create Backup" /> or <a href="{% url backups_backup_list %}">Cancel and go back</a>
 				</form>

@@ -237,6 +237,7 @@ form.standard-form select {
 form.standard-form div.field-wrapper {
 	clear: left;
 	margin-top: 1em;
+	margin-bottom: 1em;
 }
 
 /*

@@ -6,3 +6,4 @@ class BackupForm(forms.ModelForm):
 	
 	class Meta:
 		model = Backup
+		exclude = ['schedule']
