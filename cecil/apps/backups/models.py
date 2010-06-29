@@ -19,7 +19,7 @@ class Backup(models.Model):
 	execute this backup next.
 	"""
 	name = models.CharField(max_length=200, unique=True)
-	client = models.ForeignKey(Host)
+	client = models.ForeignKey(Host, related_name='backups')
 	active = models.BooleanField(default=True)
 	schedule = models.ForeignKey(Schedule, related_name='backups')
 	task_id = models.CharField(max_length=36, null=True, editable=False)

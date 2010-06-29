@@ -1,37 +1,42 @@
-{% extends 'backups/base.html' %}
+{% extends 'hosts/base.html' %}
 
 {% block content %}
 	<div class="container">
 		<section class="span-18">
-			<h1>Backups<a href="{% url backups_create_backup %}" class="header-button" title="Add a backup">Create a new backup &rarr;</a></h1>
-			<div class="content">
-				{% if object_list %}
+			<h1>{{ object.hostname }}</h1>
+			<div class="content clearfix">
+				<h2>Backups</h2>
+				{% if object.backups.all %}
 					<table class="backup_list">
 						<thead>
 							<tr>
-								<th>Name</th><th>Client</th><th>Status</th>
+								<th>Name</th><th>Status</th>
 							</tr>
 						</thead>
 						<tbody>
-						{% for backup in object_list %}
+						{% for backup in object.backups.all %}
 							<tr class="{% cycle 'odd' 'even' %}{% if not backup.active %} inactive{% endif %}">
 								<td><a href="{{ backup.get_absolute_url }}">{{ backup.name }}</a></td>
-								<td><a href="{{ backup.client.get_absolute_url }}">{{ backup.client.hostname }}</a></td>
 								<td>{{ backup.get_status|capfirst }}</td>
 							</tr>
 						{% endfor %}
 						</tbody>
 					</table>
 				{% else %}
-					<p>There are no backups at present.</p>
+					<p>There are no backups for this client.</p>
 				{% endif %}
+				<hr />
+				<h2>Recent Events</h2>
+				<p>
+					A list of recent events...
+				</p>
 			</div>
 		</section>
 		<section class="span-6 last">
-			<h1>Filters</h1>
+			<h1>Actions</h1>
 			<div class="content">
 				<p>
-					Filters go here...
+					Actions for this host...
 				</p>
 			</div>
 		</section>

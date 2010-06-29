@@ -7,7 +7,7 @@
 			<div class="content clearfix">
 				<h2>Details</h2>
 				<p>
-					<strong>Client:</strong> {{ object.client.hostname }}<br />
+					<strong>Client:</strong> <a href="{{ object.client.get_absolute_url }}">{{ object.client.hostname }}</a><br />
 					<strong>Status:</strong> {{ object.get_status|capfirst }}<br />
 					<strong>Next run:</strong> {% if object.active %}{{ object.schedule.get_next_occurrence }}{% else %}N/A{% endif %}<br />
 				</p>

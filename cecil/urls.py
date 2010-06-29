@@ -16,6 +16,8 @@ urlpatterns = patterns('',
 	
 	(r'^backups/', include('cecil.apps.backups.urls')),
 	
+	(r'^clients/', include('cecil.apps.hosts.urls')),
+	
 )
 
 from django.conf import settings

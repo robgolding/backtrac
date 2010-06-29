@@ -1,0 +1,38 @@
+{% extends 'hosts/base.html' %}
+
+{% block content %}
+	<div class="container">
+		<section class="span-18">
+			<h1>Clients<a href="{% url hosts_create_host %}" class="header-button" title="Add a client">Add a new client &rarr;</a></h1>
+			<div class="content">
+				{% if object_list %}
+					<table class="backup_list">
+						<thead>
+							<tr>
+								<th>Name</th><th>Status</th>
+							</tr>
+						</thead>
+						<tbody>
+						{% for client in object_list %}
+							<tr>
+								<td><a href="{{ client.get_absolute_url }}">{{ client.hostname }}</a></td>
+								<td></td>
+							</tr>
+						{% endfor %}
+						</tbody>
+					</table>
+				{% else %}
+					<p>There are no clients at present.</p>
+				{% endif %}
+			</div>
+		</section>
+		<section class="span-6 last">
+			<h1>Filters</h1>
+			<div class="content">
+				<p>
+					Filters go here...
+				</p>
+			</div>
+		</section>
+	</div>
+{% endblock %}
