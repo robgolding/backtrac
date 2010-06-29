@@ -7,13 +7,12 @@ from django.utils.translation import ugettext, ugettext_lazy as _
 import managers
 
 FREQUENCY_CHOICES = (
-	('YEARLY', _('Yearly')),
-	('MONTHLY', _('Monthly')),
-	('WEEKLY', _('Weekly')),
-	('DAILY', _('Daily')),
-	('HOURLY', _('Hourly')),
-	('MINUTELY', _('Minutely')),
-	('SECONDLY', _('Secondly'))
+	('YEARLY', _('Years')),
+	('MONTHLY', _('Months')),
+	('WEEKLY', _('Weeks')),
+	('DAILY', _('Days')),
+	('HOURLY', _('Hours')),
+	('MINUTELY', _('Minutes'))
 )
 
 class Schedule(models.Model):
@@ -21,9 +20,13 @@ class Schedule(models.Model):
 	Model to represent a schedule, which consists of a start date and multiple
 	'rules' - each of which determines how often the given event recurs.
 	"""
-	start_date = models.DateTimeField(_('start date'))
+	start_date = models.DateField(_('start date'))
+	start_time = models.TimeField(_('start time'))
 	
 	objects = managers.ScheduleManager()
+	
+	def get_start_datetime(self):
+		return datetime.datetime.combine(self.start_date, self.start_time)
 	
 	def get_next_occurrence(self):
 		occs = sorted([r.get_next_occurrence() for r in self.rules.all()])
@@ -48,7 +51,7 @@ class Rule(models.Model):
 	def get_rrule_object(self):
 		frequency = eval('rrule.%s' % self.frequency)
 		return rrule.rrule(frequency, interval=self.interval,
-						dtstart=self.schedule.start_date)
+						dtstart=self.schedule.get_start_datetime())
 	
 	def get_next_occurrence(self):
 		return self.get_rrule_object().after(datetime.datetime.now())
