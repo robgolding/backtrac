@@ -1,14 +1,15 @@
+import re, datetime
+
 from django import forms
+from django.forms.widgets import Widget, Select, MultiWidget
 from django.forms.extras.widgets import SelectDateWidget
 from django.forms.formsets import formset_factory
 from django.forms.formsets import BaseFormSet
+from django.forms.extras.widgets import SelectDateWidget
+
+from django.utils.safestring import mark_safe
 
 from models import Schedule, Rule
-
-import re
-from django.forms.extras.widgets import SelectDateWidget
-from django.forms.widgets import Widget, Select, MultiWidget
-from django.utils.safestring import mark_safe
 
 # Attempt to match many time formats:
 # Example: "12:34:56 P.M."  matches:
@@ -182,7 +183,8 @@ class SelectTimeWidget(Widget):
 class ScheduleForm(forms.ModelForm):
 	def __init__(self, *args, **kwargs):
 		super(ScheduleForm, self).__init__(*args, **kwargs)
-		self.fields['start_date'] = forms.DateField(widget=SelectDateWidget())
+		self.fields['start_date'] = forms.DateField(widget=SelectDateWidget(),
+												initial=datetime.date.today())
 		self.fields['start_time'] = forms.TimeField(widget=SelectTimeWidget(minute_step=5))
 	
 	class Meta:
