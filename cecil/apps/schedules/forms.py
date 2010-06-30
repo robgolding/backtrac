@@ -131,7 +131,7 @@ class SelectTimeWidget(Widget):
         select_html = Select(choices=hour_choices).render(self.hour_field % name, hour_val, local_attrs)
         output.append(select_html)
         
-#       output.append(':')
+        output.append(':')
 
         minute_choices = [("%.2d"%i, "%.2d"%i) for i in self.minutes]
         local_attrs['id'] = self.minute_field % id_
@@ -191,6 +191,9 @@ class ScheduleForm(forms.ModelForm):
 		model = Schedule
 
 class RuleForm(forms.ModelForm):
+	def __init__(self, *args, **kwargs):
+		super(RuleForm, self).__init__(*args, **kwargs)
+		self.fields['interval'] = forms.ChoiceField(choices=[(i,i) for i in range(1,11)])
 	
 	class Meta:
 		model = Rule

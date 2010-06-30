@@ -1,6 +1,49 @@
 {% extends 'backups/base.html' %}
 
 {% block content %}
+	<script language="javascript">
+		$(function() {
+			firstRule = $($("#rules ul li")[0]);
+			function removeRule(rule) {
+				num_forms = parseInt($("#id_form-TOTAL_FORMS").val());
+				$("#id_form-TOTAL_FORMS").val(num_forms-1);
+				rule.remove();
+				if (num_forms == 1)
+				{
+					$("#rules ul").append("<li><div class='field-wrapper clearfix'>(do not repeat)</div></li>");
+				}
+				return false;
+			}
+			
+			function addRemovalClick() {
+				$("#rules .remove-rule").click(function() { return removeRule($(this).parent().parent()); });
+			}
+			
+			$("#new-rule").click(function() {
+				num_forms = parseInt($("#id_form-TOTAL_FORMS").val());
+				$("#id_form-TOTAL_FORMS").val(num_forms+1);
+				if (num_forms == 0)
+				{
+					$("#rules ul").html("");
+				}
+				next = firstRule.clone();
+				select = next.find("select");
+				interval = $(select[0]);
+				frequency = $(select[1]);
+				s = "form-"+(num_forms)+"-interval";
+				interval.attr("name", s);
+				interval.attr("id", "id_"+s);
+				s = "form-"+(num_forms)+"-frequency";
+				frequency.attr("name", s);
+				frequency.attr("id", "id_"+s);
+				next.appendTo("#rules ul");
+				addRemovalClick();
+				return false;
+			});
+			
+			addRemovalClick();
+		});
+	</script>
 	<div class="container">
 		<section class="span-18">
 			<h1>Create a Backup</h1>
@@ -36,35 +79,31 @@
 					{% for field in schedule_form %}
 						{% if field.is_hidden %}
 							{{ field }}
-						{% else %}
-							<div class="field-wrapper clearfix">
-								{{ field.label_tag }}<br />
-								<div class="field">{{ field }}</div>
-								<div class="field-errors">	
-									{% if field.errors %}
-										<span class="error">{{ field.errors.0 }}</span>
-									{% endif %}
-								</div>
-							</div>
 						{% endif %}
 					{% endfor %}
+					<div class="field-wrapper clearfix">
+						Run on &nbsp;{{ schedule_form.start_date }} &nbsp;at &nbsp;{{ schedule_form.start_time }} &nbsp;and then repeat every:
+					</div>
 					{{ rule_formset.management_form }}
+					<div id="rules">
 					{% for form in rule_formset.forms %}
 						{% for field in form %}
 							{% if field.is_hidden %}
 								{{ field }}
-							{% else %}
-								<div class="field-wrapper clearfix">
-									{{ field.label_tag }}<br />
-									<div class="field">{{ field }}</div>
-									<div class="field-errors">	
-										{% if field.errors %}
-											<span class="error">{{ field.errors.0 }}</span>
-										{% endif %}
-									</div>
-								</div>
 							{% endif %}
 						{% endfor %}
+						<ul class="formset-list">
+							<li>
+								<div class="field-wrapper clearfix">
+									{{ form.interval }} &nbsp;{{ form.frequency }}
+									<a class="remove-rule" title="Remove recurrence" href="#">(remove)</a>
+								</div>
+							</li>
+						</ul>
+					</div>
+					<ul class="formset-list">
+						<li><a id="new-rule" title="Add another recurrence" href="#">add another</a></li>
+					</ul>
 					{% endfor %}
 					<input type="submit" value="Create Backup" /> or <a href="{% url backups_backup_list %}">Cancel and go back</a>
 				</form>

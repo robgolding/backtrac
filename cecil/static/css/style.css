@@ -270,6 +270,18 @@ form.standard-form input[type=submit] {
 	margin-top: 1em;
 }
 
+form.standard-form ul.formset-list {
+	list-display: none;
+	margin: 0;
+	padding: 0;
+}
+
+form.standard-form ul.formset-list li {
+	list-style: none;
+	margin: 0 0 0 15px;;
+	padding: 0;
+}
+
 /* Sections */
 
 section {
@@ -327,7 +339,7 @@ table.backup_list tbody tr.inactive a:visited {
 	color: #6193e4!important;
 }
 
- /* Footer */
+/* Footer */
 
 body>footer {
 	border-top: 1px solid #aaa;
