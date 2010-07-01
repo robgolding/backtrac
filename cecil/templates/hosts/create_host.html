@@ -1,0 +1,41 @@
+{% extends 'hosts/base.html' %}
+
+{% block content %}
+	<div class="container">
+		<section class="span-18">
+			<h1>Add a Client</h1>
+			<div class="content clearfix">
+				<form action="" method="post" class="standard-form">{% csrf_token %}
+					<h2>Client Details</h2>
+					{% for error in form.non_field_errors %}
+						<p class="error">{{ error }}</p>
+					{% endfor %}
+					{% for field in form %}
+						{% if field.is_hidden %}
+							{{ field }}
+						{% else %}
+							<div class="field-wrapper clearfix">
+								{{ field.label_tag }}<br />
+								<div class="field">{{ field }}</div>
+								<div class="field-errors">	
+									{% if field.errors %}
+										<span class="error">{{ field.errors.0 }}</span>
+									{% endif %}
+								</div>
+							</div>
+						{% endif %}
+					{% endfor %}
+					<input type="submit" value="Add Client" /> or <a href="{% url hosts_host_list %}">Cancel and go back</a>
+				</form>
+			</div>
+		</section>
+		<section class="span-6 last">
+			<h1>Help</h1>
+			<div class="content">
+				<p>
+					Some tips here...
+				</p>
+			</div>
+		</section>
+	</div>
+{% endblock %}
