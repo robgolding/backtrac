@@ -2,38 +2,6 @@
 
 {% block content %}
 	<script language="javascript">
-		function addRule() {
-			num_forms = parseInt($("#id_form-TOTAL_FORMS").val());
-			$("#id_form-TOTAL_FORMS").val(num_forms+1);
-			rule = $('<li><div class="field-wrapper clearfix"><select name="form-'+num_forms+'-interval" id="id_form-'+num_forms+'-interval"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option></select>&nbsp; <select name="form-'+num_forms+'-frequency" id="id_form-'+num_forms+'-frequency"><option value="" selected="selected">---------</option><option value="YEARLY">Years</option><option value="MONTHLY">Months</option><option value="WEEKLY">Weeks</option><option value="DAILY">Days</option><option value="HOURLY">Hours</option><option value="MINUTELY">Minutes</option></select>&nbsp; <a class="remove-rule" title="Remove recurrence" href="#">(remove)</a></div></li>');
-			rule.appendTo("#rules ul");
-		}
-		/*
-		$(function() {
-			firstRule = $($("#rules ul li")[0]);
-			function removeRule(rule) {
-				num_forms = parseInt($("#id_form-TOTAL_FORMS").val());
-				$("#id_form-TOTAL_FORMS").val(num_forms-1);
-				rule.remove();
-				if (num_forms == 1)
-				{
-					$("#rules ul").append("<li><div class='field-wrapper clearfix'>(do not repeat)</div></li>");
-				}
-				return false;
-			}
-			
-			function addRemovalClick() {
-				$("#rules .remove-rule").click(function() { return removeRule($(this).parent().parent()); });
-			}
-			
-			$("#new-rule").click(function() {
-				addRule();
-				return false;
-			});
-			
-			addRemovalClick();
-		});
-		*/
 		$(function() {
 			$("ul.formset-list li").formset();
 		});
