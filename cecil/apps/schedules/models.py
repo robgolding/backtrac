@@ -2,6 +2,7 @@ import datetime
 from dateutil import rrule
 
 from django.db import models
+from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext, ugettext_lazy as _
 
 import managers
@@ -14,6 +15,8 @@ FREQUENCY_CHOICES = (
 	('HOURLY', _('Hours')),
 	('MINUTELY', _('Minutes'))
 )
+
+DEFAULT_FREQUENCY = rrule.MONTHLY
 
 class Schedule(models.Model):
 	"""
@@ -49,9 +52,12 @@ class Rule(models.Model):
 	schedule = models.ForeignKey(Schedule, related_name='rules')
 	
 	def get_rrule_object(self):
-		frequency = eval('rrule.%s' % self.frequency)
+		try:
+			frequency = eval('rrule.%s' % self.frequency)
+		except:
+			frequency = DEFAULT_FREQUENCY
 		return rrule.rrule(frequency, interval=self.interval,
-						dtstart=self.schedule.get_start_datetime())
+					dtstart=self.schedule.get_start_datetime())
 	
 	def get_next_occurrence(self):
 		return self.get_rrule_object().after(datetime.datetime.now())
