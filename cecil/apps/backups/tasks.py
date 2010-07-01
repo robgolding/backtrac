@@ -16,8 +16,6 @@ def resubmit_backup(backup, clear_old_task=True):
 	
 	r = execute_backup.apply_async(args=[backup.id], eta=next)
 	
-	print 'submitting backup %s to run at %s' % (backup, next)
-	
 	return (backup.task_id, next)
 
 @task()
