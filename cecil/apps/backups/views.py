@@ -1,5 +1,4 @@
 from django.http import HttpResponseRedirect
-from django.core.urlresolvers import reverse
 from django.shortcuts import render_to_response
 from django.template.context import RequestContext
 
@@ -29,6 +28,6 @@ def create_backup(request, template_name='backups/create_backup.html'):
 	data = {
 		'backup_form': backup_form,
 		'schedule_form': schedule_form,
-		'rule_formset': rule_formset
+		'rule_formset': rule_formset,
 	}
 	return render_to_response(template_name, data, context_instance=RequestContext(request))
