@@ -109,8 +109,6 @@ class SelectTimeWidget(Widget):
         if self.twelve_hr and self.meridiem_val:
             if self.meridiem_val.lower().startswith('p') and hour_val > 12 and hour_val < 24:
                 hour_val = hour_val % 12
-        elif hour_val == 0:
-            hour_val = 12
             
         output = []
         if 'id' in self.attrs:
@@ -199,3 +197,4 @@ class RuleForm(forms.ModelForm):
 		exclude = ['schedule']
 
 RuleFormSet = formset_factory(RuleForm, formset=BaseFormSet, extra=1)
+UpdateRuleFormSet = formset_factory(RuleForm, formset=BaseFormSet, extra=0)

@@ -15,6 +15,8 @@ urlpatterns = patterns('',
 							'queryset': Backup.objects.all()},
 							name='backups_backup_detail'),
 	
+	url(r'^(?P<backup_id>\d+)/update/$', views.update_backup, name='backups_update_backup'),
+	
 	url(r'^create/$', views.create_backup, name='backups_create_backup'),
 	
 )

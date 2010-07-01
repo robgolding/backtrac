@@ -9,7 +9,7 @@
 					<table class="backup_list">
 						<thead>
 							<tr>
-								<th>Name</th><th>Client</th><th>Status</th>
+								<th>Name</th><th>Client</th><th>Status</th><th>Actions</th>
 							</tr>
 						</thead>
 						<tbody>
@@ -18,6 +18,7 @@
 								<td><a href="{{ backup.get_absolute_url }}">{{ backup.name }}</a></td>
 								<td><a href="{{ backup.client.get_absolute_url }}">{{ backup.client.hostname }}</a></td>
 								<td>{{ backup.get_status|capfirst }}</td>
+								<td><a href="{% url backups_update_backup backup.id %}" title="Update backup"><img src="{{ STATIC_URL}}/img/icons/16x16/edit_item.png" /></a><img src="{{ STATIC_URL}}/img/icons/16x16/delete_item.png" /></td>
 							</tr>
 						{% endfor %}
 						</tbody>
