@@ -2,6 +2,13 @@
 
 {% block content %}
 	<script language="javascript">
+		function addRule() {
+			num_forms = parseInt($("#id_form-TOTAL_FORMS").val());
+			$("#id_form-TOTAL_FORMS").val(num_forms+1);
+			rule = $('<li><div class="field-wrapper clearfix"><select name="form-'+num_forms+'-interval" id="id_form-'+num_forms+'-interval"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option></select>&nbsp; <select name="form-'+num_forms+'-frequency" id="id_form-'+num_forms+'-frequency"><option value="" selected="selected">---------</option><option value="YEARLY">Years</option><option value="MONTHLY">Months</option><option value="WEEKLY">Weeks</option><option value="DAILY">Days</option><option value="HOURLY">Hours</option><option value="MINUTELY">Minutes</option></select>&nbsp; <a class="remove-rule" title="Remove recurrence" href="#">(remove)</a></div></li>');
+			rule.appendTo("#rules ul");
+		}
+		/*
 		$(function() {
 			firstRule = $($("#rules ul li")[0]);
 			function removeRule(rule) {
@@ -20,28 +27,15 @@
 			}
 			
 			$("#new-rule").click(function() {
-				num_forms = parseInt($("#id_form-TOTAL_FORMS").val());
-				$("#id_form-TOTAL_FORMS").val(num_forms+1);
-				if (num_forms == 0)
-				{
-					$("#rules ul").html("");
-				}
-				next = firstRule.clone();
-				select = next.find("select");
-				interval = $(select[0]);
-				frequency = $(select[1]);
-				s = "form-"+(num_forms)+"-interval";
-				interval.attr("name", s);
-				interval.attr("id", "id_"+s);
-				s = "form-"+(num_forms)+"-frequency";
-				frequency.attr("name", s);
-				frequency.attr("id", "id_"+s);
-				next.appendTo("#rules ul");
-				addRemovalClick();
+				addRule();
 				return false;
 			});
 			
 			addRemovalClick();
+		});
+		*/
+		$(function() {
+			$("ul.formset-list li").formset();
 		});
 	</script>
 	<div class="container">
@@ -85,26 +79,33 @@
 						Run on &nbsp;{{ schedule_form.start_date }} &nbsp;at &nbsp;{{ schedule_form.start_time }} &nbsp;and then repeat every:
 					</div>
 					{{ rule_formset.management_form }}
-					<div id="rules">
-					{% for form in rule_formset.forms %}
-						{% for field in form %}
-							{% if field.is_hidden %}
-								{{ field }}
-							{% endif %}
-						{% endfor %}
+					<div class="field-wrapper clearfix" id="rules">
 						<ul class="formset-list">
-							<li>
-								<div class="field-wrapper clearfix">
-									{{ form.interval }} &nbsp;{{ form.frequency }}
-									<a class="remove-rule" title="Remove recurrence" href="#">(remove)</a>
-								</div>
-							</li>
+							{% for form in rule_formset.forms %}
+								{% for field in form %}
+									{% if field.is_hidden %}
+										{{ field }}
+									{% endif %}
+								{% endfor %}
+								<li>
+									
+										{{ form.interval }}&nbsp;
+										{% if form.interval.errors %}
+											<span class="error">
+											({{ form.interval.errors.0 }})
+											</span>&nbsp;
+										{% endif %}
+										{{ form.frequency }}&nbsp;
+										{% if form.frequency.errors %}
+											<span class="error">
+											({{ form.frequency.errors.0 }})
+											</span>&nbsp;
+										{% endif %}
+										
+								</li>
+							{% endfor %}
 						</ul>
 					</div>
-					<ul class="formset-list">
-						<li><a id="new-rule" title="Add another recurrence" href="#">add another</a></li>
-					</ul>
-					{% endfor %}
 					<input type="submit" value="Create Backup" /> or <a href="{% url backups_backup_list %}">Cancel and go back</a>
 				</form>
 			</div>
