@@ -77,6 +77,7 @@ MIDDLEWARE_CLASSES = (
 	'django.middleware.csrf.CsrfViewMiddleware',
 	'django.contrib.auth.middleware.AuthenticationMiddleware',
 	'django.contrib.messages.middleware.MessageMiddleware',
+	'cecil.apps.core.middleware.RequireLoginMiddleware',
 )
 
 ROOT_URLCONF = 'cecil.urls'

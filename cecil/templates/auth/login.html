@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block content %}
+	<div class="container">
+    	<section class="span-16" style="margin-left: 160px;">
+    		<h1>Login</h1>
+    		<div class="content">
+    			<p>Welcome to the Backtrac Backup System. Please enter your credentials below to login.</p>
+    			<hr />
+				<form action="" method="post" class="standard-form">{% csrf_token %}
+					<input type="hidden" name="next" value="{% url index %}" />
+					{% for field in form %}
+						{% if field.is_hidden %}
+							{{field}}
+						{% else %}
+							<p>
+								{{ field.label_tag }}<br>
+								{{ field }}
+							</p>
+						{% endif %}
+					{% endfor %}
+					<hr />
+					<p><input type="submit" value="Login" /> or <a href="{% url index %}">Cancel and go back</a></p>
+				</form>
+			</div>
+    	</section>
+    </div>
+{% endblock %}

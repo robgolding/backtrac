@@ -23,19 +23,14 @@
 							{% if user.is_superuser %}
 								<li><a href="{% url admin:index %}">Admin</a></li>
 							{% endif %}
-							<li><a href="">Logout</a></li>
-						</ul>
-					</div>
-				{% else %}
-					<div id="non-auth-box" class="menu">
-						<ul>
-							<li><a href="">Login</a></li>
+							<li><a href="{% url auth_logout %}">Logout</a></li>
 						</ul>
 					</div>
 				{% endif %}
 			</header>
 		</div><!-- end #masthead_wrap -->
 		<div id="nav-bar" class="clearfix">
+			{% if user.is_authenticated %}
 			<div id="nav-primary">
 				<ul>
 					<li class="dashboard"><a href="{% url dashboard %}">Dashboard</a></li>
@@ -43,6 +38,7 @@
 					<li class="clients"><a href="{% url hosts_host_list %}">Clients</a></li>
 				</ul>
 			</div>
+			{% endif %}
 		</div>
 		<div id="main">
 		{% block messages %}

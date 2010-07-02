@@ -166,6 +166,7 @@ code { font-family: 'Courier New', Courier, monospace; color: #333; font-size: 0
 	position: relative;
 	background-color: #7fba49;
 	overflow: hidden;
+	height: 47px;
 }
 
 #nav-primary {
@@ -185,6 +186,7 @@ code { font-family: 'Courier New', Courier, monospace; color: #333; font-size: 0
 	float: left;
 	margin: 0;
 	padding: 15px 0 0 0;
+	height: 32px;
 }
 
 #nav-primary ul li a {
