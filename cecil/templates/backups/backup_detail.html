@@ -10,6 +10,7 @@
 					<strong>Client:</strong> <a href="{{ object.client.get_absolute_url }}">{{ object.client.hostname }}</a><br />
 					<strong>Status:</strong> {{ object.get_status|capfirst }}<br />
 					<strong>Next run:</strong> {% if object.active %}{{ object.schedule.get_next_occurrence }}{% else %}N/A{% endif %}<br />
+					<strong>Recur:</strong> {% for rule in object.schedule.rules.all %}{{ rule }}{% if not forloop.last %}, {% endif %}{% endfor %}
 				</p>
 				<hr />
 				<h2>Recent Events</h2>
@@ -21,16 +22,14 @@
 		<section class="span-6 last">
 			<h1>Actions</h1>
 			<div class="content menu clearfix">
-				<p>
-					<ul>
-						<li>
-							<a href="{% url backups_update_backup object.id %}" title="Update backup">Update backup</a>
-						</li>
-						<li>
-							<a href="" title="Delete backup">Delete backup</a>
-						</li>
-					</ul>
-				</p>
+				<ul>
+					<li>
+						<a href="{% url backups_update_backup object.id %}" title="Update backup">Update backup</a>
+					</li>
+					<li>
+						<a href="" title="Delete backup">Delete backup</a>
+					</li>
+				</ul>
 			</div>
 		</section>
 	</div>

@@ -345,6 +345,10 @@ table.backup_list tbody tr.inactive a:visited {
 	color: #6193e4!important;
 }
 
+table.backup_list tbody td.actions {
+	width: 50px;
+}
+
 /* Footer */
 
 body>footer {

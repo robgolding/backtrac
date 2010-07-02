@@ -15,10 +15,10 @@
 						<tbody>
 						{% for backup in object_list %}
 							<tr class="{% cycle 'odd' 'even' %}{% if not backup.active %} inactive{% endif %}">
-								<td><a href="{{ backup.get_absolute_url }}">{{ backup.name }}</a></td>
-								<td><a href="{{ backup.client.get_absolute_url }}">{{ backup.client.hostname }}</a></td>
-								<td>{{ backup.get_status|capfirst }}</td>
-								<td><a href="{% url backups_update_backup backup.id %}" title="Update backup"><img src="{{ STATIC_URL}}/img/icons/16x16/edit_item.png" /></a><img src="{{ STATIC_URL}}/img/icons/16x16/delete_item.png" /></td>
+								<td class="name"><a href="{{ backup.get_absolute_url }}">{{ backup.name }}</a></td>
+								<td class="client"><a href="{{ backup.client.get_absolute_url }}">{{ backup.client.hostname }}</a></td>
+								<td class="status">{{ backup.get_status|capfirst }}</td>
+								<td class="actions"><a href="{% url backups_update_backup backup.id %}" title="Update backup"><img src="{{ STATIC_URL}}/img/icons/16x16/edit_item.png" /></a><img src="{{ STATIC_URL}}/img/icons/16x16/delete_item.png" /></td>
 							</tr>
 						{% endfor %}
 						</tbody>

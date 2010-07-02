@@ -63,9 +63,6 @@ class Rule(models.Model):
 		return self.get_rrule_object().after(datetime.datetime.now())
 	
 	def __unicode__(self):
-		s = '%(frequency)s, starting %(start)s'
-		if self.interval > 1:
-			s = s + '%(interval)d-'
+		s = 'Every %(interval)d %(frequency)s'
 		return s % {'frequency': self.get_frequency_display(),
-					'start': self.schedule.start_date,
 					'interval': self.interval}
