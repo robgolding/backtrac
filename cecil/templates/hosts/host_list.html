@@ -9,14 +9,15 @@
 					<table class="backup_list">
 						<thead>
 							<tr>
-								<th>Name</th><th>Status</th>
+								<th>Name</th><th>Status</th><th>Actions</th>
 							</tr>
 						</thead>
 						<tbody>
 						{% for client in object_list %}
 							<tr>
-								<td><a href="{{ client.get_absolute_url }}">{{ client.hostname }}</a></td>
-								<td></td>
+								<td class="name"><a href="{{ client.get_absolute_url }}">{{ client.hostname }}</a></td>
+								<td class="status"></td>
+								<td class="actions"><a href="{% url hosts_update_host client.id %}" title="Update client"><img src="{{ STATIC_URL}}/img/icons/16x16/edit_item.png" /></a><img src="{{ STATIC_URL}}/img/icons/16x16/delete_item.png" /></td>
 							</tr>
 						{% endfor %}
 						</tbody>

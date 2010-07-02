@@ -15,6 +15,8 @@ urlpatterns = patterns('',
 							'queryset': Host.objects.all()},
 							name='hosts_host_detail'),
 	
+	url(r'^(?P<host_id>\d+)/update/$', views.update_host, name='hosts_update_host'),
+	
 	url(r'^create/$', views.create_host, name='hosts_create_host'),
 	
 )

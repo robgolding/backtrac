@@ -34,10 +34,15 @@
 		</section>
 		<section class="span-6 last">
 			<h1>Actions</h1>
-			<div class="content">
-				<p>
-					Actions for this host...
-				</p>
+			<div class="content menu clearfix">
+				<ul>
+					<li>
+						<a href="{% url hosts_update_host object.id %}" title="Update client">Update client</a>
+					</li>
+					<li>
+						<a href="" title="Delete client">Delete client</a>
+					</li>
+				</ul>
 			</div>
 		</section>
 	</div>
