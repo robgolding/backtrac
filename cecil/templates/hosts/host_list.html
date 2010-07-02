@@ -17,7 +17,7 @@
 							<tr>
 								<td class="name"><a href="{{ client.get_absolute_url }}">{{ client.hostname }}</a></td>
 								<td class="status"></td>
-								<td class="actions"><a href="{% url hosts_update_host client.id %}" title="Update client"><img src="{{ STATIC_URL}}/img/icons/16x16/edit_item.png" /></a><img src="{{ STATIC_URL}}/img/icons/16x16/delete_item.png" /></td>
+								<td class="actions"><a href="{% url hosts_update_host client.id %}" title="Update client"><img src="{{ STATIC_URL}}/img/icons/edit_16.png" /></a> <img src="{{ STATIC_URL}}/img/icons/cancel_16.png" /></td>
 							</tr>
 						{% endfor %}
 						</tbody>
