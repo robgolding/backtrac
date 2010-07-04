@@ -1,4 +1,5 @@
 from django.http import HttpResponseRedirect
+from django.core.urlresolvers import reverse
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template.context import RequestContext
 
@@ -65,3 +66,19 @@ def update_backup(request, backup_id, template_name='backups/backup_form.html'):
 		'rule_formset': rule_formset,
 	}
 	return render_to_response(template_name, data, context_instance=RequestContext(request))
+
+def pause_backup(self, backup_id, next=None):
+	backup = get_object_or_404(Backup, pk=backup_id)
+	backup.active = False
+	backup.save()
+	if next is None:
+		next = reverse('backups_backup_list')
+	return HttpResponseRedirect(next)
+
+def resume_backup(self, backup_id, next=None):
+	backup = get_object_or_404(Backup, pk=backup_id)
+	backup.active = True
+	backup.save()
+	if next is None:
+		next = reverse('backups_backup_list')
+	return HttpResponseRedirect(next)

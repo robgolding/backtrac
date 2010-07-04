@@ -18,7 +18,21 @@
 								<td class="name"><a href="{{ backup.get_absolute_url }}">{{ backup.name }}</a></td>
 								<td class="client"><a href="{{ backup.client.get_absolute_url }}">{{ backup.client.hostname }}</a></td>
 								<td class="status">{{ backup.get_status|capfirst }}</td>
-								<td class="actions"><a href="{% url backups_update_backup backup.id %}" title="Update backup"><img src="{{ STATIC_URL}}/img/icons/edit_16.png" /></a> <img src="{{ STATIC_URL}}/img/icons/cancel_16.png" /></td>
+								<td class="actions">
+									<a href="{% url backups_update_backup backup.id %}" title="Update backup">
+										<img src="{{ STATIC_URL}}/img/icons/edit_16.png" />
+									</a>
+									<img src="{{ STATIC_URL}}/img/icons/cancel_16.png" />
+									{% if backup.active %}
+										<a href="{% url backups_pause_backup backup.id %}" title="Pause backup">
+											<img src="{{ STATIC_URL}}/img/icons/controls_pause_16.png" />
+										</a>
+									{% else %}
+										<a href="{% url backups_resume_backup backup.id %}" title="Resume backup">
+											<img src="{{ STATIC_URL}}/img/icons/controls_play_16.png" />
+										</a>
+									{% endif %}
+								</td>
 							</tr>
 						{% endfor %}
 						</tbody>

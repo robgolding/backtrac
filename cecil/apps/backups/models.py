@@ -20,7 +20,7 @@ class Backup(models.Model):
 	"""
 	name = models.CharField(max_length=200, unique=True)
 	client = models.ForeignKey(Host, related_name='backups')
-	active = models.BooleanField(default=True)
+	active = models.BooleanField(default=True, editable=False)
 	schedule = models.ForeignKey(Schedule, related_name='backups')
 	task_id = models.CharField(max_length=36, null=True, editable=False)
 	
@@ -41,7 +41,7 @@ class Backup(models.Model):
 	
 	def get_status(self):
 		if not self.active:
-			return 'inactive'
+			return 'paused'
 		elif self.is_running():
 			return 'running'
 		else:

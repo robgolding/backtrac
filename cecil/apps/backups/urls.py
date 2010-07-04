@@ -17,6 +17,10 @@ urlpatterns = patterns('',
 	
 	url(r'^(?P<backup_id>\d+)/update/$', views.update_backup, name='backups_update_backup'),
 	
+	url(r'^(?P<backup_id>\d+)/pause/$', views.pause_backup, name='backups_pause_backup'),
+	
+	url(r'^(?P<backup_id>\d+)/resume/$', views.resume_backup, name='backups_resume_backup'),
+	
 	url(r'^create/$', views.create_backup, name='backups_create_backup'),
 	
 )
