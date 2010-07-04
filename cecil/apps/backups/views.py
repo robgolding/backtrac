@@ -2,6 +2,7 @@ from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template.context import RequestContext
+from django.contrib import messages
 
 from models import Backup
 from forms import BackupForm
@@ -21,6 +22,7 @@ def create_backup(request, template_name='backups/backup_form.html'):
 			backup = backup_form.save(commit=False)
 			backup.schedule = schedule
 			backup.save()
+			messages.success(request, 'Backup created successfully.')
 			return HttpResponseRedirect(backup.get_absolute_url())
 	else:
 		backup_form = BackupForm()
@@ -51,6 +53,7 @@ def update_backup(request, backup_id, template_name='backups/backup_form.html'):
 			backup = backup_form.save(commit=False)
 			backup.schedule = schedule
 			backup.save()
+			messages.success(request, 'Backup updated successfully.')
 			return HttpResponseRedirect(backup.get_absolute_url())
 	else:
 		backup_form = BackupForm(instance=backup)

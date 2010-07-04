@@ -1,6 +1,7 @@
 from django.http import HttpResponseRedirect
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template.context import RequestContext
+from django.contrib import messages
 
 from models import Host
 from forms import HostForm
@@ -10,6 +11,7 @@ def create_host(request, template_name='hosts/host_form.html'):
 		form = HostForm(request.POST)
 		if form.is_valid():
 			host = form.save()
+			messages.success(request, 'Host added successfully.')
 			return HttpResponseRedirect(host.get_absolute_url())
 	else:
 		form = HostForm()
@@ -25,6 +27,7 @@ def update_host(request, host_id, template_name='hosts/host_form.html'):
 		form = HostForm(request.POST, instance=host)
 		if form.is_valid():
 			host = form.save()
+			messages.success(request, 'Host updated successfully.')
 			return HttpResponseRedirect(host.get_absolute_url())
 	else:
 		form = HostForm(instance=host)
