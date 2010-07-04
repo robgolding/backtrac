@@ -32,6 +32,9 @@ class Schedule(models.Model):
 		return datetime.datetime.combine(self.start_date, self.start_time)
 	
 	def get_next_occurrence(self):
+		first = self.get_start_datetime()
+		if first > datetime.datetime.now():
+			return first
 		occs = sorted([r.get_next_occurrence() for r in self.rules.all()])
 		return occs[0] if occs else None
 	
