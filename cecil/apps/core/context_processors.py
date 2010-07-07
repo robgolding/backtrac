@@ -1,4 +1,5 @@
-from settings import STATIC_URL
+from django.conf import settings
 
 def static_url(request):
-    return {'STATIC_URL': STATIC_URL}
+    url = getattr(settings, 'STATIC_URL', '/media/')
+    return {'STATIC_URL': url}

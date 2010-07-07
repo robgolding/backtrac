@@ -109,7 +109,7 @@ INSTALLED_APPS = (
 	'django.contrib.contenttypes',
 	
 	# 3rd party apps
-	'celery',
+	'djcelery',
 	
 	# cecil apps
 	'cecil.apps.core',
