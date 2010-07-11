@@ -7,6 +7,7 @@ class RequireLoginMiddleware(object):
 	EXCLUDED_URLS = (
 		'/accounts/login/',
 		'/__debug__/',
+		'/api/',
 		settings.STATIC_URL,
 	)
 
@@ -16,4 +17,4 @@ class RequireLoginMiddleware(object):
 				if request.POST:
 					return login(request)
 				else:
-					return HttpResponseRedirect('%s?next=%s' % (self.login_url, request.path))
+					return HttpResponseRedirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
