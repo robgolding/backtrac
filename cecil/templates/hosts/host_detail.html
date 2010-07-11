@@ -5,6 +5,11 @@
 		<section class="span-18">
 			<h1>{{ object.hostname }}</h1>
 			<div class="content clearfix">
+				<h2>Details</h2>
+				<p>
+					<strong>Secret key:</strong> <code>{{ object.secret_key }}</code>
+				</p>
+				
 				<h2>Backups</h2>
 				{% if object.backups.all %}
 					<table class="backup_list">
