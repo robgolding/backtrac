@@ -22,6 +22,8 @@ urlpatterns = patterns('',
 	
 	(r'^clients/', include('cecil.apps.hosts.urls')),
 	
+	(r'^api/', include('cecil.api.urls')),
+	
 )
 
 from django.conf import settings
