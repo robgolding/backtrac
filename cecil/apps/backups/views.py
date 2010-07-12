@@ -89,7 +89,7 @@ def update_backup(request, backup_id, template_name='backups/backup_form.html'):
 	}
 	return render_to_response(template_name, data, context_instance=RequestContext(request))
 
-def pause_backup(self, backup_id, next=None):
+def pause_backup(request, backup_id, next=None):
 	backup = get_object_or_404(Backup, pk=backup_id)
 	backup.active = False
 	backup.save()
@@ -97,10 +97,20 @@ def pause_backup(self, backup_id, next=None):
 		next = reverse('backups_backup_list')
 	return HttpResponseRedirect(next)
 
-def resume_backup(self, backup_id, next=None):
+def resume_backup(request, backup_id, next=None):
 	backup = get_object_or_404(Backup, pk=backup_id)
 	backup.active = True
 	backup.save()
 	if next is None:
 		next = reverse('backups_backup_list')
 	return HttpResponseRedirect(next)
+
+def delete_backup(request, backup_id, template_name='backups/delete_backup.html', next=None):
+	backup = get_object_or_404(Backup, pk=backup_id)
+	if request.method == 'POST':
+		if request.POST.get('confirm', False):
+			backup.delete()
+			messages.success(request, "Backup deleted successfully.")
+			return HttpResponseRedirect(reverse('backups_backup_list'))
+	data = { 'backup': backup }
+	return render_to_response(template_name, data, context_instance=RequestContext(request))

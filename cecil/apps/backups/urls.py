@@ -21,6 +21,8 @@ urlpatterns = patterns('',
 	
 	url(r'^(?P<backup_id>\d+)/resume/$', views.resume_backup, name='backups_resume_backup'),
 	
+	url(r'^(?P<backup_id>\d+)/delete/$', views.delete_backup, name='backups_delete_backup'),
+	
 	url(r'^create/$', views.create_backup, name='backups_create_backup'),
 	
 )

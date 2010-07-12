@@ -22,7 +22,9 @@
 									<a href="{% url backups_update_backup backup.id %}" title="Update backup">
 										<img src="{{ STATIC_URL}}/img/icons/edit_16.png" />
 									</a>
-									<img src="{{ STATIC_URL}}/img/icons/cancel_16.png" />
+									<a href="{% url backups_delete_backup backup.id %}" title="Delete backup">
+										<img src="{{ STATIC_URL}}/img/icons/cancel_16.png" />
+									</a>
 									{% if backup.active %}
 										<a href="{% url backups_pause_backup backup.id %}" title="Pause backup">
 											<img src="{{ STATIC_URL}}/img/icons/controls_pause_16.png" />
