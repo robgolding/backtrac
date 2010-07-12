@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from models import Backup, BackupEvent
+from models import Backup, Event, Job
 
 class BackupAdmin(admin.ModelAdmin):
 	list_display = ('id', 'name', 'client', 'get_status', 'active',)
@@ -8,4 +8,5 @@ class BackupAdmin(admin.ModelAdmin):
 	list_filter = ('active',)
 
 admin.site.register(Backup, BackupAdmin)
-admin.site.register(BackupEvent)
+admin.site.register(Event)
+admin.site.register(Job)

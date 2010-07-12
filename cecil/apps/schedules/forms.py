@@ -3,8 +3,7 @@ import re, datetime
 from django import forms
 from django.forms.widgets import Widget, Select, MultiWidget
 from django.forms.extras.widgets import SelectDateWidget
-from django.forms.formsets import formset_factory
-from django.forms.formsets import BaseFormSet
+from django.forms.formsets import BaseFormSet, formset_factory
 from django.forms.extras.widgets import SelectDateWidget
 
 from django.utils.safestring import mark_safe

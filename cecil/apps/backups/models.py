@@ -6,10 +6,11 @@ from cecil.apps.hosts.models import Host
 
 import tasks
 
-BACKUP_EVENT_TYPE_CHOICES = (
-	('started', 'Backup started'),
-	('finished', 'Backup finished'),
-	('error', 'Backup error'),
+EVENT_TYPE_CHOICES = (
+	('pending', 'Pending'),
+	('started', 'Started'),
+	('finished', 'Finished'),
+	('error', 'Error'),
 )
 
 class Backup(models.Model):
@@ -36,7 +37,13 @@ class Backup(models.Model):
 	def is_running(self):
 		try:
 			return self.events.latest().type == 'started'
-		except BackupEvent.DoesNotExist:
+		except Event.DoesNotExist:
+			return False
+	
+	def is_pending(self):
+		try:
+			return self.events.latest().type == 'pending'
+		except Event.DoesNotExist:
 			return False
 	
 	def get_status(self):
@@ -44,23 +51,28 @@ class Backup(models.Model):
 			return 'paused'
 		elif self.is_running():
 			return 'running'
+		elif self.is_pending():
+			return 'pending'
 		else:
 			return 'idle'
 	get_status.short_description = 'Status'
 	
+	def next_run(self):
+		return self.schedule.get_next_occurrence()
+	
 	def __unicode__(self):
 		return self.name
 
-class BackupPath(models.Model):
-	backup = models.ForeignKey(Backup, related_name='paths')
+class Job(models.Model):
+	backup = models.ForeignKey(Backup, related_name='jobs')
 	path = models.CharField(max_length=255)
 	
 	def __unicode__(self):
 		return self.path
 
-class BackupEvent(models.Model):
+class Event(models.Model):
 	backup = models.ForeignKey(Backup, related_name='events')
-	type = models.CharField(max_length=20, choices=BACKUP_EVENT_TYPE_CHOICES)
+	type = models.CharField(max_length=20, choices=EVENT_TYPE_CHOICES)
 	occured_at = models.DateTimeField(auto_now_add=True)
 	
 	def __unicode__(self):

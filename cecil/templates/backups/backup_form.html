@@ -3,7 +3,14 @@
 {% block content %}
 	<script language="javascript">
 		$(function() {
-			$("ul.formset-list li").formset();
+			$("#rules ul.formset-list li").formset({
+				prefix: '{{ rule_formset.prefix }}',
+				formCssClass: 'rules-dynamic-form'
+			});
+			$("#jobs ul.formset-list li").formset({
+				prefix: '{{ job_formset.prefix }}',
+				formCssClass: 'jobs-dynamic-form'
+			});
 		});
 	</script>
 	<div class="container">
@@ -69,6 +76,31 @@
 											<span class="error">
 											({{ form.frequency.errors.0 }})
 											</span>&nbsp;
+										{% endif %}
+										
+								</li>
+							{% endfor %}
+						</ul>
+					</div>
+					<hr />
+					<h2>Job Details</h2>
+					<p>Backup the following paths:</p>
+					{{ job_formset.management_form }}
+					<div class="field-wrapper clearfix" id="jobs">
+						<ul class="formset-list">
+							{% for form in job_formset.forms %}
+								{% for field in form %}
+									{% if field.is_hidden %}
+										{{ field }}
+									{% endif %}
+								{% endfor %}
+								<li>
+									
+										{{ form.path }}&nbsp;
+										{% if form.path.errors %}
+											<span class="error">
+											({{ form.path.errors.0 }})
+											</span>
 										{% endif %}
 										
 								</li>

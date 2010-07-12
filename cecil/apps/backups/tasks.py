@@ -21,7 +21,7 @@ def resubmit_backup(backup, clear_old_task=True):
 @task()
 def execute_backup(backup_id, **kwargs):
 	Backup = get_model('backups', 'Backup')
-	BackupEvent = get_model('backups', 'BackupEvent')
+	Event = get_model('backups', 'Event')
 	
 	logger = execute_backup.get_logger(**kwargs)
 	backup = Backup.objects.get(id=backup_id)
@@ -29,7 +29,7 @@ def execute_backup(backup_id, **kwargs):
 	_, next_run = resubmit_backup(backup)
 	logger.warning("Submitted backup '%s' to run at %s" % (backup, next_run))
 	
-	BackupEvent.objects.create(type='started', backup=backup)
+	Event.objects.create(type='started', backup=backup)
 	logger.warning("Added 'started' event to database")
 	
 	logger.warning("Executing backup %d" % backup.id)

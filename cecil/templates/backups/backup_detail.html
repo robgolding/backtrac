@@ -3,14 +3,15 @@
 {% block content %}
 	<div class="container">
 		<section class="span-18">
-			<h1>{{ object.name }}<a href="{% url backups_backup_list %}" class="header-button" title="Back to backups list">&larr; Back</a></h1>
+			<h1><a href="">{{ object.name }}</a><a href="{% url backups_backup_list %}" class="header-button" title="Back to backups list">&larr; Back</a></h1>
 			<div class="content clearfix">
 				<h2>Details</h2>
 				<p>
 					<strong>Client:</strong> <a href="{{ object.client.get_absolute_url }}">{{ object.client.hostname }}</a><br />
 					<strong>Status:</strong> {{ object.get_status|capfirst }}<br />
 					<strong>Next run:</strong> {% if object.active %}{{ object.schedule.get_next_occurrence }}{% else %}N/A{% endif %}<br />
-					<strong>Recur:</strong> {% for rule in object.schedule.rules.all %}{{ rule }}{% if not forloop.last %}, {% endif %}{% endfor %}
+					<strong>Recur:</strong> {% for rule in object.schedule.rules.all %}{{ rule }}{% if not forloop.last %}, {% endif %}{% endfor %}<br />
+					<strong>Locations:</strong> <ul>{% for job in object.jobs.all %}<li>{{ job.path }}</li>{% endfor %}</ul>
 				</p>
 				<hr />
 				<h2>Recent Events</h2>
