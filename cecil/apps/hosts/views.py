@@ -1,4 +1,5 @@
 from django.http import HttpResponseRedirect
+from django.core.urlresolvers import reverse
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template.context import RequestContext
 from django.contrib import messages
@@ -36,4 +37,14 @@ def update_host(request, host_id, template_name='hosts/host_form.html'):
 		'host': host,
 		'form': form,
 	}
+	return render_to_response(template_name, data, context_instance=RequestContext(request))
+
+def delete_host(request, host_id, template_name='hosts/delete_host.html', next=None):
+	host = get_object_or_404(Host, pk=host_id)
+	if request.method == 'POST':
+		if request.POST.get('confirm', False):
+			host.delete()
+			messages.success(request, "Host deleted successfully.")
+			return HttpResponseRedirect(reverse('hosts_host_list'))
+	data = { 'host': host }
 	return render_to_response(template_name, data, context_instance=RequestContext(request))

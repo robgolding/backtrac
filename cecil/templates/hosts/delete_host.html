@@ -1,0 +1,35 @@
+{% extends 'backups/base.html' %}
+
+{% block content %}
+	<div class="container">
+		<section class="span-18">
+			<h1>Delete Client<a href="{{ host.get_absolute_url }}" class="header-button" title="Back to '{{ host.hostname }}'">&larr; Back</a></h1>
+			<div class="content clearfix">
+				<p>Are you sure you wish to delete <strong>{{ host.hostname }}</strong>?</p>
+				{% if host.backups.all %}
+				<p>
+					Please note that this will also delete the following backups:
+					<ul>
+						{% for backup in host.backups.all %}
+						<li>{{ backup.name }}</li>
+						{% endfor %}
+					</ul>
+				</p>
+				{% endif %}
+				<form method="POST">{% csrf_token %}
+					<input type="hidden" name="confirm" value="true" />
+					<button type="submit" class="button negative">Yes, I'm sure</button>
+				</form>
+				<form method="GET" action="{{ host.get_absolute_url }}">
+					<button type="submit" class="button">No, take me back</button>
+				</form>
+			</div>
+		</section>
+		<section class="span-6 last">
+			<h1>Actions</h1>
+			<div class="content menu clearfix">
+				
+			</div>
+		</section>
+	</div>
+{% endblock %}

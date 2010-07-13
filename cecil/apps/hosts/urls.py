@@ -17,6 +17,8 @@ urlpatterns = patterns('',
 	
 	url(r'^(?P<host_id>\d+)/update/$', views.update_host, name='hosts_update_host'),
 	
+	url(r'^(?P<host_id>\d+)/delete/$', views.delete_host, name='hosts_delete_host'),
+	
 	url(r'^create/$', views.create_host, name='hosts_create_host'),
 	
 )
