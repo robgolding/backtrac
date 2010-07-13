@@ -107,7 +107,10 @@
 							{% endfor %}
 						</ul>
 					</div>
-					<input type="submit" value="{% if backup %}Update Backup{% else %}Create Backup{% endif %}" /> or <a href="{% if backup %}{{ backup.get_absolute_url }}{% else %}{% url backups_backup_list %}{% endif %}">Cancel and go back</a>
+					<button type="submit" class="button">{% if backup %}Update Backup{% else %}Create Backup{% endif %}</button>
+				</form>
+				<form method="GET" action="{% if backup %}{{ backup.get_absolute_url }}{% else %}{% url backups_backup_list %}{% endif %}">
+					 <button type="submit" class="button negative">Cancel</button>
 				</form>
 			</div>
 		</section>
