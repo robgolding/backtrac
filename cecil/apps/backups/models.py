@@ -6,13 +6,6 @@ from cecil.apps.hosts.models import Host
 
 import tasks
 
-EVENT_TYPE_CHOICES = (
-	('pending', 'Pending'),
-	('started', 'Started'),
-	('finished', 'Finished'),
-	('error', 'Error'),
-)
-
 class Backup(models.Model):
 	"""
 	Model to represent a backup task, which can be either active or inactive.
@@ -36,14 +29,8 @@ class Backup(models.Model):
 	
 	def is_running(self):
 		try:
-			return self.events.latest().type == 'started'
-		except Event.DoesNotExist:
-			return False
-	
-	def is_pending(self):
-		try:
-			return self.events.latest().type == 'pending'
-		except Event.DoesNotExist:
+			return not self.runs.latest().is_finished()
+		except Run.DoesNotExist:
 			return False
 	
 	def get_status(self):
@@ -51,8 +38,6 @@ class Backup(models.Model):
 			return 'paused'
 		elif self.is_running():
 			return 'running'
-		elif self.is_pending():
-			return 'pending'
 		else:
 			return 'idle'
 	get_status.short_description = 'Status'
@@ -70,16 +55,21 @@ class Job(models.Model):
 	def __unicode__(self):
 		return self.path
 
-class Event(models.Model):
-	backup = models.ForeignKey(Backup, related_name='events')
-	type = models.CharField(max_length=20, choices=EVENT_TYPE_CHOICES)
-	occured_at = models.DateTimeField(auto_now_add=True)
+class Run(models.Model):
+	backup = models.ForeignKey(Backup, related_name='runs')
+	successful = models.BooleanField()
+	started_at = models.DateTimeField(auto_now_add=True)
+	finished_at = models.DateTimeField(auto_now=True)
 	
 	def __unicode__(self):
-		return '%s: %s' % (self.get_type_display(), self.backup)
+		return '%s (%s)' % (self.backup.name, self.started_at)
+	
+	def is_finished(self):
+		return self.finished_at is None
 	
 	class Meta:
-		get_latest_by = 'occured_at'
+		get_latest_by = 'started_at'
+	
 
 def resubmit_backup(sender, instance, **kwargs):
 	if sender == Schedule:
