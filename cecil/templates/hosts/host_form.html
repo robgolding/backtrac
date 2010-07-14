@@ -4,7 +4,7 @@
 	<div class="container">
 		<section class="span-18">
 			<h1>{% if host %}{{ host.hostname }}{% else %}Add a Client{% endif %}
-			<a href="{% if host %}{{ host.get_absolute_url }}{% else %}{% url hosts_host_list %}{% endif %}" class="header-button" title="{% if host %}Back to '{{ host.hostname }}'{% else %}Back to host list{% endif %}">&larr; Back</a></h1>
+			<a class="header-button" href="{{ back_link}}" title="Back">&larr; Back</a></h1>
 			<div class="content clearfix">
 				<form action="" method="post" class="standard-form">{% csrf_token %}
 					<h2>Client Details</h2>

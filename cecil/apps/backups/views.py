@@ -41,6 +41,7 @@ def create_backup(request, template_name='backups/backup_form.html'):
 		'schedule_form': schedule_form,
 		'rule_formset': rule_formset,
 		'job_formset': job_formset,
+		'back_link': reverse('backups_backup_list'),
 	}
 	return render_to_response(template_name, data, context_instance=RequestContext(request))
 

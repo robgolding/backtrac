@@ -19,6 +19,7 @@ def create_host(request, template_name='hosts/host_form.html'):
 	
 	data = {
 		'form': form,
+		'back_link': reverse('hosts_host_list'),
 	}
 	return render_to_response(template_name, data, context_instance=RequestContext(request))
 
