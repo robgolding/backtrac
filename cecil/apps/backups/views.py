@@ -101,7 +101,12 @@ def pause_backup(request, backup_id, next=None):
 	backup.active = False
 	backup.save()
 	if next is None:
-		next = reverse('backups_backup_list')
+		referrer = request.META['HTTP_REFERER'].strip(' ?')
+		if referrer.endswith(backup.get_absolute_url()):
+			next = backup.get_absolute_url()
+		else:
+			next = reverse('backups_backup_list')
+	messages.success(request, 'Backup updated successfully.')
 	return HttpResponseRedirect(next)
 
 def resume_backup(request, backup_id, next=None):
@@ -109,7 +114,12 @@ def resume_backup(request, backup_id, next=None):
 	backup.active = True
 	backup.save()
 	if next is None:
-		next = reverse('backups_backup_list')
+		referrer = request.META['HTTP_REFERER'].strip(' ?')
+		if referrer.endswith(backup.get_absolute_url()):
+			next = backup.get_absolute_url()
+		else:
+			next = reverse('backups_backup_list')
+	messages.success(request, 'Backup updated successfully.')
 	return HttpResponseRedirect(next)
 
 def delete_backup(request, backup_id, template_name='backups/delete_backup.html'):

@@ -5,14 +5,34 @@
 		<section class="span-18">
 			<h1><a href="">{{ object.name }}</a><a href="{% url backups_backup_list %}" class="header-button" title="Back to backups list">&larr; Back</a></h1>
 			<div class="content clearfix">
-				<h2>Details</h2>
-				<p>
-					<strong>Client:</strong> <a href="{{ object.client.get_absolute_url }}">{{ object.client.hostname }}</a><br />
-					<strong>Status:</strong> {{ object.get_status|capfirst }}<br />
-					<strong>Next run:</strong> {% if object.active %}{{ object.schedule.get_next_occurrence }}{% else %}N/A{% endif %}<br />
-					<strong>Recur:</strong> {% for rule in object.schedule.rules.all %}{{ rule }}{% if not forloop.last %}, {% endif %}{% endfor %}<br />
-					<strong>Locations:</strong> <ul>{% for job in object.jobs.all %}<li>{{ job.path }}</li>{% endfor %}</ul>
-				</p>
+				<h2>Summary</h2>
+				<div class="backup-summary">
+					<dl class="clearfix">
+						<dt>Description:</dt>
+						<dd>{{ object.name }}</dd>
+						
+						<dt>Client:</dt>
+						<dd><a href="{{ object.client.get_absolute_url }}">{{ object.client.hostname }}</a></dd>
+						
+						<dt>Status:</dt>
+						<dd>{{ object.get_status|capfirst }}</dd>
+						
+						<dt>Next run:</dt>
+						<dd>{{ object.next_run }}</dd>
+					</dl>
+					<div class="actions">
+						<span>Actions:</span>
+						<ul class="backup-actions">
+							<li class="update"><a href="{% url backups_update_backup object.id %}" title="Update backup">Update</a></li>
+							<li class="delete"><a href="{% url backups_delete_backup object.id %}" title="Delete backup">Delete</a></li>
+							{% if object.active %}
+								<li class="pause"><a href="{% url backups_pause_backup object.id %}" title="Pause backup">Pause</a></li>
+							{% else %}
+								<li class="resume"><a href="{% url backups_resume_backup object.id %}" title="Resume backup">Resume</a></li>
+							{% endif %}
+						</ul>
+					</div>
+				</div>
 				<hr />
 				<h2>Recent Events</h2>
 				<p>
@@ -21,16 +41,9 @@
 			</div>
 		</section>
 		<section class="span-6 last">
-			<h1>Actions</h1>
+			<h1>Help</h1>
 			<div class="content menu clearfix">
-				<ul>
-					<li>
-						<a href="{% url backups_update_backup object.id %}" title="Update backup">Update backup</a>
-					</li>
-					<li>
-						<a href="{% url backups_delete_backup object.id %}" title="Delete backup">Delete backup</a>
-					</li>
-				</ul>
+				<p>Possibly help or something else here...</p>
 			</div>
 		</section>
 	</div>

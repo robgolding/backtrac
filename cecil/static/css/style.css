@@ -351,6 +351,82 @@ table.backup_list tbody td.actions {
 	width: 70px;
 }
 
+.backup-summary {
+	float: left;
+	background: url("../img/icons/backup_32.png") no-repeat 0 4px;
+	padding-left: 50px;
+	width: 100%;
+	min-height: 40px;
+	margin-bottom: 20px;
+}
+
+.backup-summary dl {
+	margin: 0;
+	padding: 0;
+}
+
+.backup-summary dl dt {
+	clear: left;
+	float: left;
+	color: #888;
+	width: 100px;
+	text-align: right;
+	font-weight: normal;
+	margin-bottom: 10px;
+}
+
+.backup-summary dl dd {
+	float: left;
+	margin-left: 10px;
+}
+
+.backup-summary div.actions {
+	clear: left;
+	margin: 10px 0 0 -50px;
+}
+
+.backup-summary div.actions span {
+	display: block;
+	float: left;
+}
+
+ul.backup-actions {
+	float: left;
+	list-style: none;
+	padding: 0;
+	margin: 0 10px;
+}
+
+ul.backup-actions li {
+	display: inline;
+}
+
+ul.backup-actions li a	{
+	height: 0;
+	padding-top: 16px;
+	overflow: hidden;
+	float: left;
+	width: 16px;
+	border: 0;
+	margin-right: 10px;
+}
+
+ul.backup-actions li.update a {
+	background-image: url("../img/icons/edit_16.png");
+}
+
+ul.backup-actions li.delete a {
+	background-image: url("../img/icons/cancel_16.png");
+}
+
+ul.backup-actions li.pause a {
+	background-image: url("../img/icons/controls_pause_16.png");
+}
+
+ul.backup-actions li.resume a {
+	background-image: url("../img/icons/controls_play_16.png");
+}
+
 /* Footer */
 
 body>footer {
