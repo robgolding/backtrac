@@ -230,6 +230,11 @@ h1 a.header-button {
 	line-height: 1.3em;
 }
 
+button[type] {
+  padding: 4px 10px 6px 7px;   /* Firefox */
+  line-height: 20px;           /* Safari */
+}
+
 /* Forms */
 
 form.standard-form label {

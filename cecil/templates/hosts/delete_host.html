@@ -18,17 +18,11 @@
 				{% endif %}
 				<form method="POST">{% csrf_token %}
 					<input type="hidden" name="confirm" value="true" />
-					<button type="submit" class="button negative">Yes, I'm sure</button>
+					<button type="submit" class="button positive"><img src="{{ STATIC_URL }}css/blueprint/plugins/buttons/icons/tick.png" />Yes, delete it</button>
 				</form>
 				<form method="GET" action="{{ back_link }}">
-					<button type="submit" class="button">No, take me back</button>
+					<button type="submit" class="button negative"><img src="{{ STATIC_URL }}css/blueprint/plugins/buttons/icons/cross.png" />No, take me back</button>
 				</form>
-			</div>
-		</section>
-		<section class="span-6 last">
-			<h1>Actions</h1>
-			<div class="content menu clearfix">
-				
 			</div>
 		</section>
 	</div>
