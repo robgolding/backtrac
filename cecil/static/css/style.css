@@ -232,6 +232,7 @@ h1 a.header-button {
 
 a.button {
 	padding:5px 10px 6px 7px;
+	color:#565656 !important;
 }
 
 a.button:hover {
