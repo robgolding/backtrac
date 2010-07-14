@@ -210,6 +210,18 @@ body#clients #nav-primary ul li.clients a {
 	background-color: #eee;
 }
 
+/* Messages */
+
+div.message {
+	position: relative;
+}
+
+div.message img {
+	position: absolute;
+	right: 15px;
+	top: 17px;
+}
+
 /* Buttons & Links */
 
 h1 a.header-button {
