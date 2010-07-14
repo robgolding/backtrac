@@ -5,14 +5,26 @@
 		<section class="span-18">
 			<h1>{{ object.hostname }}</h1>
 			<div class="content clearfix">
-				<h2>Details</h2>
-				<p>
-					<strong>Secret key:</strong> <code>{{ object.secret_key }}</code>
-				</p>
-				
+				<h2>Summary</h2>
+				<div class="object-summary host-summary">
+					<dl class="clearfix">
+						<dt>Description:</dt>
+						<dd>{{ object.hostname }}</dd>
+						
+						<dt>Secret key:</dt>
+						<dd><code>{{ object.secret_key }}</code></dd>
+					</dl>
+					<div class="actions">
+						<span>Actions:</span>
+						<ul class="actions">
+							<li class="update"><a href="{% url hosts_update_host object.id %}" title="Update client">Update</a></li>
+							<li class="delete"><a href="{% url hosts_delete_host object.id %}" title="Delete client">Delete</a></li>
+						</ul>
+					</div>
+				</div>
 				<h2>Backups</h2>
 				{% if object.backups.all %}
-					<table class="backup_list">
+					<table class="object_list">
 						<thead>
 							<tr>
 								<th>Name</th><th>Status</th>

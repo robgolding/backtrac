@@ -3,10 +3,10 @@
 {% block content %}
 	<div class="container">
 		<section class="span-18">
-			<h1><a href="">{{ object.name }}</a><a href="{% url backups_backup_list %}" class="header-button" title="Back to backups list">&larr; Back</a></h1>
+			<h1><a href="">{{ object.name }}</a></h1>
 			<div class="content clearfix">
 				<h2>Summary</h2>
-				<div class="backup-summary">
+				<div class="object-summary backup-summary">
 					<dl class="clearfix">
 						<dt>Description:</dt>
 						<dd>{{ object.name }}</dd>
@@ -22,7 +22,7 @@
 					</dl>
 					<div class="actions">
 						<span>Actions:</span>
-						<ul class="backup-actions">
+						<ul class="actions">
 							<li class="update"><a href="{% url backups_update_backup object.id %}" title="Update backup">Update</a></li>
 							<li class="delete"><a href="{% url backups_delete_backup object.id %}" title="Delete backup">Delete</a></li>
 							{% if object.active %}

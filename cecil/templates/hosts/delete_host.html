@@ -3,7 +3,7 @@
 {% block content %}
 	<div class="container">
 		<section class="span-18">
-			<h1>Delete Client<a href="{{ host.get_absolute_url }}" class="header-button" title="Back to '{{ host.hostname }}'">&larr; Back</a></h1>
+			<h1>Delete Client</h1>
 			<div class="content clearfix">
 				<p>Are you sure you wish to delete <strong>{{ host.hostname }}</strong>?</p>
 				{% if host.backups.all %}

@@ -3,7 +3,7 @@
 {% block content %}
 	<div class="container">
 		<section class="span-18">
-			<h1>Delete Backup<a href="{{ backup.get_absolute_url }}" class="header-button" title="Back to '{{ object.name }}'">&larr; Back</a></h1>
+			<h1>Delete Backup</h1>
 			<div class="content clearfix">
 				<p>Are you sure you wish to delete <strong>{{ backup.name }}</strong>?</p>
 				<form method="POST">{% csrf_token %}

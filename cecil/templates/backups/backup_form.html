@@ -15,8 +15,7 @@
 	</script>
 	<div class="container">
 		<section class="span-18">
-			<h1>{% if backup %}{{ backup.name }}{% else %}Create a Backup{% endif %}
-			<a class="header-button" href="{{ back_link }}" title="Back">&larr; Back</a></h1>
+			<h1>{% if backup %}{{ backup.name }}{% else %}Create a Backup{% endif %}</h1>
 			<div class="content clearfix">
 				<form action="" method="post" class="standard-form">{% csrf_token %}
 					<h2>Backup Details</h2>

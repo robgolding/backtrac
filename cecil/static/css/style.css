@@ -332,7 +332,7 @@ section div.content {
 
 /* Backups */
 
-table.backup_list thead th {
+table.object_list thead th {
 	background: none;
 	border-bottom: 2px #3f7a09 solid;
 	color: #3f7a09;
@@ -342,47 +342,45 @@ table.backup_list thead th {
 	font-family: Helvetica, sans-serif;
 }
 
-table.backup_list tbody td {
+table.object_list tbody td {
 	padding: 10px 20px;
 	font-size: 15px;
 	border-bottom: 1px solid #bbb;
 	color: #444444;
 }
 
-table.backup_list tbody tr.even td {
-	/*background: #cfd9c3;*/
+table.object_list tbody tr.even td {
 	background: none;
 }
 
-table.backup_list tbody tr.inactive td {
+table.object_list tbody tr.inactive td {
 	background: #eee;
 	color: #aaa;
 }
 
-table.backup_list tbody tr.inactive a:link,
-table.backup_list tbody tr.inactive a:visited {
+table.object_list tbody tr.inactive a:link,
+table.object_list tbody tr.inactive a:visited {
 	color: #6193e4!important;
 }
 
-table.backup_list tbody td.actions {
+table.object_list tbody td.actions {
 	width: 70px;
 }
 
-.backup-summary {
+.object-summary {
 	float: left;
-	background: url("../img/icons/backup_32.png") no-repeat 0 4px;
 	padding-left: 50px;
 	width: 100%;
 	min-height: 40px;
 	margin-bottom: 20px;
 }
 
-.backup-summary dl {
+.object-summary dl {
 	margin: 0;
 	padding: 0;
 }
 
-.backup-summary dl dt {
+.object-summary dl dt {
 	clear: left;
 	float: left;
 	color: #888;
@@ -392,33 +390,33 @@ table.backup_list tbody td.actions {
 	margin-bottom: 10px;
 }
 
-.backup-summary dl dd {
+.object-summary dl dd {
 	float: left;
 	margin-left: 10px;
 }
 
-.backup-summary div.actions {
+.object-summary div.actions {
 	clear: left;
 	margin: 10px 0 0 -50px;
 }
 
-.backup-summary div.actions span {
+.object-summary div.actions span {
 	display: block;
 	float: left;
 }
 
-ul.backup-actions {
+ul.actions {
 	float: left;
 	list-style: none;
 	padding: 0;
 	margin: 0 10px;
 }
 
-ul.backup-actions li {
+ul.actions li {
 	display: inline;
 }
 
-ul.backup-actions li a	{
+ul.actions li a	{
 	height: 0;
 	padding-top: 16px;
 	overflow: hidden;
@@ -428,20 +426,29 @@ ul.backup-actions li a	{
 	margin-right: 10px;
 }
 
-ul.backup-actions li.update a {
+ul.actions li.update a {
 	background-image: url("../img/icons/edit_16.png");
 }
 
-ul.backup-actions li.delete a {
+ul.actions li.delete a {
 	background-image: url("../img/icons/cancel_16.png");
 }
 
-ul.backup-actions li.pause a {
+ul.actions li.pause a {
 	background-image: url("../img/icons/controls_pause_16.png");
 }
 
-ul.backup-actions li.resume a {
+ul.actions li.resume a {
 	background-image: url("../img/icons/controls_play_16.png");
+}
+
+
+.backup-summary {
+	background: url("../img/icons/backup_32.png") no-repeat 0 4px;
+}
+
+.host-summary {
+	background: url("../img/icons/server_32.png") no-repeat 0 4px;
 }
 
 /* Footer */
