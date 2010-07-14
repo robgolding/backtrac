@@ -230,9 +230,23 @@ h1 a.header-button {
 	line-height: 1.3em;
 }
 
+a.button {
+	padding:5px 10px 6px 7px;
+}
+
+a.button:hover {
+	text-decoration: none !important;
+}
+
 button[type] {
-  padding: 4px 10px 6px 7px;   /* Firefox */
-  line-height: 20px;           /* Safari */
+  padding: 4px 10px 6px 7px;
+  line-height: 20px;
+}
+
+p.buttons a.button, p.buttons button {
+	float: right;
+	margin-left: 10px;
+	margin-right: 0;
 }
 
 /* Forms */

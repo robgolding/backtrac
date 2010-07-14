@@ -3,7 +3,7 @@
 {% block content %}
 	<div class="container">
 		<section class="span-18">
-			<h1>Backups<a href="{% url backups_create_backup %}" class="header-button" title="Add a backup">Create a new backup &rarr;</a></h1>
+			<h1>Backups</h1>
 			<div class="content">
 				{% if object_list %}
 					<table class="object_list">
@@ -42,6 +42,12 @@
 				{% else %}
 					<p>There are no backups at present.</p>
 				{% endif %}
+				<p class="buttons">
+					<a class="button" href="{% url backups_create_backup %}">
+						<img src="{{ STATIC_URL }}img/icons/famfamfam/add.png" />
+						Create a backup
+					</a>
+				</p>
 			</div>
 		</section>
 		<section class="span-6 last">

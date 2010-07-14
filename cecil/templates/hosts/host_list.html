@@ -3,7 +3,7 @@
 {% block content %}
 	<div class="container">
 		<section class="span-18">
-			<h1>Clients<a href="{% url hosts_create_host %}" class="header-button" title="Add a client">Add a new client &rarr;</a></h1>
+			<h1>Clients</h1>
 			<div class="content">
 				{% if object_list %}
 					<table class="object_list">
@@ -31,6 +31,12 @@
 				{% else %}
 					<p>There are no clients at present.</p>
 				{% endif %}
+				<p class="buttons">
+					<a class="button" href="{% url hosts_create_host %}">
+						<img src="{{ STATIC_URL }}img/icons/famfamfam/add.png" />
+						Add a client
+					</a>
+				</p>
 			</div>
 		</section>
 		<section class="span-6 last">
