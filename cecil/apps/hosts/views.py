@@ -24,6 +24,7 @@ def create_host(request, template_name='hosts/host_form.html'):
 
 def update_host(request, host_id, template_name='hosts/host_form.html'):
 	host = get_object_or_404(Host, pk=host_id)
+	referrer = request.META['HTTP_REFERER'].strip(' ?')
 	if request.method == 'POST':
 		form = HostForm(request.POST, instance=host)
 		if form.is_valid():
@@ -33,18 +34,31 @@ def update_host(request, host_id, template_name='hosts/host_form.html'):
 	else:
 		form = HostForm(instance=host)
 	
+	if referrer.endswith(host.get_absolute_url()):
+		back_link = host.get_absolute_url()
+	else:
+		back_link = reverse('hosts_host_list')
+	
 	data = {
 		'host': host,
 		'form': form,
+		'back_link': back_link,
 	}
 	return render_to_response(template_name, data, context_instance=RequestContext(request))
 
 def delete_host(request, host_id, template_name='hosts/delete_host.html', next=None):
 	host = get_object_or_404(Host, pk=host_id)
+	referrer = request.META['HTTP_REFERER'].strip(' ?')
 	if request.method == 'POST':
 		if request.POST.get('confirm', False):
 			host.delete()
 			messages.success(request, "Host deleted successfully.")
 			return HttpResponseRedirect(reverse('hosts_host_list'))
-	data = { 'host': host }
+	
+	if referrer.endswith(host.get_absolute_url()):
+		back_link = host.get_absolute_url()
+	else:
+		back_link = reverse('hosts_host_list')
+	
+	data = { 'host': host, 'back_link': back_link }
 	return render_to_response(template_name, data, context_instance=RequestContext(request))

@@ -109,7 +109,7 @@
 					</div>
 					<button type="submit" class="button">{% if backup %}Update Backup{% else %}Create Backup{% endif %}</button>
 				</form>
-				<form method="GET" action="{% if backup %}{{ backup.get_absolute_url }}{% else %}{% url backups_backup_list %}{% endif %}">
+				<form method="GET" action="{{ back_link }}">
 					 <button type="submit" class="button negative">Cancel</button>
 				</form>
 			</div>

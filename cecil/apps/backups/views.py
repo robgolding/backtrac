@@ -46,6 +46,7 @@ def create_backup(request, template_name='backups/backup_form.html'):
 
 def update_backup(request, backup_id, template_name='backups/backup_form.html'):
 	backup = get_object_or_404(Backup, pk=backup_id)
+	referrer = request.META['HTTP_REFERER'].strip(' ?')
 	schedule = backup.schedule
 	if request.method == 'POST':
 		backup_form = BackupForm(request.POST, instance=backup)
@@ -80,12 +81,18 @@ def update_backup(request, backup_id, template_name='backups/backup_form.html'):
 		rule_formset = UpdateRuleFormSet(initial=rules_data, prefix='rules')
 		job_formset = UpdateJobFormSet(initial=jobs_data, prefix='jobs')
 	
+	if referrer.endswith(backup.get_absolute_url()):
+		back_link = backup.get_absolute_url()
+	else:
+		back_link = reverse('backups_backup_list')
+	
 	data = {
 		'backup': backup,
 		'backup_form': backup_form,
 		'schedule_form': schedule_form,
 		'rule_formset': rule_formset,
 		'job_formset': job_formset,
+		'back_link': back_link,
 	}
 	return render_to_response(template_name, data, context_instance=RequestContext(request))
 
@@ -105,12 +112,19 @@ def resume_backup(request, backup_id, next=None):
 		next = reverse('backups_backup_list')
 	return HttpResponseRedirect(next)
 
-def delete_backup(request, backup_id, template_name='backups/delete_backup.html', next=None):
+def delete_backup(request, backup_id, template_name='backups/delete_backup.html'):
 	backup = get_object_or_404(Backup, pk=backup_id)
+	referrer = request.META['HTTP_REFERER'].strip(' ?')
 	if request.method == 'POST':
 		if request.POST.get('confirm', False):
 			backup.delete()
 			messages.success(request, "Backup deleted successfully.")
 			return HttpResponseRedirect(reverse('backups_backup_list'))
-	data = { 'backup': backup }
+	
+	if referrer.endswith(backup.get_absolute_url()):
+		back_link = backup.get_absolute_url()
+	else:
+		back_link = reverse('backups_backup_list')
+	
+	data = { 'backup': backup, 'back_link': back_link }
 	return render_to_response(template_name, data, context_instance=RequestContext(request))

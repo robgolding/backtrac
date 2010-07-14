@@ -28,7 +28,7 @@
 					{% endfor %}
 					<button type="submit" class="button">{% if host %}Update Client{% else %}Create client{% endif %}</button>
 				</form>
-				<form method="GET" action="{% if host %}{{ host.get_absolute_url }}{% else %}{% url hosts_host_list %}{% endif %}">
+				<form method="GET" action="{{ back_link }}">
 					 <button type="submit" class="button negative">Cancel</button>
 				</form>
 			</div>
