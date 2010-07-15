@@ -2,46 +2,52 @@
 
 {% block content %}
 	<div class="container">
-		<section class="span-18">
+		<section class="span-24">
 			<h1>Backups</h1>
 			<div class="content">
-				{% if object_list %}
-					<table class="object_list">
-						<thead>
-							<tr>
-								<th>Name</th><th>Client</th><th>Status</th><th>Actions</th>
-							</tr>
-						</thead>
-						<tbody>
-						{% for backup in object_list %}
-							<tr class="{% cycle 'odd' 'even' %}{% if not backup.active %} inactive{% endif %}">
-								<td class="name"><a href="{{ backup.get_absolute_url }}">{{ backup.name }}</a></td>
-								<td class="client"><a href="{{ backup.client.get_absolute_url }}">{{ backup.client.hostname }}</a></td>
-								<td class="status">{{ backup.get_status|capfirst }}</td>
-								<td class="actions">
-									<a href="{% url backups_update_backup backup.id %}" title="Update backup">
-										<img src="{{ STATIC_URL}}/img/icons/edit_16.png" />
-									</a>
-									<a href="{% url backups_delete_backup backup.id %}" title="Delete backup">
-										<img src="{{ STATIC_URL}}/img/icons/cancel_16.png" />
-									</a>
-									{% if backup.active %}
-										<a href="{% url backups_pause_backup backup.id %}" title="Pause backup">
-											<img src="{{ STATIC_URL}}/img/icons/controls_pause_16.png" />
+				<table class="object_list">
+					<thead>
+						<tr>
+							<th class="icon"></th><th>Name</th><th>Client</th><th>Status</th><th>Last Result</th><th>Actions</th>
+						</tr>
+					</thead>
+					<tbody>
+						{% if object_list %}
+							{% for backup in object_list %}
+								<tr class="{% cycle 'odd' 'even' %}{% if not backup.active %} inactive{% endif %}">
+									<td class="icon"><img src="{{ STATIC_URL }}img/icons/famfamfam/{% if backup.active %}{% if backup.is_running %}folder_go.png{% else %}{% if not backup.results.all or backup.results.latest.successful %}accept.png{% else %}exclamation.png{% endif %}{% endif %}{% else %}control_pause.png{% endif %}" /></td>
+									<td class="name"><a href="{{ backup.get_absolute_url }}">{{ backup.name }}</a></td>
+									<td class="client"><a href="{{ backup.client.get_absolute_url }}">{{ backup.client.hostname }}</a></td>
+									<td class="status">{{ backup.get_status|capfirst }}</td>
+									<td class="status">{{ backup.get_last_result_status|capfirst }}</td>
+									<td class="actions">
+										<a href="{% url backups_update_backup backup.id %}" title="Update backup">
+											<img src="{{ STATIC_URL}}/img/icons/edit_16.png" />
 										</a>
-									{% else %}
-										<a href="{% url backups_resume_backup backup.id %}" title="Resume backup">
-											<img src="{{ STATIC_URL}}/img/icons/controls_play_16.png" />
+										<a href="{% url backups_delete_backup backup.id %}" title="Delete backup">
+											<img src="{{ STATIC_URL}}/img/icons/cancel_16.png" />
 										</a>
-									{% endif %}
+										{% if backup.active %}
+											<a href="{% url backups_pause_backup backup.id %}" title="Pause backup">
+												<img src="{{ STATIC_URL}}/img/icons/controls_pause_16.png" />
+											</a>
+										{% else %}
+											<a href="{% url backups_resume_backup backup.id %}" title="Resume backup">
+												<img src="{{ STATIC_URL}}/img/icons/controls_play_16.png" />
+											</a>
+										{% endif %}
+									</td>
+								</tr>
+							{% endfor %}
+						{% else %}
+							<tr class="info">
+								<td colspan="6">
+									There are no backups at present. To create one, <a href="{% url backups_create_backup %}">click here</a> or use the button below.
 								</td>
 							</tr>
-						{% endfor %}
-						</tbody>
-					</table>
-				{% else %}
-					<p>There are no backups at present.</p>
-				{% endif %}
+						{% endif %}
+					</tbody>
+				</table>
 				<p class="buttons">
 					<a class="button" href="{% url backups_create_backup %}">
 						<img src="{{ STATIC_URL }}img/icons/famfamfam/add.png" />
@@ -50,13 +56,6 @@
 				</p>
 			</div>
 		</section>
-		<section class="span-6 last">
-			<h1>Filters</h1>
-			<div class="content">
-				<p>
-					Filters go here...
-				</p>
-			</div>
-		</section>
+		
 	</div>
 {% endblock %}

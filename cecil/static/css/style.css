@@ -94,6 +94,22 @@ code { font-family: 'Courier New', Courier, monospace; color: #333; font-size: 0
 
 /* General menu-type styles (lists, links etc.) */
 
+span.success {
+	background: none;
+	border: none;
+	margin: 0;
+	padding: 0;
+	color: green;
+}
+
+span.error {
+	background: none;
+	border: none;
+	margin: 0;
+	padding: 0;
+	color: red;
+}
+
 .menu ul {
 	list-display: none;
 	margin: 0;
@@ -295,13 +311,6 @@ form.standard-form div.field-wrapper div.field input[type=password] {
 	width: 300px;
 }
 
-form.standard-form div.field-wrapper span.error {
-	background: none;
-	border: none;
-	margin: 0;
-	padding: 0;
-}
-
 form.standard-form input[type=submit] {
 	margin-top: 1em;
 }
@@ -345,7 +354,7 @@ section div.content {
 	padding: 0 15px 15px;
 }
 
-/* Backups */
+/* Object Lists */
 
 table.object_list thead th {
 	background: none;
@@ -378,9 +387,30 @@ table.object_list tbody tr.inactive a:visited {
 	color: #6193e4!important;
 }
 
+table.object_list tbody th.icon {
+	width: 10px;
+}
+
+table.object_list tbody td.icon {
+	width: 10px;
+	padding-right: 0;
+	padding-left: 16px;
+}
+
 table.object_list tbody td.actions {
 	width: 70px;
 }
+
+table.object_list tbody tr.info td {
+	background-color: #E8F6FD;
+	border-bottom: 1px solid #B8F0FA;
+	font-style: italic;
+	color: #666;
+	text-align: center;
+	padding: 15px inherit;
+}
+
+/* Object Summary */
 
 .object-summary {
 	float: left;

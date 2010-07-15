@@ -29,8 +29,8 @@ class Backup(models.Model):
 	
 	def is_running(self):
 		try:
-			return not self.runs.latest().is_finished()
-		except Run.DoesNotExist:
+			return not self.results.latest().is_finished()
+		except Result.DoesNotExist:
 			return False
 	
 	def get_status(self):
@@ -41,6 +41,18 @@ class Backup(models.Model):
 		else:
 			return 'idle'
 	get_status.short_description = 'Status'
+	
+	def get_last_result_status(self):
+		if self.is_running():
+			results = self.results.exclude(pk=self.results.latest().pk)
+		else:
+			results = self.results.all()
+		if not results:
+			return 'N/A'
+		result = results.latest()
+		if result.successful:
+			return 'success'
+		return 'error'
 	
 	def next_run(self):
 		return self.schedule.get_next_occurrence()
@@ -55,17 +67,17 @@ class Job(models.Model):
 	def __unicode__(self):
 		return self.path
 
-class Run(models.Model):
-	backup = models.ForeignKey(Backup, related_name='runs')
+class Result(models.Model):
+	backup = models.ForeignKey(Backup, related_name='results')
 	successful = models.BooleanField()
 	started_at = models.DateTimeField(auto_now_add=True)
-	finished_at = models.DateTimeField(auto_now=True)
+	finished_at = models.DateTimeField(null=True, blank=True)
 	
 	def __unicode__(self):
 		return '%s (%s)' % (self.backup.name, self.started_at)
 	
 	def is_finished(self):
-		return self.finished_at is None
+		return self.finished_at is not None
 	
 	class Meta:
 		get_latest_by = 'started_at'
