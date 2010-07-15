@@ -1,6 +1,7 @@
 from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from django.shortcuts import render_to_response, get_object_or_404
+from django.db import transaction
 from django.template.context import RequestContext
 from django.contrib import messages
 
@@ -8,6 +9,7 @@ from models import Backup
 from forms import BackupForm, JobFormSet, UpdateJobFormSet
 from cecil.apps.schedules.forms import ScheduleForm, RuleFormSet, UpdateRuleFormSet
 
+@transaction.commit_on_success
 def create_backup(request, template_name='backups/backup_form.html'):
 	if request.method == 'POST':
 		backup_form = BackupForm(request.POST)
@@ -45,6 +47,7 @@ def create_backup(request, template_name='backups/backup_form.html'):
 	}
 	return render_to_response(template_name, data, context_instance=RequestContext(request))
 
+@transaction.commit_on_success
 def update_backup(request, backup_id, template_name='backups/backup_form.html'):
 	backup = get_object_or_404(Backup, pk=backup_id)
 	referrer = request.META['HTTP_REFERER'].strip(' ?')
