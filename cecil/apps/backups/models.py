@@ -80,6 +80,7 @@ class Job(models.Model):
 
 class Result(models.Model):
 	backup = models.ForeignKey(Backup, related_name='results')
+	client = models.ForeignKey(Host, related_name='results')
 	successful = models.BooleanField()
 	started_at = models.DateTimeField(auto_now_add=True)
 	finished_at = models.DateTimeField(null=True, blank=True)
