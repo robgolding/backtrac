@@ -8,15 +8,17 @@
 				<table class="object_list">
 					<thead>
 						<tr>
-							<th>Name</th><th>Status</th><th>Actions</th>
+							<th class="icon"></th><th>Name</th><th>Last Backup</th><th>Status</th><th>Actions</th>
 						</tr>
 					</thead>
 					<tbody>
 						{% if object_list %}
 							{% for client in object_list %}
 								<tr>
+									<td class="icon"><img src="{{ STATIC_URL }}img/icons/famfamfam/{% if client.is_backing_up %}folder_go.png{% else %}{% if client.get_last_completed_result and not client.get_last_completed_result.successful %}exclamation.png{% else %}accept.png{% endif %}{% endif %}" /></td>
 									<td class="name"><a href="{{ client.get_absolute_url }}">{{ client.hostname }}</a></td>
-									<td class="status"></td>
+									<td class="last_backup">{{ client.get_last_completed_result.started_at|default:'N/A' }}</td>
+									<td class="status">{{ client.get_status|capfirst }}</td>
 									<td class="actions">
 										<a href="{% url hosts_update_host client.id %}" title="Update client">
 											<img src="{{ STATIC_URL}}/img/icons/edit_16.png" />

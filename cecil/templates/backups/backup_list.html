@@ -14,7 +14,7 @@
 					<tbody>
 						{% if object_list %}
 							{% for backup in object_list %}
-								<tr class="{% cycle 'odd' 'even' %}{% if not backup.active %} inactive{% endif %}">
+								<tr class="{% if not backup.active %}inactive{% endif %}">
 									<td class="icon"><img src="{{ STATIC_URL }}img/icons/famfamfam/{% if backup.active %}{% if backup.is_running %}folder_go.png{% else %}{% if not backup.results.all or backup.results.latest.successful %}accept.png{% else %}exclamation.png{% endif %}{% endif %}{% else %}control_pause.png{% endif %}" /></td>
 									<td class="name"><a href="{{ backup.get_absolute_url }}">{{ backup.name }}</a></td>
 									<td class="client"><a href="{{ backup.client.get_absolute_url }}">{{ backup.client.hostname }}</a></td>
