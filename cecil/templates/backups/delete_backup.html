@@ -6,6 +6,7 @@
 			<h1>Delete Backup</h1>
 			<div class="content clearfix">
 				<p>Are you sure you wish to delete <strong>{{ backup.name }}</strong>?</p>
+				<p>All history associated with this backup will also be permanently removed.</p>
 				<form method="POST">{% csrf_token %}
 					<input type="hidden" name="confirm" value="true" />
 					<button type="submit" class="button positive"><img src="{{ STATIC_URL }}css/blueprint/plugins/buttons/icons/tick.png" />Yes, delete it</button>

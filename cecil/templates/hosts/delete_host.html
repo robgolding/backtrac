@@ -6,9 +6,10 @@
 			<h1>Delete Client</h1>
 			<div class="content clearfix">
 				<p>Are you sure you wish to delete <strong>{{ host.hostname }}</strong>?</p>
+				<p>All history associated with this client will also be permanently removed.</p>
 				{% if host.backups.all %}
 				<p>
-					Please note that this will also delete the following backups:
+					Please note that this will also delete the following backups, <strong>and all associated history</strong>:
 					<ul>
 						{% for backup in host.backups.all %}
 						<li>{{ backup.name }}</li>
