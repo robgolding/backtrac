@@ -433,11 +433,13 @@ table.object_list tbody tr.info td {
 	text-align: right;
 	font-weight: normal;
 	margin-bottom: 10px;
+	min-height: 1em;
 }
 
 .object-summary dl dd {
 	float: left;
 	margin-left: 10px;
+	max-width: 550px;
 }
 
 .object-summary div.actions {

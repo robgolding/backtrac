@@ -13,6 +13,34 @@
 						
 						<dt>Secret key:</dt>
 						<dd><code>{{ object.secret_key }}</code></dd>
+						
+						<dt>Status:</dt>
+						<dd>{{ object.get_status|capfirst }}</dd>
+						
+						<dt>Last backup:</dt>
+						{% with object.get_last_completed_result as r %}
+						<dd>
+							{% if r %}
+								<a href="{{ r.backup.get_absolute_url }}">{{ r.backup.name }}</a> <small>({{ r.started_at }})</small>
+							{% else %}
+								N/A
+							{% endif %}
+						</dd>
+						{% endwith %}
+						
+						<dt>Last result:</dt>
+						<dd><span class="{{ object.get_last_result_status }}">{{ object.get_last_result_status|capfirst }}</span></dd>
+						
+						<dt>Next backup:</dt>
+						{% with object.get_next_backup as b %}
+						<dd>
+							{% if b %}
+								<a href="{{ b.get_absolute_url }}">{{ b.name }}</a> <small>({{ b.next_run }})</small>
+							{% else %}
+								N/A
+							{% endif %}
+						</dd>
+						{% endwith %}
 					</dl>
 					<div class="actions">
 						<span>Actions:</span>
@@ -22,6 +50,7 @@
 						</ul>
 					</div>
 				</div>
+				<hr />
 				<h2>Backups</h2>
 				{% if object.backups.all %}
 					<table class="object_list">
@@ -42,7 +71,6 @@
 				{% else %}
 					<p>There are no backups for this client.</p>
 				{% endif %}
-				<hr />
 				<h2>Recent Events</h2>
 				<p>
 					A list of recent events...

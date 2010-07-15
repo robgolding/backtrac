@@ -17,11 +17,14 @@
 						<dt>Status:</dt>
 						<dd>{{ object.get_status|capfirst }}</dd>
 						
+						<dt>Last run:</dt>
+						<dd>{{ object.get_last_completed_result.started_at|default:'N/A' }}</dd>
+						
 						<dt>Last result:</dt>
 						<dd><span class="{{ object.get_last_result_status }}">{{ object.get_last_result_status|capfirst }}</span></dd>
 						
 						<dt>Next run:</dt>
-						<dd>{{ object.next_run }}</dd>
+						<dd>{{ object.next_run|default:'N/A' }}</dd>
 					</dl>
 					<div class="actions">
 						<span>Actions:</span>

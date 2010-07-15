@@ -4,6 +4,7 @@ from django.db.models.signals import post_save
 from cecil.apps.schedules.models import Schedule, Rule
 from cecil.apps.hosts.models import Host
 
+from managers import BackupManager
 import tasks
 
 class Backup(models.Model):
@@ -17,6 +18,8 @@ class Backup(models.Model):
 	active = models.BooleanField(default=True, editable=False)
 	schedule = models.ForeignKey(Schedule, related_name='backups')
 	task_id = models.CharField(max_length=36, null=True, editable=False)
+	
+	objects = BackupManager()
 	
 	def save(self, resubmit=True, *args, **kwargs):
 		super(Backup, self).save(*args, **kwargs)
@@ -42,6 +45,12 @@ class Backup(models.Model):
 			return 'idle'
 	get_status.short_description = 'Status'
 	
+	def get_last_completed_result(self):
+		try:
+			return self.results.filter(finished_at__isnull=False).latest()
+		except Result.DoesNotExist:
+			return None
+	
 	def get_last_result_status(self):
 		if self.is_running():
 			results = self.results.exclude(pk=self.results.latest().pk)
@@ -55,6 +64,8 @@ class Backup(models.Model):
 		return 'error'
 	
 	def next_run(self):
+		if not self.active:
+			return None
 		return self.schedule.get_next_occurrence()
 	
 	def __unicode__(self):
