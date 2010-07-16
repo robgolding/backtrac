@@ -5,11 +5,17 @@
 		$(function() {
 			$("#rules ul.formset-list li").formset({
 				prefix: '{{ rule_formset.prefix }}',
-				formCssClass: 'rules-dynamic-form'
+				formCssClass: 'rules-dynamic-form',
+				addCssClass: 'add-row button small',
+				addText: '<img src="{{ STATIC_URL }}img/icons/famfamfam/add.png" /> add another</a>',
+				deleteText: '<img src="{{ STATIC_URL }}img/icons/famfamfam/delete.png" />',
 			});
 			$("#jobs ul.formset-list li").formset({
 				prefix: '{{ job_formset.prefix }}',
-				formCssClass: 'jobs-dynamic-form'
+				formCssClass: 'jobs-dynamic-form',
+				addCssClass: 'add-row button small',
+				addText: '<img src="{{ STATIC_URL }}img/icons/famfamfam/add.png" /> add another</a>',
+				deleteText: '<img src="{{ STATIC_URL }}img/icons/famfamfam/delete.png" />',
 			});
 		});
 	</script>
@@ -63,20 +69,18 @@
 									{% endif %}
 								{% endfor %}
 								<li>
-									
-										{{ form.interval }}&nbsp;
-										{% if form.interval.errors %}
-											<span class="error">
-											({{ form.interval.errors.0 }})
-											</span>&nbsp;
-										{% endif %}
-										{{ form.frequency }}&nbsp;
-										{% if form.frequency.errors %}
-											<span class="error">
-											({{ form.frequency.errors.0 }})
-											</span>&nbsp;
-										{% endif %}
-										
+									{{ form.interval }}&nbsp;
+									{% if form.interval.errors %}
+										<span class="error">
+										({{ form.interval.errors.0 }})
+										</span>&nbsp;
+									{% endif %}
+									{{ form.frequency }}&nbsp;
+									{% if form.frequency.errors %}
+										<span class="error">
+										({{ form.frequency.errors.0 }})
+										</span>&nbsp;
+									{% endif %}
 								</li>
 							{% endfor %}
 						</ul>
@@ -94,22 +98,20 @@
 									{% endif %}
 								{% endfor %}
 								<li>
-									
-										{{ form.path }}&nbsp;
-										{% if form.path.errors %}
-											<span class="error">
-											({{ form.path.errors.0 }})
-											</span>
-										{% endif %}
-										
+									{{ form.path }}&nbsp;
+									{% if form.path.errors %}
+										<span class="error">
+										({{ form.path.errors.0 }})
+										</span>
+									{% endif %}	
 								</li>
 							{% endfor %}
 						</ul>
 					</div>
-					<button type="submit" class="button"><img src="{{ STATIC_URL }}css/blueprint/plugins/buttons/icons/tick.png" />{% if backup %}Update Backup{% else %}Create Backup{% endif %}</button>
+					<button type="submit" class="button"><img src="{{ STATIC_URL }}css/blueprint/plugins/buttons/icons/tick.png" /> {% if backup %}Update Backup{% else %}Create Backup{% endif %}</button>
 				</form>
 				<form method="GET" action="{{ back_link }}">
-					 <button type="submit" class="button negative"><img src="{{ STATIC_URL }}css/blueprint/plugins/buttons/icons/cross.png" />Cancel</button>
+					 <button type="submit" class="button negative"><img src="{{ STATIC_URL }}css/blueprint/plugins/buttons/icons/cross.png" /> Cancel</button>
 				</form>
 			</div>
 		</section>

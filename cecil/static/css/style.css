@@ -247,8 +247,9 @@ h1 a.header-button {
 }
 
 a.button {
-	padding:5px 10px 6px 7px;
-	color:#565656 !important;
+	padding: 6px 10px;
+	color: #565656 !important;
+	line-height: 1.5em;
 }
 
 a.button:hover {
@@ -257,13 +258,17 @@ a.button:hover {
 
 button[type] {
   padding: 4px 10px 6px 7px;
-  line-height: 20px;
 }
 
 p.buttons a.button, p.buttons button {
 	float: right;
 	margin-left: 10px;
 	margin-right: 0;
+}
+
+a.button.small {
+	padding: 3px 5px;
+	font-weight: normal;
 }
 
 /* Forms */
@@ -328,7 +333,12 @@ form.standard-form ul.formset-list li {
 }
 
 form.standard-form ul.formset-list a.add-row {
-	margin: 0 0 0 15px;
+	margin: 10px 15px;
+}
+
+form.standard-form ul.formset-list a.delete-row img {
+	position: relative;
+	top: 2px;
 }
 
 /* Sections */
