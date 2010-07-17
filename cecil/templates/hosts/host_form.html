@@ -25,10 +25,10 @@
 							</div>
 						{% endif %}
 					{% endfor %}
-					<button type="submit" class="button"><img src="{{ STATIC_URL }}css/blueprint/plugins/buttons/icons/tick.png" />{% if host %}Update Client{% else %}Create client{% endif %}</button>
+					<button type="submit" class="button"><img src="{{ STATIC_URL }}css/blueprint/plugins/buttons/icons/tick.png" /> {% if host %}Update Client{% else %}Create client{% endif %}</button>
 				</form>
 				<form method="GET" action="{{ back_link }}">
-					 <button type="submit" class="button negative"><img src="{{ STATIC_URL }}css/blueprint/plugins/buttons/icons/cross.png" />Cancel</button>
+					 <button type="submit" class="button negative"><img src="{{ STATIC_URL }}css/blueprint/plugins/buttons/icons/cross.png" /> Cancel</button>
 				</form>
 			</div>
 		</section>

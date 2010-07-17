@@ -336,9 +336,14 @@ form.standard-form ul.formset-list a.add-row {
 	margin: 10px 15px;
 }
 
-form.standard-form ul.formset-list a.delete-row img {
+form.standard-form ul.formset-list a.delete-row {
 	position: relative;
-	top: 2px;
+	top: 3px;
+}
+
+form.standard-form ul.formset-list a.delete-row.select {
+	position: relative;
+	top: 5px;
 }
 
 /* Sections */
