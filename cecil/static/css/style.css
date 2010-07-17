@@ -351,6 +351,8 @@ form.standard-form ul.formset-list a.delete-row.select {
 section {
 	background-color: #fff;
 	-webkit-box-shadow: 3px 3px 2px #999;
+	-moz-box-shadow: 3px 3px 2px #999;
+	box-shadow: 3px 3px 2px #999;
 }
 
 section h1 {
