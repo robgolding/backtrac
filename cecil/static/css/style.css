@@ -65,11 +65,19 @@ code { font-family: 'Courier New', Courier, monospace; color: #333; font-size: 0
 
 #masthead {
 	width: 960px;
-	height: 70px;
+	height: 90px;
 	overflow: hidden;
 	margin: 0 auto;
 	padding: 0;
 	position: relative;
+}
+
+#masthead .logo {
+	float: left;
+}
+
+#masthead .text {
+	float: left;
 }
 
 #masthead h1 {
@@ -90,6 +98,19 @@ code { font-family: 'Courier New', Courier, monospace; color: #333; font-size: 0
 #masthead h1 a:hover {
 	text-decoration: none;
 	color: auto;
+}
+
+#masthead h2 {
+	clear: left;
+	color: #999;
+	font-size: 20px;
+	margin-left: 12px;
+}
+
+#masthead img {
+	float: left;
+	position: relative;
+	top: 10px;
 }
 
 /* General menu-type styles (lists, links etc.) */

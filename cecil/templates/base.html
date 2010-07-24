@@ -24,7 +24,15 @@
 	<div id="wrap"> 
 		<div id="masthead-wrap">
 			<header id="masthead">
-				<img src="{{ STATIC_URL }}img/backtrac-3.png" style="float: left; height: 50px; position: relative; top: 10px;"/><h1><a href="{% url index %}">backtrac</a></h1>
+				<div class="logo">
+					<a href="{% url index %}">
+						<img src="{{ STATIC_URL }}img/backtrac-6.png" />
+					</a>
+				</div>
+				<div class="text">
+					<h1><a href="{% url index %}">backtrac</a></h1>
+					<h2>backup system</h2>
+				</div>
 				{% if user.is_authenticated %}
 					<div id="userbox" class="menu">
 						<ul>
