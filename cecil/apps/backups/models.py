@@ -4,7 +4,7 @@ from django.db.models.signals import post_save
 from cecil.apps.schedules.models import Schedule, Rule
 from cecil.apps.hosts.models import Host
 
-from managers import BackupManager
+from managers import BackupManager, ResultManager
 import tasks
 
 class Backup(models.Model):
@@ -88,6 +88,8 @@ class Result(models.Model):
 	started_at = models.DateTimeField(auto_now_add=True)
 	finished_at = models.DateTimeField(null=True, blank=True)
 	
+	objects = ResultManager()
+	
 	def __unicode__(self):
 		return '%s (%s)' % (self.backup.name, self.started_at)
 	
@@ -95,6 +97,7 @@ class Result(models.Model):
 		return self.finished_at is not None
 	
 	class Meta:
+		ordering = ('-started_at',)
 		get_latest_by = 'started_at'
 	
 
