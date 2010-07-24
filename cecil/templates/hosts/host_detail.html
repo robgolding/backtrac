@@ -71,10 +71,32 @@
 				{% else %}
 					<p>There are no backups for this client.</p>
 				{% endif %}
-				<h2>Recent Events</h2>
-				<p>
-					A list of recent events...
-				</p>
+				<h2>Results</h2>
+				<table class="object_list">
+					<thead>
+						<tr>
+							<th class="icon"></th><th>Started</th><th>Finished</th><th>Status</th>
+						</tr>
+					</thead>
+					<tbody>
+						{% if object.results.finished %}
+							{% for result in object.results.finished %}
+								<tr>
+									<td class="icon"><img src="{{ STATIC_URL }}img/icons/famfamfam/{% if result.successful %}accept.png{% else %}exclamation.png{% endif %}" /></td>
+									<td class="started">{{ result.started_at }}</td>
+									<td class="finished">{{ result.finished_at }}</td>
+									<td class="status">{% if result.successful %}Success{% else %}Error{% endif %}</td>
+								</tr>
+							{% endfor %}
+						{% else %}
+							<tr class="info">
+								<td colspan="6">
+									No results available.
+								</td>
+							</tr>
+						{% endif %}
+					</tbody>
+				</table>
 			</div>
 		</section>
 		<section class="span-6 last">

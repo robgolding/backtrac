@@ -41,33 +41,31 @@
 				</div>
 				<hr />
 				<h2>Results</h2>
-				<p>
-					<table class="object_list">
-						<thead>
-							<tr>
-								<th class="icon"></th><th>Started</th><th>Finished</th><th>Status</th>
-							</tr>
-						</thead>
-						<tbody>
-							{% if object.results.finished %}
-								{% for result in object.results.finished %}
-									<tr>
-										<td class="icon"><img src="{{ STATIC_URL }}img/icons/famfamfam/{% if result.successful %}accept.png{% else %}exclamation.png{% endif %}" /></td>
-										<td class="started">{{ result.started_at }}</td>
-										<td class="finished">{{ result.finished_at }}</td>
-										<td class="status">{% if result.successful %}Success{% else %}Error{% endif %}</td>
-									</tr>
-								{% endfor %}
-							{% else %}
-								<tr class="info">
-									<td colspan="6">
-										This backup has not yet run.
-									</td>
+				<table class="object_list">
+					<thead>
+						<tr>
+							<th class="icon"></th><th>Started</th><th>Finished</th><th>Status</th>
+						</tr>
+					</thead>
+					<tbody>
+						{% if object.results.finished %}
+							{% for result in object.results.finished %}
+								<tr>
+									<td class="icon"><img src="{{ STATIC_URL }}img/icons/famfamfam/{% if result.successful %}accept.png{% else %}exclamation.png{% endif %}" /></td>
+									<td class="started">{{ result.started_at }}</td>
+									<td class="finished">{{ result.finished_at }}</td>
+									<td class="status">{% if result.successful %}Success{% else %}Error{% endif %}</td>
 								</tr>
-							{% endif %}
-						</tbody>
-					</table>
-				</p>
+							{% endfor %}
+						{% else %}
+							<tr class="info">
+								<td colspan="6">
+									This backup has not yet run.
+								</td>
+							</tr>
+						{% endif %}
+					</tbody>
+				</table>
 			</div>
 		</section>
 		<section class="span-6 last">
