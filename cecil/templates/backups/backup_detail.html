@@ -44,7 +44,7 @@
 				<table class="object_list">
 					<thead>
 						<tr>
-							<th class="icon"></th><th>Started</th><th>Finished</th><th>Status</th>
+							<th class="icon"></th><th>Started</th><th>Duration</th><th>Status</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -52,8 +52,8 @@
 							{% for result in object.results.finished %}
 								<tr>
 									<td class="icon"><img src="{{ STATIC_URL }}img/icons/famfamfam/{% if result.successful %}accept.png{% else %}exclamation.png{% endif %}" /></td>
-									<td class="started">{{ result.started_at }}</td>
-									<td class="finished">{{ result.finished_at }}</td>
+									<td class="started"><a href="{{ result.get_absolute_url }}">{{ result.started_at }}</a></td>
+									<td class="finished">{{ result.started_at|timesince:result.finished_at }}</td>
 									<td class="status">{% if result.successful %}Success{% else %}Error{% endif %}</td>
 								</tr>
 							{% endfor %}

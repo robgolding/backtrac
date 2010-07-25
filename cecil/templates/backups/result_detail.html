@@ -1,0 +1,36 @@
+{% extends 'backups/base.html' %}
+
+{% block content %}
+	<div class="container">
+		<section class="span-18">
+			<h1>{{ object.backup.name }} ({{ object.started_at }})</h1>
+			<div class="content clearfix">
+				<h2>Summary</h2>
+				<div class="object-summary backup-result-summary">
+					<dl class="clearfix">
+						<dt>Backup:</dt>
+						<dd><a href="{{ object.backup.get_absolute_url }}">{{ object.backup.name }}</a></dd>
+						
+						<dt>Client:</dt>
+						<dd><a href="{{ object.client.get_absolute_url }}">{{ object.client.hostname }}</a></dd>
+						
+						<dt>Status:</dt>
+						<dd><span class="{{ object.get_status }}">{{ object.get_status|capfirst }}</a></dd>
+						
+						<dt>Started:</dt>
+						<dd>{{ object.started_at }}</dd>
+						
+						<dt>Finished:</dt>
+						<dd>{{ object.finished_at }}</dd>
+					</dl>
+				</div>
+			</div>
+		</section>
+		<section class="span-6 last">
+			<h1>Help</h1>
+			<div class="content menu clearfix">
+				<p>Possibly help or something else here...</p>
+			</div>
+		</section>
+	</div>
+{% endblock %}

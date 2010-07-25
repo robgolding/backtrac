@@ -59,9 +59,7 @@ class Backup(models.Model):
 		if not results:
 			return 'N/A'
 		result = results.latest()
-		if result.successful:
-			return 'success'
-		return 'error'
+		return result.get_status()
 	
 	def next_run(self):
 		if not self.active:
@@ -90,11 +88,23 @@ class Result(models.Model):
 	
 	objects = ResultManager()
 	
-	def __unicode__(self):
-		return '%s (%s)' % (self.backup.name, self.started_at)
+	@models.permalink
+	def get_absolute_url(self):
+		return ('backups_result_detail', [self.backup.id, self.id])
 	
 	def is_finished(self):
 		return self.finished_at is not None
+	
+	def get_status(self):
+		if not self.finished_at:
+			return 'running'
+		if self.successful:
+			return 'success'
+		else:
+			return 'error'
+	
+	def __unicode__(self):
+		return '%s (%s)' % (self.backup.name, self.started_at)
 	
 	class Meta:
 		ordering = ('-started_at',)

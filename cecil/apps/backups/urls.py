@@ -25,4 +25,10 @@ urlpatterns = patterns('',
 	
 	url(r'^create/$', views.create_backup, name='backups_create_backup'),
 	
+	# results
+	
+	url(r'^(?P<backup_id>\d+)/results/(?P<result_id>\d+)$', views.result_detail, {
+							'template_name': 'backups/backup_list.html'}, 
+					name='backups_result_detail'),
+	
 )

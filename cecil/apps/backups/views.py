@@ -1,11 +1,12 @@
 from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from django.shortcuts import render_to_response, get_object_or_404
+from django.views.generic.list_detail import object_detail
 from django.db import transaction
 from django.template.context import RequestContext
 from django.contrib import messages
 
-from models import Backup
+from models import Backup, Result
 from forms import BackupForm, JobFormSet, UpdateJobFormSet
 from cecil.apps.schedules.forms import ScheduleForm, RuleFormSet, UpdateRuleFormSet
 
@@ -142,3 +143,7 @@ def delete_backup(request, backup_id, template_name='backups/delete_backup.html'
 	
 	data = { 'backup': backup, 'back_link': back_link }
 	return render_to_response(template_name, data, context_instance=RequestContext(request))
+
+def result_detail(request, backup_id, result_id, template_name='backups/result_detail.html'):
+	result = get_object_or_404(Result, pk=result_id, backup__pk=backup_id)
+	return object_detail(request, queryset=Result.objects.select_related(), object_id=result.pk)

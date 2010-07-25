@@ -532,6 +532,10 @@ ul.actions li.resume a {
 	background: url("../img/icons/backup_32.png") no-repeat 0 4px;
 }
 
+.backup-result-summary {
+	background: url("../img/icons/backup_run_32.png") no-repeat 0 4px;
+}
+
 .host-summary {
 	background: url("../img/icons/server_32.png") no-repeat 0 4px;
 }
