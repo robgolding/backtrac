@@ -22,6 +22,9 @@
 						
 						<dt>Finished:</dt>
 						<dd>{{ object.finished_at }}</dd>
+						
+						<dt>Duration:</dt>
+						<dd>{{ object.started_at|timesince:object.finished_at }}</dd>
 					</dl>
 				</div>
 			</div>
