@@ -7,17 +7,17 @@
 				prefix: '{{ rule_formset.prefix }}',
 				formCssClass: 'rules-dynamic-form',
 				addCssClass: 'add-row button small',
-				addText: '<img src="{{ STATIC_URL }}img/icons/famfamfam/add.png" /> add another</a>',
-				deleteCssClass: 'delete-row select',
-				deleteText: '<img src="{{ STATIC_URL }}img/icons/famfamfam/delete.png" />',
+				addText: '<img src="{{ STATIC_URL }}img/icons/famfamfam/add.png" /\> add another</a>',
+				deleteCssClass: 'delete-row',
+				deleteText: '<img src="{{ STATIC_URL }}img/icons/famfamfam/delete.png" /\>',
 			});
 			$("#jobs ul.formset-list li").formset({
 				prefix: '{{ job_formset.prefix }}',
 				formCssClass: 'jobs-dynamic-form',
 				addCssClass: 'add-row button small',
-				addText: '<img src="{{ STATIC_URL }}img/icons/famfamfam/add.png" /> add another</a>',
+				addText: '<img src="{{ STATIC_URL }}img/icons/famfamfam/add.png" /\> add another</a>',
 				deleteCssClass: 'delete-row',
-				deleteText: '<img src="{{ STATIC_URL }}img/icons/famfamfam/delete.png" />',
+				deleteText: '<img src="{{ STATIC_URL }}img/icons/famfamfam/delete.png" /\>',
 			});
 			$('a.delete-row').attr('title', 'Remove');
 		});
