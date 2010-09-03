@@ -3,18 +3,6 @@ from piston.handler import BaseHandler
 from cecil.apps.backups.models import Backup, Job
 from cecil.apps.hosts.models import Host
 
-class TodoHandler(BaseHandler):
-	allowed_methods = ('GET',)
-	
-	def read(self, request):
-		host = request.user
-		todo = []
-		for backup in host.backups.all():
-			if backup.is_pending():
-				todo.append(backup)
-		
-		return todo
-
 class BackupHandler(BaseHandler):
 	allowed_methods = ('GET',)
 	model = Backup
