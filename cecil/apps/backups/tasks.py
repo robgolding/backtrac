@@ -1,4 +1,4 @@
-import datetime
+import time, datetime, random
 
 from django.db.models import get_model
 
@@ -21,7 +21,6 @@ def resubmit_backup(backup, clear_old_task=True):
 @task()
 def execute_backup(backup_id, **kwargs):
 	Backup = get_model('backups', 'Backup')
-	Event = get_model('backups', 'Event')
 	
 	logger = execute_backup.get_logger(**kwargs)
 	backup = Backup.objects.get(id=backup_id)
@@ -29,10 +28,7 @@ def execute_backup(backup_id, **kwargs):
 	_, next_run = resubmit_backup(backup)
 	logger.warning("Submitted backup '%s' to run at %s" % (backup, next_run))
 	
-	Event.objects.create(type='started', backup=backup)
-	logger.warning("Added 'started' event to database")
-	
-	logger.warning("Executing backup %d" % backup.id)
+	logger.warning("Executed backup '%s' [%d]" % (backup, backup.id))
 	
 @task()
 def resubmit_all_backups(**kwargs):

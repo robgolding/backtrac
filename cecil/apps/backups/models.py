@@ -112,7 +112,9 @@ class Result(models.Model):
 	
 
 def resubmit_backup(sender, instance, **kwargs):
-	if sender == Schedule:
+	if sender == Backup:
+		backups = [instance]
+	elif sender == Schedule:
 		backups = instance.backups.all()
 	elif sender == Rule:
 		backups = instance.schedule.backups.all()
