@@ -117,3 +117,6 @@ INSTALLED_APPS = (
 	'cecil.apps.hosts',
 	'cecil.apps.schedules',
 )
+
+import djcelery
+djcelery.setup_loader()
