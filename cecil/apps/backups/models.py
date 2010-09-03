@@ -21,11 +21,6 @@ class Backup(models.Model):
 	
 	objects = BackupManager()
 	
-	def save(self, resubmit=True, *args, **kwargs):
-		super(Backup, self).save(*args, **kwargs)
-		if resubmit:
-			tasks.resubmit_backup(self)
-	
 	@models.permalink
 	def get_absolute_url(self):
 		return ('backups_backup_detail', [self.id])
@@ -65,6 +60,9 @@ class Backup(models.Model):
 		if not self.active:
 			return None
 		return self.schedule.get_next_occurrence()
+	
+	def resubmit(self):
+		return tasks.resubmit_backup(self)
 	
 	def __unicode__(self):
 		return self.name
@@ -109,18 +107,3 @@ class Result(models.Model):
 	class Meta:
 		ordering = ('-started_at',)
 		get_latest_by = 'started_at'
-	
-
-def resubmit_backup(sender, instance, **kwargs):
-	if sender == Backup:
-		backups = [instance]
-	elif sender == Schedule:
-		backups = instance.backups.all()
-	elif sender == Rule:
-		backups = instance.schedule.backups.all()
-	else:
-		return
-	for backup in backups:
-		tasks.resubmit_backup(backup)
-
-post_save.connect(resubmit_backup)

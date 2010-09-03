@@ -16,6 +16,9 @@ def resubmit_backup(backup, clear_old_task=True):
 	
 	r = execute_backup.apply_async(args=[backup.id], eta=next)
 	
+	backup.task_id = r.task_id
+	backup.save()
+	
 	return (backup.task_id, next)
 
 @task()
@@ -26,9 +29,9 @@ def execute_backup(backup_id, **kwargs):
 	backup = Backup.objects.get(id=backup_id)
 	
 	_, next_run = resubmit_backup(backup)
-	logger.warning("Submitted backup '%s' to run at %s" % (backup, next_run))
+	print "Submitted backup '%s' to run at %s" % (backup, next_run)
 	
-	logger.warning("Executed backup '%s' [%d]" % (backup, backup.id))
+	print "Executed backup '%s' [%d]" % (backup, backup.id)
 	
 @task()
 def resubmit_all_backups(**kwargs):
@@ -37,5 +40,4 @@ def resubmit_all_backups(**kwargs):
 	logger = resubmit_all_backups.get_logger(**kwargs)
 	discard_all()
 	for backup in Backup.objects.all():
-		_, next_run = resubmit_backup(backup, clear_old_task=False)
-		logger.warning("Submitted backup '%s' to run at %s" % (backup, next_run))
+		resubmit_backup(backup, clear_old_task=False)

@@ -9,6 +9,7 @@ from django.contrib import messages
 from models import Backup, Result
 from forms import BackupForm, JobFormSet, UpdateJobFormSet
 from cecil.apps.schedules.forms import ScheduleForm, RuleFormSet, UpdateRuleFormSet
+from tasks import resubmit_backup
 
 @transaction.commit_on_success
 def create_backup(request, template_name='backups/backup_form.html'):
@@ -31,6 +32,7 @@ def create_backup(request, template_name='backups/backup_form.html'):
 				job = form.save(commit=False)
 				job.backup = backup
 				job.save()
+			backup.resubmit()
 			messages.success(request, 'Backup created successfully.')
 			return HttpResponseRedirect(backup.get_absolute_url())
 	else:
@@ -51,7 +53,7 @@ def create_backup(request, template_name='backups/backup_form.html'):
 @transaction.commit_on_success
 def update_backup(request, backup_id, template_name='backups/backup_form.html'):
 	backup = get_object_or_404(Backup, pk=backup_id)
-	referrer = request.META['HTTP_REFERER'].strip(' ?')
+	referrer = request.META.get('HTTP_REFERER', '').strip(' ?')
 	schedule = backup.schedule
 	if request.method == 'POST':
 		backup_form = BackupForm(request.POST, instance=backup)
@@ -74,6 +76,7 @@ def update_backup(request, backup_id, template_name='backups/backup_form.html'):
 				job = form.save(commit=False)
 				job.backup = backup
 				job.save()
+			backup.resubmit()
 			messages.success(request, 'Backup updated successfully.')
 			return HttpResponseRedirect(backup.get_absolute_url())
 	else:

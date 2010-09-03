@@ -9,7 +9,7 @@ DJANGO_SERVE_ADMIN = True # Serve admin files
 IP_ADDRESS = '127.0.0.1'
 PORT = 8000
 SERVER_NAME = 'localhost'
-SERVER_THREADS = 3
+SERVER_THREADS = 20
 # Change it to True if you want it to run as daemon, if you use a
 # daemon.sh file you should also change it to True
 RUN_AS_DAEMON = False
