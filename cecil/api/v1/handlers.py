@@ -30,9 +30,9 @@ class BackupReceiptHandler(BaseHandler):
 	@classmethod
 	def port(cls, backup):
 		from receiver import PackageReceiver
-		r = PackageReceiver(1338, str(uuid.uuid4()))
+		r = PackageReceiver(str(uuid.uuid4()))
 		r.start()
-		return 1338
+		return r.port
 	
 	fields = ['port']
 

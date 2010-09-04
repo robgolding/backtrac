@@ -4,14 +4,15 @@ from threading import *
 
 class PackageReceiver(Thread):
 
-	def __init__(self, port, uuid):
+	def __init__(self, uuid, port=None):
 		Thread.__init__(self)
-		self.port = port
+		port = port or 0
 		self.uuid = uuid
 		self.stopping = False
 		
 		self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-		self.server.bind(('', self.port))
+		self.server.bind(('', port))
+		self.port = self.server.getsockname()[1]
 		self.server.listen(1)
 		print 'Listening on port %d' % self.port
 		
@@ -21,10 +22,11 @@ class PackageReceiver(Thread):
 	
 	def run(self):
 		while not self.stopping:
-			rr, rr, rx = select.select([self.server], [], [], 0.1)
+			rr, rw, rx = select.select([self.server], [], [], 1)
 			if self.server in rr:
 				self.client, address = self.server.accept()
 				self.transfer()
+				break
 		self.server.shutdown(socket.SHUT_RDWR)
 		self.server.close()
 	
