@@ -1,3 +1,5 @@
+import uuid
+
 from piston.handler import BaseHandler
 
 from cecil.apps.backups.models import Backup, Job
@@ -20,6 +22,19 @@ class BackupHandler(BaseHandler):
 		return backup.jobs.all()
 	
 	fields = ['id', 'name', 'client', 'status', 'jobs', 'next_run']
+
+class BackupReceiptHandler(BaseHandler):
+	allowed_methods = ('GET',)
+	model = Backup
+	
+	@classmethod
+	def port(cls, backup):
+		from receiver import PackageReceiver
+		r = PackageReceiver(1338, str(uuid.uuid4()))
+		r.start()
+		return 1338
+	
+	fields = ['port']
 
 class HostHandler(BaseHandler):
 	allowed_methods = ('GET',)
