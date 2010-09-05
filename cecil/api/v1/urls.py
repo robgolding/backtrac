@@ -20,10 +20,10 @@ check_status_handler = Resource(CheckStatusHandler)
 
 urlpatterns = patterns('',
 	
-	url(r'^check_status/$', check_status_handler),
+	url(r'^check_status/$', check_status_handler, name="api_v1_check_status"),
 	
-	url(r'^backups/(?P<id>\d+)/$', backup_handler),
+	url(r'^backups/(?P<id>\d+)/$', backup_handler, name="api_v1_backup_detail"),
 	
-	url(r'^backups/(?P<id>\d+)/submit_package/$', backup_receipt_handler),
+	url(r'^backups/(?P<id>\d+)/submit_package/$', backup_receipt_handler, name="api_v1_backup_submit_package"),
 	
 )

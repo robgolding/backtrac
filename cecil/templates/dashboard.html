@@ -18,7 +18,7 @@
 			$("#system-status").addClass("checking");
 			$("#system-status").html("Checking system status...");
 			
-			$.getJSON('/api/v1/check_status/', function(data) {
+			$.getJSON('{% url api_v1_check_status %}', function(data) {
 				setStatus(data.status);
 			});
 		});
