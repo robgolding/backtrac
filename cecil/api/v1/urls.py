@@ -2,7 +2,7 @@ from django.conf.urls.defaults import *
 from piston.resource import Resource
 from piston.authentication import HttpBasicAuthentication
 
-from handlers import BackupHandler, BackupReceiptHandler
+from handlers import CheckStatusHandler, BackupHandler, BackupReceiptHandler
 
 def host_auth(username, password):
 	from cecil.apps.hosts.models import Host
@@ -16,8 +16,11 @@ ad = { 'authentication': auth }
 
 backup_handler = Resource(BackupHandler, **ad)
 backup_receipt_handler = Resource(BackupReceiptHandler, **ad)
+check_status_handler = Resource(CheckStatusHandler)
 
 urlpatterns = patterns('',
+	
+	url(r'^check_status/$', check_status_handler),
 	
 	url(r'^backups/(?P<id>\d+)/$', backup_handler),
 	

@@ -392,6 +392,30 @@ section div.content {
 	padding: 0 15px 15px;
 }
 
+/* Dashboard */
+
+div#system-status {
+	padding-left: 50px;
+	background-repeat: no-repeat;
+	background-position: 10px; center;
+}
+
+div#system-status.notice {
+	background-image: url("../img/knobs/Knob Orange.png");
+}
+
+div#system-status.success {
+	background-image: url("../img/knobs/Knob Green.png");
+}
+
+div#system-status.error {
+	background-image: url("../img/knobs/Knob Red.png");
+}
+
+div#system-status.checking {
+	background-image: url("../img/ajax-loader-big.gif");
+}
+
 /* Object Lists */
 
 table.object_list thead th {
@@ -543,13 +567,22 @@ ul.actions li.resume a {
 /* Footer */
 
 body>footer {
-	border-top: 1px solid #aaa;
+	border-top: 1px solid #ccc;
 	position: relative;
 	margin-top: -41px; /* negative value of footer height */
 	height: 40px;
 	clear: both;
+	background-color: #fff;
+	font-size: 12px;
 }
 
 body>footer #copyright {
 	padding: 10px 0;
+	float: left;
+}
+
+body>footer #attrs {
+	padding: 10px 0;
+	float: right;
+	
 }

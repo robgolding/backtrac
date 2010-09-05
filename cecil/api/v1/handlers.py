@@ -1,9 +1,24 @@
 import uuid
 
 from piston.handler import BaseHandler
+from celery.exceptions import TimeoutError
 
+from cecil.apps.core.tasks import check_status
 from cecil.apps.backups.models import Backup, Job
 from cecil.apps.hosts.models import Host
+
+class CheckStatusHandler(BaseHandler):
+	allowed_methods = ('GET',)
+	
+	def read(self, request):
+		response = {'status': True}
+		result = check_status.delay()
+		try:
+			result.wait(timeout=5)
+		except TimeoutError:
+			response['status'] = False
+		finally:
+			return response
 
 class BackupHandler(BaseHandler):
 	allowed_methods = ('GET',)
