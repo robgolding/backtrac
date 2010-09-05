@@ -1,5 +1,7 @@
 import uuid
 
+from django.shortcuts import get_object_or_404
+
 from piston.handler import BaseHandler
 from celery.exceptions import TimeoutError
 
@@ -23,6 +25,7 @@ class CheckStatusHandler(BaseHandler):
 class BackupHandler(BaseHandler):
 	allowed_methods = ('GET',)
 	model = Backup
+	fields = ('id', 'name', ('client', ('hostname',)), 'status', 'jobs',)
 	
 	@classmethod
 	def next_run(cls, backup):
@@ -35,27 +38,19 @@ class BackupHandler(BaseHandler):
 	@classmethod
 	def jobs(cls, backup):
 		return backup.jobs.all()
-	
-	fields = ['id', 'name', 'client', 'status', 'jobs', 'next_run']
 
 class BackupReceiptHandler(BaseHandler):
 	allowed_methods = ('GET',)
-	model = Backup
 	
-	@classmethod
-	def port(cls, backup):
+	def read(self, request, id):
+		backup = get_object_or_404(Backup, pk=id)
+		
 		from receiver import PackageReceiver
 		r = PackageReceiver(str(uuid.uuid4()))
 		r.start()
 		return r.port
 	
 	fields = ['port']
-
-class HostHandler(BaseHandler):
-	allowed_methods = ('GET',)
-	model = Host
-	
-	fields = ['hostname']
 
 class JobHandler(BaseHandler):
 	allowed_mathods = ('GET',)
