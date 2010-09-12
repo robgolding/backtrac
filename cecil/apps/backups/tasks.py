@@ -1,4 +1,4 @@
-import time, datetime, random
+import time, datetime, random, xmlrpclib
 
 from django.db.models import get_model
 
@@ -28,11 +28,12 @@ def execute_backup(backup_id, **kwargs):
 	logger = execute_backup.get_logger(**kwargs)
 	backup = Backup.objects.get(id=backup_id)
 	
-	_, next_run = resubmit_backup(backup)
-	print "Submitted backup '%s' to run at %s" % (backup, next_run)
+	_, next_run = resubmit_backup(backup, clear_old_task=False)
+	logger.debug("Submitted backup '%s' to run at %s" % (backup, next_run))
 	
-	print "Executed backup '%s' [%d]" % (backup, backup.id)
-	
+	proxy = xmlrpclib.ServerProxy('http://%s:8080/' % backup.client.hostname)
+	return proxy.do_backup(backup_id)
+
 @task()
 def resubmit_all_backups(**kwargs):
 	Backup = get_model('backups', 'Backup')

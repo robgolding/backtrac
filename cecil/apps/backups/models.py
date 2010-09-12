@@ -1,5 +1,5 @@
 from django.db import models
-from django.db.models.signals import post_save
+from django.db.models.signals import pre_delete
 
 from cecil.apps.schedules.models import Schedule, Rule
 from cecil.apps.hosts.models import Host
@@ -107,3 +107,9 @@ class Result(models.Model):
 	class Meta:
 		ordering = ('-started_at',)
 		get_latest_by = 'started_at'
+
+def resubmit_backup(sender, instance, **kwargs):
+	if sender == Backup:
+		tasks.resubmit_backup(instance)
+
+pre_delete.connect(resubmit_backup)
