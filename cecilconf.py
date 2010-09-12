@@ -6,7 +6,7 @@ DJANGO_SETTINGS = 'cecil.settings'
 DJANGO_SERVE_ADMIN = True # Serve admin files
 
 # Server settings
-IP_ADDRESS = '127.0.0.1'
+IP_ADDRESS = '0.0.0.0'
 PORT = 8000
 SERVER_NAME = 'localhost'
 SERVER_THREADS = 20
