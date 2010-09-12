@@ -34,7 +34,7 @@
 					<h2>backup system</h2>
 				</div>
 				{% if user.is_authenticated %}
-					<div id="userbox" class="menu">
+					<div id="userbox" class="menu clearfix">
 						<ul>
 							<li class="username">{% if user.get_full_name %}{{ user.get_full_name }} ({{ user.username }}){% else %}{{ user.username }}{% endif %}</li>
 							{% if user.is_superuser %}

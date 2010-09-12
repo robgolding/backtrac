@@ -154,30 +154,15 @@ span.error {
 	text-decoration: underline;
 }
 
-/* Non-authenticated box */
-
-#non-auth-box {
-	float: right;
-	margin: 36px 150px 0 0;
-}
-
-#non-auth-box ul li {
-	border-left: 1px solid #ddd;
-}
-
-#non-auth-box ul li:first-child {
-	border-left: 0;
-}
-
 /* User box */
 
 #userbox {
+/*
 	margin: 0;
 	position: absolute;
 	top: 0;
 	right: 0;
-	background-color: #f8f8f8;
-	border: 1px solid #ccc;
+	
 	-webkit-border-bottom-left-radius: 5px;
 	-moz-border-radius-bottomleft: 5px;
 	-webkit-border-bottom-right-radius: 5px;
@@ -185,7 +170,14 @@ span.error {
 	border-bottom-left-radius: 5px;
 	border-bottom-right-radius: 5px;
 	border-top: none;
+*/
+	
+	background-color: #f8f8f8;
+	border: 1px solid #ccc;
+	border-radius: 3px;
 	color: #333;
+	float: right;
+	margin-top: 27px;
 }
 
 #userbox ul li {
