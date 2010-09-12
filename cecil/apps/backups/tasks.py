@@ -5,9 +5,12 @@ from django.db.models import get_model
 from celery.decorators import task
 from celery.task.control import revoke, discard_all
 
+def revoke_backup(backup):
+	revoke(backup.task_id)
+
 def resubmit_backup(backup, clear_old_task=True):
 	if clear_old_task and backup.task_id is not None:
-		revoke(backup.task_id)
+		revoke_backup(backup)
 	
 	next = backup.schedule.get_next_occurrence()
 	

@@ -108,8 +108,8 @@ class Result(models.Model):
 		ordering = ('-started_at',)
 		get_latest_by = 'started_at'
 
-def resubmit_backup(sender, instance, **kwargs):
+def pre_delete_handler(sender, instance, **kwargs):
 	if sender == Backup:
-		tasks.resubmit_backup(instance)
+		tasks.revoke_backup(instance)
 
-pre_delete.connect(resubmit_backup)
+pre_delete.connect(pre_delete_handler)
