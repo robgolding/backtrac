@@ -38,6 +38,12 @@ class Schedule(models.Model):
 		occs = sorted([r.get_next_occurrence() for r in self.rules.all()])
 		return occs[0] if occs else None
 	
+	def get_last_occurrence(self):
+		if self.get_start_datetime() > datetime.datetime.now():
+			return None
+		occs = sorted([r.get_last_occurrence() for r in self.rules.all()])
+		return occs[-1] if occs else None
+	
 	def __unicode__(self):
 		return '[Schedule] %d' % self.id
 
@@ -64,6 +70,9 @@ class Rule(models.Model):
 	
 	def get_next_occurrence(self):
 		return self.get_rrule_object().after(datetime.datetime.now())
+	
+	def get_last_occurrence(self):
+		return self.get_rrule_object().before(datetime.datetime.now())
 	
 	def __unicode__(self):
 		s = 'Every %(interval)d %(frequency)s'

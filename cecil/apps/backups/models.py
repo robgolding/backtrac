@@ -1,3 +1,4 @@
+import datetime
 from django.db import models
 from django.db.models.signals import pre_delete
 
@@ -36,6 +37,8 @@ class Backup(models.Model):
 			return 'paused'
 		elif self.is_running():
 			return 'running'
+		elif self.is_pending():
+			return 'pending'
 		else:
 			return 'idle'
 	get_status.short_description = 'Status'
@@ -60,6 +63,17 @@ class Backup(models.Model):
 		if not self.active:
 			return None
 		return self.schedule.get_next_occurrence()
+	
+	def is_pending(self):
+		if self.is_running():
+			return False
+		last = self.schedule.get_last_occurrence()
+		if last is None:
+			return False
+		r = self.get_last_completed_result()
+		if r is None:
+			return datetime.datetime.now() > self.schedule.get_start_datetime()
+		return r.started_at < self.schedule.get_last_occurrence()
 	
 	def resubmit(self):
 		return tasks.resubmit_backup(self)
