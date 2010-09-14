@@ -1,3 +1,5 @@
+import datetime
+
 from django.db import models
 
 class Host(models.Model):
@@ -40,14 +42,21 @@ class Host(models.Model):
 	def get_status(self):
 		if self.is_backing_up():
 			return 'backup running'
-		r = self.get_last_completed_result()
-		if r and not r.successful:
-			return 'error'
-		else:
-			return 'idle'
+		cs = self.checkins.order_by('-created')
+		if not cs or (cs[0].created < datetime.datetime.now() - datetime.timedelta(seconds=60)):
+			return 'offline'
+		return 'online'
+			
 	
 	def __unicode__(self):
 		return self.hostname
 	
 	class Meta:
 		ordering = ('hostname',)
+
+class Checkin(models.Model):
+	host = models.ForeignKey(Host, related_name='checkins')
+	created = models.DateTimeField(auto_now_add=True)
+	
+	def __unicode__(self):
+		return '%s @ %s' % (self.host, self.created)

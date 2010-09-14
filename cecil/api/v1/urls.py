@@ -2,7 +2,7 @@ from django.conf.urls.defaults import *
 from piston.resource import Resource
 from piston.authentication import HttpBasicAuthentication
 
-from handlers import CheckStatusHandler, BackupHandler, BackupReceiptHandler
+from handlers import *
 
 def host_auth(username, password):
 	from cecil.apps.hosts.models import Host
@@ -14,15 +14,26 @@ def host_auth(username, password):
 auth = HttpBasicAuthentication(realm="Backtrac API", auth_func=host_auth)
 ad = { 'authentication': auth }
 
-backup_handler = Resource(BackupHandler, **ad)
-backup_receipt_handler = Resource(BackupReceiptHandler, **ad)
-check_status_handler = Resource(CheckStatusHandler)
+class CsrfExemptResource(Resource):
+	def __init__(self, handler, authentication=None):
+		super(CsrfExemptResource, self).__init__(handler, authentication)
+		self.csrf_exempt = getattr(self.handler, 'csrf_exempt', True)
+
+check_status_handler = CsrfExemptResource(CheckStatusHandler)
+checkin_handler = CsrfExemptResource(CheckinHandler, **ad)
+backup_handler = CsrfExemptResource(BackupHandler, **ad)
+backup_begin_handler = CsrfExemptResource(BackupBeginHandler, **ad)
+backup_receipt_handler = CsrfExemptResource(BackupReceiptHandler, **ad)
 
 urlpatterns = patterns('',
 	
 	url(r'^check_status/$', check_status_handler, name="api_v1_check_status"),
 	
+	url(r'^checkin/$', checkin_handler, name="api_v1_checkin"),
+	
 	url(r'^backups/(?P<id>\d+)/$', backup_handler, name="api_v1_backup_detail"),
+	
+	url(r'^backups/(?P<id>\d+)/begin/$', backup_begin_handler, name="api_v1_backup_begin"),
 	
 	url(r'^backups/(?P<id>\d+)/submit_package/$', backup_receipt_handler, name="api_v1_backup_submit_package"),
 	
