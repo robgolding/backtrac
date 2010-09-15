@@ -65,15 +65,13 @@ class Backup(models.Model):
 		return self.schedule.get_next_occurrence()
 	
 	def is_pending(self):
-		if self.is_running():
-			return False
 		last = self.schedule.get_last_occurrence()
-		if last is None:
+		if self.is_running() or last is None:
 			return False
 		r = self.get_last_completed_result()
 		if r is None:
-			return datetime.datetime.now() > self.schedule.get_start_datetime()
-		return r.started_at < self.schedule.get_last_occurrence()
+			return True # No need to do the above check I think??
+		return last != self.schedule.get_last_occurrence(before=r.finished_at)
 	
 	def resubmit(self):
 		return tasks.resubmit_backup(self)
