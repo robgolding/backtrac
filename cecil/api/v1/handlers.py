@@ -1,26 +1,10 @@
 import uuid
 
 from django.shortcuts import get_object_or_404
-
 from piston.handler import BaseHandler
-from celery.exceptions import TimeoutError
 
-from cecil.apps.core.tasks import check_status
 from cecil.apps.backups.models import Backup, Job, Result
 from cecil.apps.hosts.models import Host, Checkin
-
-class CheckStatusHandler(BaseHandler):
-	allowed_methods = ('GET',)
-	
-	def read(self, request):
-		response = {'status': True}
-		result = check_status.delay()
-		try:
-			result.wait(timeout=5)
-		except TimeoutError:
-			response['status'] = False
-		finally:
-			return response
 
 class CheckinHandler(BaseHandler):
 	allowed_methods = ('POST',)

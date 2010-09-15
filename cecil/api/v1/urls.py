@@ -19,15 +19,12 @@ class CsrfExemptResource(Resource):
 		super(CsrfExemptResource, self).__init__(handler, authentication)
 		self.csrf_exempt = getattr(self.handler, 'csrf_exempt', True)
 
-check_status_handler = CsrfExemptResource(CheckStatusHandler)
 checkin_handler = CsrfExemptResource(CheckinHandler, **ad)
 backup_handler = CsrfExemptResource(BackupHandler, **ad)
 backup_begin_handler = CsrfExemptResource(BackupBeginHandler, **ad)
 backup_receipt_handler = CsrfExemptResource(BackupReceiptHandler, **ad)
 
 urlpatterns = patterns('',
-	
-	url(r'^check_status/$', check_status_handler, name="api_v1_check_status"),
 	
 	url(r'^checkin/$', checkin_handler, name="api_v1_checkin"),
 	

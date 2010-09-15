@@ -176,10 +176,6 @@ if __name__ == "__main__":
         console.setFormatter(formatter)
         log.addHandler(console)
     
-    from cecil.apps.backups.tasks import resubmit_all_backups
-    
-    resubmit_all_backups.delay()
-    
     if options.RUN_AS_DAEMON:
         log.info("Run as daemon")
         # do the UNIX double-fork magic, see Stevens' "Advanced

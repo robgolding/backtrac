@@ -3,32 +3,13 @@
 {% block page_id %}dashboard{% endblock page_id %}
 
 {% block content %}
-	<script language="javascript">
-		function setStatus(status) {
-			if (status) {
-				$("#system-status").removeClass("notice").removeClass("checking").addClass("success");
-				$("#system-status").html("All systems go!");
-			} else {
-				$("#system-status").removeClass("notice").removeClass("checking").addClass("error");
-				$("#system-status").html("Task queue is not responding.");
-			}
-		}
-		
-		$(function() {
-			$("#system-status").addClass("checking");
-			$("#system-status").html("Checking system status...");
-			
-			$.getJSON('{% url api_v1_check_status %}', function(data) {
-				setStatus(data.status);
-			});
-		});
-	</script>
-	
 	<div class="container">
 		<section class="span-18">
 			<h1>Dashboard</h1>
 			<div class="content">
-				<div id="system-status" class="notice">Javascript is required to check system status.</div>
+				<p>
+					Prepare for a wealth of information blah blah blah...
+				</p>
 			</div>
 		</section>
 		
