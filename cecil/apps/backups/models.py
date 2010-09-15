@@ -18,7 +18,6 @@ class Backup(models.Model):
 	client = models.ForeignKey(Host, related_name='backups')
 	active = models.BooleanField(default=True, editable=False)
 	schedule = models.ForeignKey(Schedule, related_name='backups')
-	task_id = models.CharField(max_length=36, null=True, editable=False)
 	
 	objects = BackupManager()
 	
@@ -73,9 +72,6 @@ class Backup(models.Model):
 			return True # No need to do the above check I think??
 		return last != self.schedule.get_last_occurrence(before=r.finished_at)
 	
-	def resubmit(self):
-		return tasks.resubmit_backup(self)
-	
 	def __unicode__(self):
 		return self.name
 	
@@ -119,9 +115,3 @@ class Result(models.Model):
 	class Meta:
 		ordering = ('-started_at',)
 		get_latest_by = 'started_at'
-
-def pre_delete_handler(sender, instance, **kwargs):
-	if sender == Backup:
-		tasks.revoke_backup(instance)
-
-pre_delete.connect(pre_delete_handler)
