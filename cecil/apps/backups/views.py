@@ -32,7 +32,6 @@ def create_backup(request, template_name='backups/backup_form.html'):
 				job = form.save(commit=False)
 				job.backup = backup
 				job.save()
-			backup.resubmit()
 			messages.success(request, 'Backup created successfully.')
 			return HttpResponseRedirect(backup.get_absolute_url())
 	else:
@@ -76,7 +75,6 @@ def update_backup(request, backup_id, template_name='backups/backup_form.html'):
 				job = form.save(commit=False)
 				job.backup = backup
 				job.save()
-			backup.resubmit()
 			messages.success(request, 'Backup updated successfully.')
 			return HttpResponseRedirect(backup.get_absolute_url())
 	else:
