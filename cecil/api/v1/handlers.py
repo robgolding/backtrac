@@ -1,6 +1,7 @@
-import uuid, json, tarfile
+import os, sys, uuid, json, tarfile
 
 from django.shortcuts import get_object_or_404
+from django.conf import settings
 from piston.handler import BaseHandler
 
 from cecil.apps.backups.models import Backup, Job, Result, ResultFile
@@ -51,15 +52,21 @@ class BackupReceiptHandler(BaseHandler):
 	allowed_methods = ('PUT', 'POST')
 	
 	def process_result(self, tarfile_name):
-		for f in self.report['deleted']:
-			rf = ResultFile.objects.create(result=self.result, path=f, type='deleted')
+		root = os.path.join(settings.BACKTRAC_BACKUP_ROOT, 'backup-%d' % self.result.backup.id)
 		try:
 			t = tarfile.open(tarfile_name, 'r:gz')
 			members = t.getmembers()
 			for member in members:
-				ResultFile.objects.create(result=self.result, path=member.name, type='added')
+				t.extract(member, path=root)
+				extracted = os.path.join(root, member.name)
+				size = os.lstat(extracted)[6]
+				ResultFile.objects.create(result=self.result, path=member.name, size=size, type='added')
 		except tarfile.ReadError:
 			pass
+		for f in self.report['deleted']:
+			rf = ResultFile.objects.create(result=self.result, path=f, type='deleted')
+			os.remove(os.path.join(root, f[1:])) #TODO: Fix this to remove starting slash
+		os.remove(tarfile_name)
 	
 	def update(self, request, id):
 		self.backup = get_object_or_404(Backup, pk=id)

@@ -1,6 +1,8 @@
-import socket, time, string, sys, urlparse, uuid, signal, select, datetime
-
+import socket, time, string, sys, urlparse, uuid, signal, select, datetime, os
+import tarfile
 from threading import *
+
+from django.conf import settings
 
 class PackageReceiver(Thread):
 
@@ -8,7 +10,7 @@ class PackageReceiver(Thread):
 		Thread.__init__(self)
 		port = port or 0
 		self.result_obj = result_obj
-		self.filename = 'receivedpackage-%d.tar.gz' % result_obj.id
+		self.filename = os.path.join(settings.BACKTRAC_TMP_DIR, 'receivedpackage-%d.tar.gz' % result_obj.id)
 		self.callback = callback
 		self.stopping = False
 		
@@ -29,12 +31,12 @@ class PackageReceiver(Thread):
 				break
 		self.server.shutdown(socket.SHUT_RDWR)
 		self.server.close()
-		
 		self.callback(self.filename)
 	
 	def transfer(self):
 		print 'Starting media transfer for %s' % self.result_obj
-		
+		if not os.path.exists(settings.BACKTRAC_BACKUP_ROOT):
+			os.makedirs(settings.BACKTRAC_BACKUP_ROOT)
 		f = open(self.filename, 'wb')
 		while 1:
 			data = self.client.recv(1024)

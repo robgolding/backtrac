@@ -108,9 +108,6 @@ INSTALLED_APPS = (
 	'django.contrib.admindocs',
 	'django.contrib.contenttypes',
 	
-	# 3rd party apps
-	'djcelery',
-	
 	# cecil apps
 	'cecil.apps.core',
 	'cecil.apps.backups',
@@ -118,5 +115,6 @@ INSTALLED_APPS = (
 	'cecil.apps.schedules',
 )
 
-import djcelery
-djcelery.setup_loader()
+BACKTRAC_BACKUP_ROOT = '/var/lib/backtrac/backups/'
+
+BACKTRAC_TMP_DIR = '/tmp/backtrac/'
