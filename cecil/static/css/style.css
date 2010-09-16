@@ -464,6 +464,11 @@ table.object_list tbody tr.info td {
 	padding: 15px inherit;
 }
 
+table.result_file_list tbody td.path, table.result_file_list tbody td.size {
+	font-size: 12px;
+	padding-right: 3px;
+}
+
 /* Object Summary */
 
 .object-summary {

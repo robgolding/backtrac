@@ -27,6 +27,32 @@
 						<dd>{{ object.started_at|timesince:object.finished_at }}</dd>
 					</dl>
 				</div>
+				<hr />
+				<h2>Changed Files</h2>
+				<table class="object_list result_file_list">
+					<thead>
+						<tr>
+							<th class="icon"></th><th>Path</th><th>Size</th>
+						</tr>
+					</thead>
+					<tbody>
+						{% if object.files.all %}
+							{% for file in object.files.all %}
+								<tr>
+									<td class="icon"><img src="{{ STATIC_URL }}img/icons/famfamfam/{% if file.type == 'added' %}page_add.png{% else %}{% if file.type == 'deleted' %}page_delete.png{% endif %}{% endif %}" /></td>
+									<td class="path">{{ file.path }}</td>
+									<td class="size">{{ file.size|filesizeformat }}</td>
+								</tr>
+							{% endfor %}
+						{% else %}
+							<tr class="info">
+								<td colspan="6">
+									No files were changed.
+								</td>
+							</tr>
+						{% endif %}
+					</tbody>
+				</table>
 			</div>
 		</section>
 		<section class="span-6 last">
