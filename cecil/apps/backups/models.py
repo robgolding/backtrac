@@ -8,6 +8,12 @@ from cecil.apps.hosts.models import Host
 from managers import BackupManager, ResultManager
 import tasks
 
+RESULTFILE_TYPE_CHOICES = (
+	('deleted', 'Deleted'),
+	('added', 'Added'),
+	('error', 'Error'),
+)
+
 class Backup(models.Model):
 	"""
 	Model to represent a backup task, which can be either active or inactive.
@@ -115,3 +121,12 @@ class Result(models.Model):
 	class Meta:
 		ordering = ('-started_at',)
 		get_latest_by = 'started_at'
+
+class ResultFile(models.Model):
+	result = models.ForeignKey(Result, related_name='files')
+	path = models.CharField(max_length=255, db_index=True)
+	size = models.BigIntegerField(null=True, blank=True)
+	type = models.CharField(max_length=20, db_index=True, choices=RESULTFILE_TYPE_CHOICES)
+	
+	def __unicode__(self):
+		return '%s \'%s\'' % (self.get_type_display(), self.path)

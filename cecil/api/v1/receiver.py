@@ -4,10 +4,12 @@ from threading import *
 
 class PackageReceiver(Thread):
 
-	def __init__(self, result_obj, port=None):
+	def __init__(self, result_obj, port=None, callback=None):
 		Thread.__init__(self)
 		port = port or 0
 		self.result_obj = result_obj
+		self.filename = 'receivedpackage-%d.tar.gz' % result_obj.id
+		self.callback = callback
 		self.stopping = False
 		
 		self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -27,11 +29,13 @@ class PackageReceiver(Thread):
 				break
 		self.server.shutdown(socket.SHUT_RDWR)
 		self.server.close()
+		
+		self.callback(self.filename)
 	
 	def transfer(self):
 		print 'Starting media transfer for %s' % self.result_obj
 		
-		f = open('receivedpackage-%d.tar.gz' % self.result_obj.id, 'wb')
+		f = open(self.filename, 'wb')
 		while 1:
 			data = self.client.recv(1024)
 			if not data:

@@ -1,10 +1,12 @@
-import uuid
+import uuid, json, tarfile
 
 from django.shortcuts import get_object_or_404
 from piston.handler import BaseHandler
 
-from cecil.apps.backups.models import Backup, Job, Result
+from cecil.apps.backups.models import Backup, Job, Result, ResultFile
 from cecil.apps.hosts.models import Host, Checkin
+
+from receiver import PackageReceiver
 
 class CheckinHandler(BaseHandler):
 	allowed_methods = ('POST',)
@@ -35,33 +37,40 @@ class BackupHandler(BaseHandler):
 		return backup.jobs.all()
 
 class BackupBeginHandler(BaseHandler):
-	allowed_methods = ('GET',)
-	
-	def read(self, request, id):
-		backup = get_object_or_404(Backup, pk=id)
-		result = Result(backup=backup, client=request.user)
-		result.save()
-		return {'result_id': result.id}
-
-class BackupReceiptHandler(BaseHandler):
 	allowed_methods = ('PUT', 'POST')
 	
 	def update(self, request, id):
 		backup = get_object_or_404(Backup, pk=id)
+		result = Result(backup=backup, client=request.user)
+		result.save()
+		return {'result_id': result.id}
+	
+	create = update
+
+class BackupReceiptHandler(BaseHandler):
+	allowed_methods = ('PUT', 'POST')
+	
+	def process_result(self, tarfile_name):
+		for f in self.report['deleted']:
+			rf = ResultFile.objects.create(result=self.result, path=f, type='deleted')
+		try:
+			t = tarfile.open(tarfile_name, 'r:gz')
+			members = t.getmembers()
+			for member in members:
+				ResultFile.objects.create(result=self.result, path=member.name, type='added')
+		except tarfile.ReadError:
+			pass
+	
+	def update(self, request, id):
+		self.backup = get_object_or_404(Backup, pk=id)
+		self.result = get_object_or_404(Result, backup=self.backup, finished_at=None)
 		
-		#from receiver import PackageReceiver
-		#r = PackageReceiver(str(uuid.uuid4()))
-		#r.start()
-		#return {'port': r.port}
+		report_file = request.FILES['report']
+		self.report = json.loads(report_file.read())
 		
-		f = request.FILES['report']
-		
-		destination = open('/home/rob/Desktop/package2.tar', 'wb+')
-		for chunk in f.chunks():
-			destination.write(chunk)
-		destination.close()
-		
-		return str(len(f))
+		r = PackageReceiver(self.result, callback=self.process_result)
+		r.start()
+		return {'port': r.port}
 	
 	create = update
 
@@ -69,4 +78,4 @@ class JobHandler(BaseHandler):
 	allowed_mathods = ('GET',)
 	model = Job
 	
-	fields = ['path']
+	fields = ['id', 'path']
