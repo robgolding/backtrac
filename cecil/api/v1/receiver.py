@@ -1,13 +1,13 @@
-import socket, time, string, sys, urlparse, uuid, signal, select
+import socket, time, string, sys, urlparse, uuid, signal, select, datetime
 
 from threading import *
 
 class PackageReceiver(Thread):
 
-	def __init__(self, uuid, port=None):
+	def __init__(self, result_obj, port=None):
 		Thread.__init__(self)
 		port = port or 0
-		self.uuid = uuid
+		self.result_obj = result_obj
 		self.stopping = False
 		
 		self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -17,8 +17,6 @@ class PackageReceiver(Thread):
 		print 'Listening on port %d' % self.port
 		
 		self.client = None
-		
-		#signal.signal(signal.SIGINT, self.sighandler)
 	
 	def run(self):
 		while not self.stopping:
@@ -31,9 +29,9 @@ class PackageReceiver(Thread):
 		self.server.close()
 	
 	def transfer(self):
-		print 'Starting media transfer for %s' % self.uuid
+		print 'Starting media transfer for %s' % self.result_obj
 		
-		f = open('%s.tar.gz' % self.uuid, 'wb')
+		f = open('receivedpackage-%d.tar.gz' % self.result_obj.id, 'wb')
 		while 1:
 			data = self.client.recv(1024)
 			if not data:
@@ -42,6 +40,10 @@ class PackageReceiver(Thread):
 		f.close()
 
 		print 'Closing media transfer'
+		
+		self.result_obj.finished_at = datetime.datetime.now()
+		self.result_obj.successful = True
+		self.result_obj.save()
 	
 	def close(self):
 		print 'Shutting down sockets...'
