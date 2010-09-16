@@ -31,14 +31,16 @@ class Schedule(models.Model):
 	def get_start_datetime(self):
 		return datetime.datetime.combine(self.start_date, self.start_time)
 	
-	def get_next_occurrence(self, after=datetime.datetime.now()):
+	def get_next_occurrence(self, after=None):
+		if after is None: after = datetime.datetime.now()
 		first = self.get_start_datetime()
 		if first > after:
 			return first
 		occs = sorted([r.get_next_occurrence(after=after) for r in self.rules.all()])
 		return occs[0] if occs else None
 	
-	def get_last_occurrence(self, before=datetime.datetime.now()):
+	def get_last_occurrence(self, before=None):
+		if before is None: before = datetime.datetime.now()
 		if self.get_start_datetime() > before:
 			return None
 		occs = sorted([r.get_last_occurrence(before=before) for r in self.rules.all()])
