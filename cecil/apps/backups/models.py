@@ -6,7 +6,6 @@ from cecil.apps.schedules.models import Schedule, Rule
 from cecil.apps.hosts.models import Host
 
 from managers import BackupManager, ResultManager
-import tasks
 
 RESULTFILE_TYPE_CHOICES = (
 	('deleted', 'Deleted'),
