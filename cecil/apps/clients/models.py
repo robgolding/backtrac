@@ -14,7 +14,7 @@ class Client(models.Model):
 		return ('clients_client_detail', [self.id])
 	
 	def is_backing_up(self):
-		return any([ not r.is_finished() for r in self.backups.all()])
+		return any([ not b.is_finished() for b in self.backups.all()])
 	
 	def get_schedule(self):
 		return self.schedule #TODO:or system schedule

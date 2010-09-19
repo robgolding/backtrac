@@ -8,52 +8,29 @@
 				<table class="object_list">
 					<thead>
 						<tr>
-							<th class="icon"></th><th>Name</th><th>Client</th><th>Status</th><th>Last Result</th><th>Actions</th>
+							<th class="icon"></th><th>Client</th><th>Started</th><th>Duration</th><th>Status</th>
 						</tr>
 					</thead>
 					<tbody>
 						{% if object_list %}
-							{% for backup in object_list %}
-								<tr class="{% if not backup.active %}inactive{% endif %}">
-									<td class="icon"><img src="{{ STATIC_URL }}img/icons/famfamfam/{% if backup.active %}{% if backup.is_running %}folder_go.png{% else %}{% if backup.is_pending %}clock.png{% else %}{% if not backup.results.all or backup.results.latest.successful %}accept.png{% else %}exclamation.png{% endif %}{% endif %}{% endif %}{% else %}control_pause.png{% endif %}" /></td>
-									<td class="name"><a href="{{ backup.get_absolute_url }}">{{ backup.name }}</a></td>
-									<td class="client"><a href="{{ backup.client.get_absolute_url }}">{{ backup.client.hostname }}</a></td>
-									<td class="status">{{ backup.get_status|capfirst }}</td>
-									<td class="status">{{ backup.get_last_result_status|capfirst }}</td>
-									<td class="actions">
-										<a href="{% url backups_update_backup backup.id %}" title="Update backup">
-											<img src="{{ STATIC_URL}}/img/icons/edit_16.png" />
-										</a>
-										<a href="{% url backups_delete_backup backup.id %}" title="Delete backup">
-											<img src="{{ STATIC_URL}}/img/icons/cancel_16.png" />
-										</a>
-										{% if backup.active %}
-											<a href="{% url backups_pause_backup backup.id %}" title="Pause backup">
-												<img src="{{ STATIC_URL}}/img/icons/controls_pause_16.png" />
-											</a>
-										{% else %}
-											<a href="{% url backups_resume_backup backup.id %}" title="Resume backup">
-												<img src="{{ STATIC_URL}}/img/icons/controls_play_16.png" />
-											</a>
-										{% endif %}
-									</td>
+							{% for object in object_list %}
+								<tr>
+									<td class="icon"><img src="{{ STATIC_URL }}img/icons/famfamfam/{% if object.successful %}accept.png{% else %}exclamation.png{% endif %}" /></td>
+									<td class="client"><a href="{{ object.client.get_absolute_url }}">{{ object.client }}</a></td>
+									<td class="started"><a href="{{ object.get_absolute_url }}">{{ object.started_at }}</a></td>
+									<td class="finished">{{ object.started_at|timesince:object.finished_at }}</td>
+									<td class="status">{% if object.successful %}Success{% else %}Error{% endif %}</td>
 								</tr>
 							{% endfor %}
 						{% else %}
 							<tr class="info">
 								<td colspan="6">
-									There are no backups at present. To create one, <a href="{% url backups_create_backup %}">click here</a> or use the button below.
+									There are no backups to display.
 								</td>
 							</tr>
 						{% endif %}
 					</tbody>
 				</table>
-				<p class="buttons">
-					<a class="button" href="{% url backups_create_backup %}">
-						<img src="{{ STATIC_URL }}img/icons/famfamfam/add.png" />
-						Create a backup
-					</a>
-				</p>
 			</div>
 		</section>
 		

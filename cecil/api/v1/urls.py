@@ -5,10 +5,10 @@ from piston.authentication import HttpBasicAuthentication
 from handlers import *
 
 def host_auth(username, password):
-	from cecil.apps.hosts.models import Host
+	from cecil.apps.clients.models import Client
 	try:
-		return Host.objects.get(hostname=username, secret_key=password)
-	except Host.DoesNotExist:
+		return Client.objects.get(hostname=username, secret_key=password)
+	except Client.DoesNotExist:
 		return None
 
 auth = HttpBasicAuthentication(realm="Backtrac API", auth_func=host_auth)
@@ -20,18 +20,17 @@ class CsrfExemptResource(Resource):
 		self.csrf_exempt = getattr(self.handler, 'csrf_exempt', True)
 
 checkin_handler = CsrfExemptResource(CheckinHandler, **ad)
-backup_handler = CsrfExemptResource(BackupHandler, **ad)
-backup_begin_handler = CsrfExemptResource(BackupBeginHandler, **ad)
+begin_backup_handler = CsrfExemptResource(BeginBackupHandler, **ad)
 backup_receipt_handler = CsrfExemptResource(BackupReceiptHandler, **ad)
 
 urlpatterns = patterns('',
 	
 	url(r'^checkin/$', checkin_handler, name="api_v1_checkin"),
 	
-	url(r'^backups/(?P<id>\d+)/$', backup_handler, name="api_v1_backup_detail"),
+#	url(r'^backups/(?P<id>\d+)/$', backup_handler, name="api_v1_backup_detail"),
 	
-	url(r'^backups/(?P<id>\d+)/begin/$', backup_begin_handler, name="api_v1_backup_begin"),
+	url(r'begin_backup/$', begin_backup_handler, name="api_v1_begin_backup"),
 	
-	url(r'^backups/(?P<id>\d+)/submit_package/$', backup_receipt_handler, name="api_v1_backup_submit_package"),
+	url(r'^submit_package/$', backup_receipt_handler, name="api_v1_backup_submit_package"),
 	
 )

@@ -4,8 +4,8 @@ from django.shortcuts import get_object_or_404
 from django.conf import settings
 from piston.handler import BaseHandler
 
-from cecil.apps.backups.models import Backup, Job, Result, ResultFile
-from cecil.apps.hosts.models import Host, Checkin
+from cecil.apps.backups.models import Backup, BackedUpFile
+from cecil.apps.clients.models import Client, Checkin
 
 from receiver import PackageReceiver
 
@@ -14,37 +14,14 @@ class CheckinHandler(BaseHandler):
 	
 	def create(self, request):
 		c = Checkin.objects.create(host=request.user)
-		todo = []
-		for backup in request.user.backups.all():
-			if backup.is_pending():
-				todo.append(backup.id)
-		return {'todo': todo}
+		return { 'pending': request.user.is_pending() }
 
-class BackupHandler(BaseHandler):
-	allowed_methods = ('GET',)
-	model = Backup
-	fields = ('id', 'name', ('client', ('hostname',)), 'status', 'jobs',)
-	
-	@classmethod
-	def next_run(cls, backup):
-		return backup.next_run()
-	
-	@classmethod
-	def status(cls, backup):
-		return backup.get_status()
-	
-	@classmethod
-	def jobs(cls, backup):
-		return backup.jobs.all()
-
-class BackupBeginHandler(BaseHandler):
+class BeginBackupHandler(BaseHandler):
 	allowed_methods = ('PUT', 'POST')
 	
-	def update(self, request, id):
-		backup = get_object_or_404(Backup, pk=id)
-		result = Result(backup=backup, client=request.user)
-		result.save()
-		return {'result_id': result.id}
+	def update(self, request):
+		backup = Backup.objects.create(client=request.user)
+		return {'backup_id': backup.id}
 	
 	create = update
 
@@ -80,9 +57,3 @@ class BackupReceiptHandler(BaseHandler):
 		return {'port': r.port}
 	
 	create = update
-
-class JobHandler(BaseHandler):
-	allowed_mathods = ('GET',)
-	model = Job
-	
-	fields = ['id', 'path']
