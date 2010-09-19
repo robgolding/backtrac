@@ -17,11 +17,11 @@ urlpatterns = patterns('',
 	
 	url(r'^(?P<client_id>\d+)/update/$', views.update_client, name='clients_update_client'),
 	
-#	url(r'^(?P<client_id>\d+)/pause/$', views.pause_client, name='clients_pause_client'),
+	url(r'^(?P<client_id>\d+)/pause/$', views.pause_client, name='clients_pause_client'),
 	
-#	url(r'^(?P<client_id>\d+)/resume/$', views.resume_client, name='clients_resume_client'),
+	url(r'^(?P<client_id>\d+)/resume/$', views.resume_client, name='clients_resume_client'),
 	
-#	url(r'^(?P<client_id>\d+)/delete/$', views.delete_client, name='clients_delete_client'),
+	url(r'^(?P<client_id>\d+)/delete/$', views.delete_client, name='clients_delete_client'),
 	
 	url(r'^create/$', views.create_client, name='clients_create_client'),
 	

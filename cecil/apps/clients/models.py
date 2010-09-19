@@ -9,6 +9,10 @@ class Client(models.Model):
 	schedule = models.ForeignKey(Schedule, related_name='clients')
 	active = models.BooleanField(default=True, editable=False)
 	
+	@models.permalink
+	def get_absolute_url(self):
+		return ('clients_client_detail', [self.id])
+	
 	def is_backing_up(self):
 		return any([ not r.is_finished() for r in self.backups.all()])
 	
@@ -59,7 +63,7 @@ class Client(models.Model):
 		ordering = ('hostname',)
 
 class FilePath(models.Model):
-	client = models.ForeignKey(Client, related_name='clients')
+	client = models.ForeignKey(Client, related_name='filepaths')
 	path = models.CharField(max_length=255)
 	
 	def __unicode__(self):
