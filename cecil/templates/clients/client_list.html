@@ -15,11 +15,11 @@
 						{% if object_list %}
 							{% for client in object_list %}
 								<tr>
-									<td class="icon"><img src="{{ STATIC_URL }}img/icons/famfamfam/{% if client.is_backing_up %}folder_go.png{% else %}{% if client.get_last_completed_result and not client.get_last_completed_result.successful %}exclamation.png{% else %}accept.png{% endif %}{% endif %}" /></td>
+									<td class="icon"><img src="{{ STATIC_URL }}img/icons/famfamfam/{% if client.is_backing_up %}folder_go.png{% else %}{% if client.get_last_completed_backup and not client.get_last_completed_backup.successful %}exclamation.png{% else %}accept.png{% endif %}{% endif %}" /></td>
 									<td class="name"><a href="{{ client.get_absolute_url }}">{{ client.hostname }}</a></td>
 									<td class="status">{{ client.get_status|capfirst }}</td>
-									<td class="last_backup">{{ client.get_last_completed_result.started_at|default:'N/A' }}</td>
-									<td class="last_result">{{ client.get_last_result_status|capfirst }}</td>
+									<td class="last_backup">{{ client.get_last_completed_backup.started_at|default:'N/A' }}</td>
+									<td class="last_result">{{ client.get_last_backup_status|capfirst }}</td>
 									<td class="actions">
 										<a href="{% url clients_update_client client.id %}" title="Update client">
 											<img src="{{ STATIC_URL}}/img/icons/edit_16.png" />

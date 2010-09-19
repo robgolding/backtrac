@@ -18,10 +18,10 @@
 						<dd>{{ object.get_status|capfirst }}</dd>
 						
 						<dt>Last backup:</dt>
-						{% with object.get_last_completed_result as r %}
+						{% with object.get_last_completed_backup as backup %}
 						<dd>
-							{% if r %}
-								<a href="{{ r.backup.get_absolute_url }}">{{ r.backup.name }}</a> <small>({{ r.started_at }})</small>
+							{% if backup %}
+								<a href="{{ backup.get_absolute_url }}">{{ backup.started_at }}</a>
 							{% else %}
 								N/A
 							{% endif %}
@@ -29,7 +29,7 @@
 						{% endwith %}
 						
 						<dt>Last result:</dt>
-						<dd><span class="{{ object.get_last_result_status }}">{{ object.get_last_result_status|capfirst }}</span></dd>
+						<dd><span class="{{ object.get_last_backup_status }}">{{ object.get_last_backup_status|capfirst }}</span></dd>
 						
 						<dt>Next backup:</dt>
 						{% with object.get_next_backup as b %}
@@ -51,48 +51,27 @@
 					</div>
 				</div>
 				<hr />
-				<h2>Backups</h2>
-				{% if object.backups.all %}
-					<table class="object_list">
-						<thead>
-							<tr>
-								<th>Name</th><th>Status</th>
-							</tr>
-						</thead>
-						<tbody>
-						{% for backup in object.backups.all %}
-							<tr class="{% cycle 'odd' 'even' %}{% if not backup.active %} inactive{% endif %}">
-								<td><a href="{{ backup.get_absolute_url }}">{{ backup.name }}</a></td>
-								<td>{{ backup.get_status|capfirst }}</td>
-							</tr>
-						{% endfor %}
-						</tbody>
-					</table>
-				{% else %}
-					<p>There are no backups for this client.</p>
-				{% endif %}
 				<h2>Results</h2>
 				<table class="object_list">
 					<thead>
 						<tr>
-							<th class="icon"></th><th>Backup</th><th>Started</th><th>Duration</th><th>Status</th>
+							<th class="icon"></th><th>Started</th><th>Duration</th><th>Status</th>
 						</tr>
 					</thead>
 					<tbody>
-						{% if object.results.finished %}
-							{% for result in object.results.finished %}
+						{% if object.backups.finished %}
+							{% for backup in object.backups.finished %}
 								<tr>
-									<td class="icon"><img src="{{ STATIC_URL }}img/icons/famfamfam/{% if result.successful %}accept.png{% else %}exclamation.png{% endif %}" /></td>
-									<td class="backup"><a href="{{ result.backup.get_absolute_url }}">{{ result.backup }}</a></td>
-									<td class="started"><a href="{{ result.get_absolute_url }}">{{ result.started_at }}</a></td>
-									<td class="finished">{{ result.started_at|timesince:result.finished_at }}</td>
-									<td class="status">{% if result.successful %}Success{% else %}Error{% endif %}</td>
+									<td class="icon"><img src="{{ STATIC_URL }}img/icons/famfamfam/{% if backup.successful %}accept.png{% else %}exclamation.png{% endif %}" /></td>
+									<td class="started"><a href="{{ backup.get_absolute_url }}">{{ backup.started_at }}</a></td>
+									<td class="finished">{{ backup.started_at|timesince:backup.finished_at }}</td>
+									<td class="status">{% if backup.successful %}Success{% else %}Error{% endif %}</td>
 								</tr>
 							{% endfor %}
 						{% else %}
 							<tr class="info">
 								<td colspan="6">
-									No results available.
+									This client has not yet been backed up.
 								</td>
 							</tr>
 						{% endif %}

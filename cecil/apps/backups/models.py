@@ -1,5 +1,7 @@
 from django.db import models
 
+import managers
+
 BACKEDUPFILE_ACTION_CHOICES = (
 	('deleted', 'Deleted'),
 	('added', 'Added'),
@@ -11,6 +13,8 @@ class Backup(models.Model):
 	successful = models.BooleanField()
 	started_at = models.DateTimeField(auto_now_add=True)
 	finished_at = models.DateTimeField(null=True, blank=True)
+	
+	objects = managers.BackupManager()
 	
 	@models.permalink
 	def get_absolute_url(self):
@@ -28,7 +32,7 @@ class Backup(models.Model):
 			return 'error'
 	
 	def __unicode__(self):
-		return '%s (%s)' % (self.client.name, self.started_at)
+		return '%s (%s)' % (self.client.hostname, self.started_at)
 	
 	class Meta:
 		ordering = ('-started_at',)

@@ -23,7 +23,7 @@ class Client(models.Model):
 		Backup = models.get_model('backups', 'Backup')
 		try:
 			return Backup.objects.filter(client=self, finished_at__isnull=False).latest()
-		except Result.DoesNotExist:
+		except Backup.DoesNotExist:
 			return None
 	
 	def get_last_backup_status(self):
