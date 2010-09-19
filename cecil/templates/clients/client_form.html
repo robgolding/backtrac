@@ -1,0 +1,44 @@
+{% extends 'hosts/base.html' %}
+
+{% block content %}
+	<div class="container">
+		<section class="span-18">
+			<h1>{% if host %}{{ host.hostname }}{% else %}Add a Client{% endif %}</h1>
+			<div class="content clearfix">
+				<form action="" method="post" class="standard-form">{% csrf_token %}
+					<h2>Client Details</h2>
+					{% for error in form.non_field_errors %}
+						<p class="error">{{ error }}</p>
+					{% endfor %}
+					{% for field in form %}
+						{% if field.is_hidden %}
+							{{ field }}
+						{% else %}
+							<div class="field-wrapper clearfix">
+								{{ field.label_tag }}<br />
+								<div class="field">{{ field }}</div>
+								<div class="field-errors">	
+									{% if field.errors %}
+										<span class="error">{{ field.errors.0 }}</span>
+									{% endif %}
+								</div>
+							</div>
+						{% endif %}
+					{% endfor %}
+					<button type="submit" class="button"><img src="{{ STATIC_URL }}css/blueprint/plugins/buttons/icons/tick.png" /> {% if host %}Update Client{% else %}Create client{% endif %}</button>
+				</form>
+				<form method="GET" action="{{ back_link }}">
+					 <button type="submit" class="button negative"><img src="{{ STATIC_URL }}css/blueprint/plugins/buttons/icons/cross.png" /> Cancel</button>
+				</form>
+			</div>
+		</section>
+		<section class="span-6 last">
+			<h1>Help</h1>
+			<div class="content">
+				<p>
+					Some tips here...
+				</p>
+			</div>
+		</section>
+	</div>
+{% endblock %}

@@ -112,6 +112,7 @@ INSTALLED_APPS = (
 	'cecil.apps.core',
 	'cecil.apps.backups',
 	'cecil.apps.hosts',
+	'cecil.apps.clients',
 	'cecil.apps.schedules',
 )
 

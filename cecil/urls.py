@@ -20,7 +20,9 @@ urlpatterns = patterns('',
 	
 	(r'^backups/', include('cecil.apps.backups.urls')),
 	
-	(r'^clients/', include('cecil.apps.hosts.urls')),
+	(r'^clients/', include('cecil.apps.clients.urls')),
+	
+	(r'^hosts/', include('cecil.apps.hosts.urls')),
 	
 	(r'^api/', include('cecil.api.urls')),
 	
