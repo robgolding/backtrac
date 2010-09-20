@@ -37,6 +37,8 @@ class Client(models.Model):
 	def get_status(self):
 		if self.is_backing_up():
 			return 'backup running'
+		if self.backup_pending():
+			return 'backup pending'
 		cs = self.checkins.order_by('-created')
 		if not cs or (cs[0].created < datetime.datetime.now() - datetime.timedelta(seconds=60)):
 			return 'offline'
@@ -47,7 +49,7 @@ class Client(models.Model):
 			return None
 		return self.get_schedule().get_next_occurrence()
 	
-	def is_pending(self):
+	def backup_pending(self):
 		last = self.get_schedule().get_last_occurrence()
 		if self.is_backing_up() or last is None:
 			return False
