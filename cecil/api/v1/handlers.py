@@ -1,4 +1,4 @@
-import os, sys, uuid, json, tarfile
+import os, sys, uuid, json, tarfile, datetime
 
 from django.shortcuts import get_object_or_404
 from django.conf import settings
@@ -47,6 +47,10 @@ class BackupReceiptHandler(BaseHandler):
 			rf = BackedUpFile.objects.create(backup=self.backup, path=f, action='deleted')
 			os.remove(os.path.join(root, f[1:])) #TODO: Fix this to remove starting slash
 		os.remove(tarfile_name)
+		
+		self.backup.finished_at = datetime.datetime.now()
+		self.backup.successful = self.report['result']
+		self.backup.save()
 	
 	def update(self, request):
 		self.backup = get_object_or_404(Backup, client=request.user, finished_at=None)

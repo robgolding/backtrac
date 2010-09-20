@@ -6,11 +6,11 @@ from django.conf import settings
 
 class PackageReceiver(Thread):
 
-	def __init__(self, result_obj, port=None, callback=None):
+	def __init__(self, backup, port=None, callback=None):
 		Thread.__init__(self)
 		port = port or 0
-		self.result_obj = result_obj
-		self.filename = os.path.join(settings.BACKTRAC_TMP_DIR, 'receivedpackage-%d.tar.gz' % result_obj.id)
+		self.backup = backup
+		self.filename = os.path.join(settings.BACKTRAC_TMP_DIR, 'receivedpackage-%d.tar.gz' % backup.id)
 		self.callback = callback
 		self.stopping = False
 		
@@ -34,7 +34,7 @@ class PackageReceiver(Thread):
 		self.callback(self.filename)
 	
 	def transfer(self):
-		print 'Starting media transfer for %s' % self.result_obj
+		print 'Starting media transfer for %s' % self.backup
 		if not os.path.exists(settings.BACKTRAC_BACKUP_ROOT):
 			os.makedirs(settings.BACKTRAC_BACKUP_ROOT)
 		f = open(self.filename, 'wb')
@@ -46,10 +46,6 @@ class PackageReceiver(Thread):
 		f.close()
 
 		print 'Closing media transfer'
-		
-		self.result_obj.finished_at = datetime.datetime.now()
-		self.result_obj.successful = True
-		self.result_obj.save()
 	
 	def close(self):
 		print 'Shutting down sockets...'
