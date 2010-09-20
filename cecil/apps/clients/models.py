@@ -49,12 +49,12 @@ class Client(models.Model):
 	
 	def is_pending(self):
 		last = self.get_schedule().get_last_occurrence()
-		if self.is_running() or last is None:
+		if self.is_backing_up() or last is None:
 			return False
-		r = self.get_last_completed_result()
-		if r is None:
+		b = self.get_last_completed_backup()
+		if b is None:
 			return True
-		return last != self.schedule.get_last_occurrence(before=r.finished_at)
+		return last != self.schedule.get_last_occurrence(before=b.finished_at)
 	
 	def __unicode__(self):
 		return self.hostname
