@@ -1,0 +1,17 @@
+{% spaceless %}
+<img src="{{ STATIC_URL }}img/icons/famfamfam/
+{% if client.is_backing_up %}
+	folder_go.png
+{% else %}
+	{% if client.backup_pending %}
+		clock.png
+	{% else %}
+		{% if client.get_last_completed_backup and not client.get_last_completed_backup.successful %}
+			exclamation.png
+		{% else %}
+			accept.png
+		{% endif %}
+	{% endif %}
+{% endif %}"
+/>
+{% endspaceless %}
