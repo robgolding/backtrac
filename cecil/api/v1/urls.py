@@ -27,8 +27,6 @@ urlpatterns = patterns('',
 	
 	url(r'^checkin/$', checkin_handler, name="api_v1_checkin"),
 	
-#	url(r'^backups/(?P<id>\d+)/$', backup_handler, name="api_v1_backup_detail"),
-	
 	url(r'begin_backup/$', begin_backup_handler, name="api_v1_begin_backup"),
 	
 	url(r'^submit_package/$', backup_receipt_handler, name="api_v1_backup_submit_package"),

@@ -21,7 +21,8 @@ class BeginBackupHandler(BaseHandler):
 	
 	def update(self, request):
 		backup = Backup.objects.create(client=request.user)
-		return {'backup_id': backup.id}
+		paths = [ f.path for f in request.user.filepaths.all() ]
+		return { 'backup_id': backup.id, 'paths': paths }
 	
 	create = update
 
@@ -29,7 +30,7 @@ class BackupReceiptHandler(BaseHandler):
 	allowed_methods = ('PUT', 'POST')
 	
 	def process_result(self, tarfile_name):
-		root = os.path.join(settings.BACKTRAC_BACKUP_ROOT, 'backup-%d' % self.result.backup.id)
+		root = os.path.join(settings.BACKTRAC_BACKUP_ROOT, '%d' % self.backup.id)
 		try:
 			t = tarfile.open(tarfile_name, 'r:gz')
 			members = t.getmembers()
@@ -37,22 +38,21 @@ class BackupReceiptHandler(BaseHandler):
 				t.extract(member, path=root)
 				extracted = os.path.join(root, member.name)
 				size = os.lstat(extracted)[6]
-				ResultFile.objects.create(result=self.result, path=member.name, size=size, type='added')
+				BackedUpFile.objects.create(backup=self.backup, path=member.name, size=size, action='added')
 		except tarfile.ReadError:
 			pass
 		for f in self.report['deleted']:
-			rf = ResultFile.objects.create(result=self.result, path=f, type='deleted')
+			rf = BackedUpFile.objects.create(backup=self.backup, path=f, action='deleted')
 			os.remove(os.path.join(root, f[1:])) #TODO: Fix this to remove starting slash
 		os.remove(tarfile_name)
 	
-	def update(self, request, id):
-		self.backup = get_object_or_404(Backup, pk=id)
-		self.result = get_object_or_404(Result, backup=self.backup, finished_at=None)
+	def update(self, request):
+		self.backup = get_object_or_404(Backup, client=request.user, finished_at=None)
 		
 		report_file = request.FILES['report']
 		self.report = json.loads(report_file.read())
 		
-		r = PackageReceiver(self.result, callback=self.process_result)
+		r = PackageReceiver(self.backup, callback=self.process_result)
 		r.start()
 		return {'port': r.port}
 	
