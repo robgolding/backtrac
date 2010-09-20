@@ -22,8 +22,6 @@ urlpatterns = patterns('',
 	
 	(r'^clients/', include('cecil.apps.clients.urls')),
 	
-	(r'^hosts/', include('cecil.apps.hosts.urls')),
-	
 	(r'^api/', include('cecil.api.urls')),
 	
 )
