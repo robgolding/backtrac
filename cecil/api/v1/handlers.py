@@ -10,11 +10,14 @@ from cecil.apps.clients.models import Client, Checkin
 from receiver import PackageReceiver
 
 class CheckinHandler(BaseHandler):
-	allowed_methods = ('POST',)
+	allowed_methods = ('PUT', 'POST', 'GET')
 	
-	def create(self, request):
-		c = Checkin.objects.create(host=request.user)
-		return { 'pending': request.user.is_pending() }
+	def update(self, request):
+		c = Checkin.objects.create(client=request.user)
+		return { 'pending': request.user.backup_pending() }
+	
+	create = update
+	read = create
 
 class BeginBackupHandler(BaseHandler):
 	allowed_methods = ('PUT', 'POST')
