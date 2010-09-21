@@ -10,7 +10,7 @@ class PackageReceiver(Thread):
 		Thread.__init__(self)
 		port = port or 0
 		self.backup = backup
-		self.filename = os.path.join(settings.BACKTRAC_TMP_DIR, 'receivedpackage-%d.tar.gz' % backup.id)
+		self.filename = os.path.join(settings.BACKTRAC_TMP_DIR, 'receivedpackage-%s.tar.gz' % backup.uuid)
 		self.callback = callback
 		self.stopping = False
 		

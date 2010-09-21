@@ -1,3 +1,5 @@
+import uuid
+
 from django.db import models
 
 import managers
@@ -9,12 +11,19 @@ BACKEDUPFILE_ACTION_CHOICES = (
 )
 
 class Backup(models.Model):
+	uuid = models.CharField(max_length=36, db_index=True, blank=True)
 	client = models.ForeignKey('clients.Client', related_name='backups')
 	successful = models.BooleanField()
 	started_at = models.DateTimeField(auto_now_add=True)
 	finished_at = models.DateTimeField(null=True, blank=True)
+	size = models.BigIntegerField(default=0, blank=True)
 	
 	objects = managers.BackupManager()
+	
+	def save(self, *args, **kwargs):
+		if not self.id:
+			self.uuid = uuid.uuid4()
+		super(Backup, self).save(*args, **kwargs)
 	
 	@models.permalink
 	def get_absolute_url(self):

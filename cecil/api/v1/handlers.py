@@ -24,7 +24,7 @@ class BeginBackupHandler(BaseHandler):
 	def update(self, request):
 		backup = Backup.objects.create(client=request.user)
 		paths = [ f.path for f in request.user.filepaths.all() ]
-		return { 'backup_id': backup.id, 'paths': paths }
+		return { 'backup_uuid': backup.uuid, 'paths': paths }
 	
 	create = update
 
@@ -32,7 +32,7 @@ class BackupReceiptHandler(BaseHandler):
 	allowed_methods = ('PUT', 'POST')
 	
 	def process_result(self, tarfile_name):
-		root = os.path.join(settings.BACKTRAC_BACKUP_ROOT, '%d' % self.backup.id)
+		root = os.path.join(settings.BACKTRAC_BACKUP_ROOT, self.backup.uuid)
 		try:
 			t = tarfile.open(tarfile_name, 'r:gz')
 			members = t.getmembers()

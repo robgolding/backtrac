@@ -2,7 +2,7 @@
 
 {% block content %}
 	<div class="container">
-		<section class="span-18">
+		<section class="span-24 last">
 			<h1>{{ object.client.hostname }} ({{ object.started_at }})</h1>
 			<div class="content clearfix">
 				<h2>Summary</h2>
@@ -13,6 +13,9 @@
 						
 						<dt>Status:</dt>
 						<dd><span class="{{ object.get_status }}">{{ object.get_status|capfirst }}</a></dd>
+						
+						<dt>UUID:</dt>
+						<dd><code>{{ object.uuid }}</code></dd>
 						
 						<dt>Started:</dt>
 						<dd>{{ object.started_at }}</dd>
@@ -50,12 +53,6 @@
 						{% endif %}
 					</tbody>
 				</table>
-			</div>
-		</section>
-		<section class="span-6 last">
-			<h1>Help</h1>
-			<div class="content menu clearfix">
-				<p>Possibly help or something else here...</p>
 			</div>
 		</section>
 	</div>
