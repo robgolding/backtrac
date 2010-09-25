@@ -13,7 +13,9 @@ class CheckinHandler(BaseHandler):
 	allowed_methods = ('PUT', 'POST')
 	
 	def update(self, request):
-		c = Checkin.objects.create(client=request.user)
+		checkin, created = Checkin.objects.get_or_create(client=request.user)
+		if not created:
+			checkin.save()
 		return { 'pending': request.user.backup_pending() }
 	
 	create = update

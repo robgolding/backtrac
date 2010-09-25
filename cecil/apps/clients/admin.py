@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from models import Client, FilePath
+from models import Client, FilePath, Checkin
 
 class ClientAdmin(admin.ModelAdmin):
 	list_display = ('id', 'hostname', 'get_status', 'active',)
@@ -9,3 +9,4 @@ class ClientAdmin(admin.ModelAdmin):
 
 admin.site.register(Client, ClientAdmin)
 admin.site.register(FilePath)
+admin.site.register(Checkin)

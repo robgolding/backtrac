@@ -73,7 +73,7 @@ class FilePath(models.Model):
 
 class Checkin(models.Model):
 	client = models.ForeignKey(Client, related_name='checkins')
-	created = models.DateTimeField(auto_now_add=True)
+	created = models.DateTimeField(auto_now_add=True, auto_now=True)
 	
 	def __unicode__(self):
 		return '%s @ %s' % (self.client, self.created)
