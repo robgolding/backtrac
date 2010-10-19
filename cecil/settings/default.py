@@ -114,6 +114,8 @@ INSTALLED_APPS = (
 	'cecil.apps.hosts',
 	'cecil.apps.clients',
 	'cecil.apps.schedules',
+    
+    'cecil.server',
 )
 
 BACKTRAC_BACKUP_ROOT = '/var/lib/backtrac/backups/'
