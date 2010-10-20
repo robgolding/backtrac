@@ -4,6 +4,7 @@ from django.shortcuts import get_object_or_404
 from django.conf import settings
 from piston.handler import BaseHandler
 
+from cecil.apps.core.utils.storage import Storage
 from cecil.apps.backups.models import Backup, BackedUpFile
 from cecil.apps.clients.models import Client, Checkin
 
@@ -34,25 +35,24 @@ class BackupReceiptHandler(BaseHandler):
 	allowed_methods = ('PUT', 'POST')
 	
 	def process_result(self, tarfile_name):
-		root = os.path.join(settings.BACKTRAC_BACKUP_ROOT, self.backup.uuid)
-		try:
-			t = tarfile.open(tarfile_name, 'r:gz')
-			members = t.getmembers()
-			for member in members:
-				t.extract(member, path=root)
-				extracted = os.path.join(root, member.name)
-				size = os.lstat(extracted)[6]
-				BackedUpFile.objects.create(backup=self.backup, path=member.name, size=size, action='added')
-		except tarfile.ReadError:
-			pass
+		for f in self.report['added']:
+			BackedUpFile.objects.create(backup=self.backup, path=f, size=0, action='added') #TODO: add size to report
 		for f in self.report['deleted']:
-			rf = BackedUpFile.objects.create(backup=self.backup, path=f, action='deleted')
-			os.remove(os.path.join(root, f[1:])) #TODO: Fix this to remove starting slash
-		os.remove(tarfile_name)
+			BackedUpFile.objects.create(backup=self.backup, path=f, action='deleted')
+		
+		storage = Storage(settings.BACKTRAC_BACKUP_ROOT)
+		storage.add_package(self.backup, tarfile_name)
 		
 		self.backup.finished_at = datetime.datetime.now()
 		self.backup.successful = self.report['result']
 		self.backup.save()
+	
+	def process_error(self, exception):
+		if not self.backup.finished_at:
+			self.backup.finished_at = datetime.datetime.now()
+		self.backup.successful = False
+		self.backup.save()
+		print 'Backup error: %s' % exception
 	
 	def update(self, request):
 		self.backup = get_object_or_404(Backup, client=request.user, finished_at=None)
@@ -60,7 +60,7 @@ class BackupReceiptHandler(BaseHandler):
 		report_file = request.FILES['report']
 		self.report = json.loads(report_file.read())
 		
-		r = PackageReceiver(self.backup, callback=self.process_result)
+		r = PackageReceiver(self.backup, callback=self.process_result, exception_callback=self.process_error)
 		r.start()
 		return {'port': r.port}
 	
