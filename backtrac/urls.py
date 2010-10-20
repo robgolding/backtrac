@@ -3,7 +3,7 @@ from django.conf.urls.defaults import *
 from django.contrib import admin
 admin.autodiscover()
 
-from cecil.apps.core import views
+from backtrac.apps.core import views
 
 urlpatterns = patterns('',
     (r'^admin/doc/', include('django.contrib.admindocs.urls')),
@@ -18,11 +18,11 @@ urlpatterns = patterns('',
 
     url(r'^accounts/logout/', 'django.contrib.auth.views.logout_then_login', name='auth_logout'),
 
-    (r'^backups/', include('cecil.apps.backups.urls')),
+    (r'^backups/', include('backtrac.apps.backups.urls')),
 
-    (r'^clients/', include('cecil.apps.clients.urls')),
+    (r'^clients/', include('backtrac.apps.clients.urls')),
 
-    (r'^api/', include('cecil.api.urls')),
+    (r'^api/', include('backtrac.api.urls')),
 
 )
 

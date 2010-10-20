@@ -1,7 +1,7 @@
 import datetime
 from django.db import models
 
-from cecil.apps.schedules.models import Schedule, Rule
+from backtrac.apps.schedules.models import Schedule, Rule
 
 class Client(models.Model):
     hostname = models.CharField(max_length=255, unique=True, db_index=True)

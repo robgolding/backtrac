@@ -1,4 +1,4 @@
 *.pyc
-cecil/settings/local.py
-cecil/dev.db
+backtrac/settings/local.py
+backtrac/dev.db
 *.swp

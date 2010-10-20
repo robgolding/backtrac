@@ -4,6 +4,6 @@ class Command(BaseCommand):
     help = 'Starts the backtrac server daemon (backtracd)'
 
     def handle(self, *args, **options):
-        from cecil.server import BackupServer
+        from backtrac.server import BackupServer
         server = BackupServer()
         server.start()

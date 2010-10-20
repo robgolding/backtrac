@@ -13,7 +13,7 @@ from twisted.internet import defer
 
 from utils import PageCollector
 
-from cecil.apps.clients.models import Client
+from backtrac.apps.clients.models import Client
 
 class BackupClientAuthChecker:
     implements(checkers.ICredentialsChecker)

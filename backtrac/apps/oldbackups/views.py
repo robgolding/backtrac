@@ -8,7 +8,7 @@ from django.contrib import messages
 
 from models import Backup, Result
 from forms import BackupForm, JobFormSet, UpdateJobFormSet
-from cecil.apps.schedules.forms import ScheduleForm, RuleFormSet, UpdateRuleFormSet
+from backtrac.apps.schedules.forms import ScheduleForm, RuleFormSet, UpdateRuleFormSet
 
 @transaction.commit_on_success
 def create_backup(request, template_name='backups/backup_form.html'):

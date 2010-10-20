@@ -2,7 +2,7 @@
 # Configuration
 #
 # Django settings
-DJANGO_SETTINGS = 'cecil.settings'
+DJANGO_SETTINGS = 'backtrac.settings'
 DJANGO_SERVE_ADMIN = True # Serve admin files
 
 # Server settings
@@ -25,7 +25,7 @@ DEBUG = True
 
 # It must match with the path given in your daemon.sh file if you are
 # using a daemon.sh file to control the server. 
-PIDFILE = '/var/run/cecil.pid' 
+PIDFILE = '/var/run/backtrac.pid' 
 
 # Launch as root to dynamically chown
 SERVER_USER = 'nobody'

@@ -8,7 +8,7 @@ from django.contrib import messages
 
 from models import Client
 from forms import ClientForm, FilePathFormSet, UpdateFilePathFormSet
-from cecil.apps.schedules.forms import ScheduleForm, RuleFormSet, UpdateRuleFormSet
+from backtrac.apps.schedules.forms import ScheduleForm, RuleFormSet, UpdateRuleFormSet
 
 @transaction.commit_on_success
 def create_client(request, template_name='clients/client_form.html'):

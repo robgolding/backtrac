@@ -4,9 +4,9 @@ from django.shortcuts import get_object_or_404
 from django.conf import settings
 from piston.handler import BaseHandler
 
-from cecil.apps.core.utils.storage import Storage
-from cecil.apps.backups.models import Backup, BackedUpFile
-from cecil.apps.clients.models import Client, Checkin
+from backtrac.apps.core.utils.storage import Storage
+from backtrac.apps.backups.models import Backup, BackedUpFile
+from backtrac.apps.clients.models import Client, Checkin
 
 from receiver import PackageReceiver
 

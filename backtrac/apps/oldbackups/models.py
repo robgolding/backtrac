@@ -2,8 +2,8 @@ import datetime
 from django.db import models
 from django.db.models.signals import pre_delete
 
-from cecil.apps.schedules.models import Schedule, Rule
-from cecil.apps.hosts.models import Host
+from backtrac.apps.schedules.models import Schedule, Rule
+from backtrac.apps.hosts.models import Host
 
 from managers import BackupManager, ResultManager
 

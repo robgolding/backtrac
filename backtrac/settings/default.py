@@ -77,10 +77,10 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    'cecil.apps.core.middleware.RequireLoginMiddleware',
+    'backtrac.apps.core.middleware.RequireLoginMiddleware',
 )
 
-ROOT_URLCONF = 'cecil.urls'
+ROOT_URLCONF = 'backtrac.urls'
 
 TEMPLATE_DIRS = (
     os.path.join(PATH, 'templates'),
@@ -95,7 +95,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.contrib.messages.context_processors.messages',
     
     # custom template context processors
-    'cecil.apps.core.context_processors.static_url',
+    'backtrac.apps.core.context_processors.static_url',
 )
 
 INSTALLED_APPS = (
@@ -108,15 +108,15 @@ INSTALLED_APPS = (
     'django.contrib.admindocs',
     'django.contrib.contenttypes',
     
-    # cecil apps
-    'cecil.apps.core',
-    'cecil.apps.backups',
-    'cecil.apps.hosts',
-    'cecil.apps.clients',
-    'cecil.apps.schedules',
-    'cecil.apps.catalog',
+    # backtrac apps
+    'backtrac.apps.core',
+    'backtrac.apps.backups',
+    'backtrac.apps.hosts',
+    'backtrac.apps.clients',
+    'backtrac.apps.schedules',
+    'backtrac.apps.catalog',
     
-    'cecil.server',
+    'backtrac.server',
 )
 
 BACKTRAC_BACKUP_ROOT = '/var/lib/backtrac/backups/'

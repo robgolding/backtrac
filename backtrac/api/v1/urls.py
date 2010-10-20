@@ -5,7 +5,7 @@ from piston.authentication import HttpBasicAuthentication
 from handlers import *
 
 def host_auth(username, password):
-	from cecil.apps.clients.models import Client
+	from backtrac.apps.clients.models import Client
 	try:
 		return Client.objects.get(hostname=username, secret_key=password)
 	except Client.DoesNotExist:
