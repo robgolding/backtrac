@@ -1,3 +1,4 @@
 *.pyc
 cecil/settings/local.py
 cecil/dev.db
+*.swp
