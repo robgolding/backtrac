@@ -19,9 +19,3 @@ INSTALLED_APPS += ('debug_toolbar',)
 DEBUG_TOOLBAR_CONFIG = {
     'INTERCEPT_REDIRECTS': False,
 }
-
-BROKER_HOST = "localhost"
-BROKER_PORT = 5672
-BROKER_USER = "backtrac"
-BROKER_PASSWORD = "backtrac"
-BROKER_VHOST = "backtrac"
