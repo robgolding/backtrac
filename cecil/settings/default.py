@@ -8,20 +8,20 @@ TEMPLATE_DEBUG = DEBUG
 SERVE_STATIC = False
 
 ADMINS = (
-	('Rob Golding', 'rob@robgolding.com'),
+    ('Rob Golding', 'rob@robgolding.com'),
 )
 
 MANAGERS = ADMINS
 
 DATABASES = {
-	'default': {
-		'ENGINE': 'django.db.backends.', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
-		'NAME': '',                      # Or path to database file if using sqlite3.
-		'USER': '',                      # Not used with sqlite3.
-		'PASSWORD': '',                  # Not used with sqlite3.
-		'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
-		'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
-	}
+    'default': {
+        'ENGINE': 'django.db.backends.', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
+        'NAME': '',                      # Or path to database file if using sqlite3.
+        'USER': '',                      # Not used with sqlite3.
+        'PASSWORD': '',                  # Not used with sqlite3.
+        'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
+        'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
+    }
 }
 
 # Local time zone for this installation. Choices can be found here:
@@ -67,53 +67,53 @@ ADMIN_MEDIA_PREFIX = '/media/admin/'
 
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
-	'django.template.loaders.filesystem.Loader',
-	'django.template.loaders.app_directories.Loader',
+    'django.template.loaders.filesystem.Loader',
+    'django.template.loaders.app_directories.Loader',
 )
 
 MIDDLEWARE_CLASSES = (
-	'django.middleware.common.CommonMiddleware',
-	'django.contrib.sessions.middleware.SessionMiddleware',
-	'django.middleware.csrf.CsrfViewMiddleware',
-	'django.contrib.auth.middleware.AuthenticationMiddleware',
-	'django.contrib.messages.middleware.MessageMiddleware',
-	'cecil.apps.core.middleware.RequireLoginMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
+    'cecil.apps.core.middleware.RequireLoginMiddleware',
 )
 
 ROOT_URLCONF = 'cecil.urls'
 
 TEMPLATE_DIRS = (
-	os.path.join(PATH, 'templates'),
+    os.path.join(PATH, 'templates'),
 )
 
 TEMPLATE_CONTEXT_PROCESSORS = (
-	# default Django template context processors
-	'django.core.context_processors.auth',
-	'django.core.context_processors.debug',
-	'django.core.context_processors.i18n',
-	'django.core.context_processors.media',
-	'django.contrib.messages.context_processors.messages',
-	
-	# custom template context processors
-	'cecil.apps.core.context_processors.static_url',
+    # default Django template context processors
+    'django.core.context_processors.auth',
+    'django.core.context_processors.debug',
+    'django.core.context_processors.i18n',
+    'django.core.context_processors.media',
+    'django.contrib.messages.context_processors.messages',
+    
+    # custom template context processors
+    'cecil.apps.core.context_processors.static_url',
 )
 
 INSTALLED_APPS = (
-	'django.contrib.auth',
-	'django.contrib.contenttypes',
-	'django.contrib.sessions',
-	'django.contrib.sites',
-	'django.contrib.messages',
-	'django.contrib.admin',
-	'django.contrib.admindocs',
-	'django.contrib.contenttypes',
-	
-	# cecil apps
-	'cecil.apps.core',
-	'cecil.apps.backups',
-	'cecil.apps.hosts',
-	'cecil.apps.clients',
-	'cecil.apps.schedules',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.sites',
+    'django.contrib.messages',
+    'django.contrib.admin',
+    'django.contrib.admindocs',
+    'django.contrib.contenttypes',
+    
+    # cecil apps
+    'cecil.apps.core',
+    'cecil.apps.backups',
+    'cecil.apps.hosts',
+    'cecil.apps.clients',
+    'cecil.apps.schedules',
     'cecil.apps.catalog',
     
     'cecil.server',

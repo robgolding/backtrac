@@ -8,75 +8,75 @@ from django.utils.translation import ugettext, ugettext_lazy as _
 import managers
 
 FREQUENCY_CHOICES = (
-	('YEARLY', _('Years')),
-	('MONTHLY', _('Months')),
-	('WEEKLY', _('Weeks')),
-	('DAILY', _('Days')),
-	('HOURLY', _('Hours')),
-	('MINUTELY', _('Minutes'))
+    ('YEARLY', _('Years')),
+    ('MONTHLY', _('Months')),
+    ('WEEKLY', _('Weeks')),
+    ('DAILY', _('Days')),
+    ('HOURLY', _('Hours')),
+    ('MINUTELY', _('Minutes'))
 )
 
 DEFAULT_FREQUENCY = rrule.MONTHLY
 
 class Schedule(models.Model):
-	"""
-	Model to represent a schedule, which consists of a start date and multiple
-	'rules' - each of which determines how often the given event recurs.
-	"""
-	start_date = models.DateField(_('start date'))
-	start_time = models.TimeField(_('start time'))
-	
-	objects = managers.ScheduleManager()
-	
-	def get_start_datetime(self):
-		return datetime.datetime.combine(self.start_date, self.start_time)
-	
-	def get_next_occurrence(self, after=None):
-		if after is None: after = datetime.datetime.now()
-		first = self.get_start_datetime()
-		if first > after:
-			return first
-		occs = sorted([r.get_next_occurrence(after=after) for r in self.rules.all()])
-		return occs[0] if occs else None
-	
-	def get_last_occurrence(self, before=None):
-		if before is None: before = datetime.datetime.now()
-		if self.get_start_datetime() > before:
-			return None
-		occs = sorted([r.get_last_occurrence(before=before) for r in self.rules.all()])
-		return occs[-1] if occs else None
-	
-	def __unicode__(self):
-		return '[Schedule] %d' % self.id
+    """
+    Model to represent a schedule, which consists of a start date and multiple
+    'rules' - each of which determines how often the given event recurs.
+    """
+    start_date = models.DateField(_('start date'))
+    start_time = models.TimeField(_('start time'))
+
+    objects = managers.ScheduleManager()
+
+    def get_start_datetime(self):
+        return datetime.datetime.combine(self.start_date, self.start_time)
+
+    def get_next_occurrence(self, after=None):
+        if after is None: after = datetime.datetime.now()
+        first = self.get_start_datetime()
+        if first > after:
+            return first
+        occs = sorted([r.get_next_occurrence(after=after) for r in self.rules.all()])
+        return occs[0] if occs else None
+
+    def get_last_occurrence(self, before=None):
+        if before is None: before = datetime.datetime.now()
+        if self.get_start_datetime() > before:
+            return None
+        occs = sorted([r.get_last_occurrence(before=before) for r in self.rules.all()])
+        return occs[-1] if occs else None
+
+    def __unicode__(self):
+        return '[Schedule] %d' % self.id
 
 class Rule(models.Model):
-	"""
-	Simple model to represent a python-dateutil rrule object.
-	
-	Limited functionality only allows the frequency and interval
-	to be recorded, which is all that is needed for this application.
-	"""
-	frequency = models.CharField(_('frequency'), choices=FREQUENCY_CHOICES,
-									max_length=10)
-	interval = models.PositiveIntegerField(_('interval'), default=1)
-	
-	schedule = models.ForeignKey(Schedule, related_name='rules')
-	
-	def get_rrule_object(self):
-		try:
-			frequency = eval('rrule.%s' % self.frequency)
-		except:
-			frequency = DEFAULT_FREQUENCY
-		return rrule.rrule(frequency, interval=self.interval,
-					dtstart=self.schedule.get_start_datetime())
-	
-	def get_next_occurrence(self, after=datetime.datetime.now()):
-		return self.get_rrule_object().after(after)
-	
-	def get_last_occurrence(self, before=datetime.datetime.now()):
-		return self.get_rrule_object().before(before)
-	
-	def __unicode__(self):
-		s = 'Every %(interval)d %(frequency)s'
-		return s % {'frequency': self.get_frequency_display(),
-					'interval': self.interval}
+    """
+    Simple model to represent a python-dateutil rrule object.
+    
+    Limited functionality only allows the frequency and interval
+    to be recorded, which is all that is needed for this application.
+    """
+    frequency = models.CharField(_('frequency'), choices=FREQUENCY_CHOICES,
+                                    max_length=10)
+    interval = models.PositiveIntegerField(_('interval'), default=1)
+
+    schedule = models.ForeignKey(Schedule, related_name='rules')
+
+    def get_rrule_object(self):
+        try:
+            frequency = eval('rrule.%s' % self.frequency)
+        except:
+            frequency = DEFAULT_FREQUENCY
+        return rrule.rrule(frequency, interval=self.interval,
+                    dtstart=self.schedule.get_start_datetime())
+
+    def get_next_occurrence(self, after=datetime.datetime.now()):
+        return self.get_rrule_object().after(after)
+
+    def get_last_occurrence(self, before=datetime.datetime.now()):
+        return self.get_rrule_object().before(before)
+
+    def __unicode__(self):
+        s = 'Every %(interval)d %(frequency)s'
+        return s % {'frequency': self.get_frequency_display(),
+                    'interval': self.interval}

@@ -1,6 +1,6 @@
 from default import *
 
 try:
-	from local import *
+    from local import *
 except ImportError:
-	pass
+    pass

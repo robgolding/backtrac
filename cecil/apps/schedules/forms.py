@@ -37,7 +37,7 @@ class SelectTimeWidget(Widget):
     second_field = '%s_second' 
     meridiem_field = '%s_meridiem'
     twelve_hr = False # Default to 24hr.
-    
+
     def __init__(self, attrs=None, hour_step=None, minute_step=None, second_step=None, twelve_hr=False):
         """
         hour_step, minute_step, second_step are optional step values for
@@ -45,11 +45,11 @@ class SelectTimeWidget(Widget):
         twelve_hr: If True, forces the output to be in 12-hr format (rather than 24-hr)
         """
         self.attrs = attrs or {}
-        
+
         if twelve_hr:
             self.twelve_hr = True # Do 12hr (rather than 24hr)
             self.meridiem_val = 'a.m.' # Default to Morning (A.M.)
-        
+
         if hour_step and twelve_hr:
             self.hours = range(1,13,hour_step) 
         elif hour_step: # 24hr, with stepping.
@@ -89,7 +89,7 @@ class SelectTimeWidget(Widget):
                         second_val = 0
                     else:
                         second_val = int(time_groups[SECONDS])
-                    
+
                     # check to see if meridiem was passed in
                     if time_groups[MERIDIEM] is not None:
                         self.meridiem_val = time_groups[MERIDIEM]
@@ -101,14 +101,14 @@ class SelectTimeWidget(Widget):
                                 self.meridiem_val = 'a.m.'
                         else:
                             self.meridiem_val = None
-                    
+
 
         # If we're doing a 12-hr clock, there will be a meridiem value, so make sure the
         # hours get printed correctly
         if self.twelve_hr and self.meridiem_val:
             if self.meridiem_val.lower().startswith('p') and hour_val > 12 and hour_val < 24:
                 hour_val = hour_val % 12
-            
+
         output = []
         if 'id' in self.attrs:
             id_ = self.attrs['id']
@@ -126,7 +126,7 @@ class SelectTimeWidget(Widget):
         local_attrs = self.build_attrs(id=self.hour_field % id_)
         select_html = Select(choices=hour_choices).render(self.hour_field % name, hour_val, local_attrs)
         output.append(select_html)
-        
+
         output.append(':')
 
         minute_choices = [("%.2d"%i, "%.2d"%i) for i in self.minutes]
@@ -138,7 +138,7 @@ class SelectTimeWidget(Widget):
 #       local_attrs['id'] = self.second_field % id_
 #       select_html = Select(choices=second_choices).render(self.second_field % name, second_val, local_attrs)
 #       output.append(select_html)
-    
+
         if self.twelve_hr:
             #  If we were given an initial value, make sure the correct meridiem gets selected.
             if self.meridiem_val is not None and  self.meridiem_val.startswith('p'):
@@ -170,30 +170,30 @@ class SelectTimeWidget(Widget):
                 h = (int(h)+12)%24 
             elif meridiem.lower().startswith('a') and int(h) == 12:
                 h = 0
-        
+
         if (int(h) == 0 or h) and m:
             return '%s:%s:%s' % (h, m, s)
 
         return data.get(name, None)
 
 class ScheduleForm(forms.ModelForm):
-	def __init__(self, *args, **kwargs):
-		super(ScheduleForm, self).__init__(*args, **kwargs)
-		self.fields['start_date'] = forms.DateField(widget=SelectDateWidget(),
-												initial=datetime.date.today())
-		self.fields['start_time'] = forms.TimeField(widget=SelectTimeWidget(minute_step=5))
-	
-	class Meta:
-		model = Schedule
+    def __init__(self, *args, **kwargs):
+        super(ScheduleForm, self).__init__(*args, **kwargs)
+        self.fields['start_date'] = forms.DateField(widget=SelectDateWidget(),
+                                                initial=datetime.date.today())
+        self.fields['start_time'] = forms.TimeField(widget=SelectTimeWidget(minute_step=5))
+
+    class Meta:
+        model = Schedule
 
 class RuleForm(forms.ModelForm):
-	def __init__(self, *args, **kwargs):
-		super(RuleForm, self).__init__(*args, **kwargs)
-		self.fields['interval'] = forms.ChoiceField(choices=[(i,i) for i in range(1,11)])
-	
-	class Meta:
-		model = Rule
-		exclude = ['schedule']
+    def __init__(self, *args, **kwargs):
+        super(RuleForm, self).__init__(*args, **kwargs)
+        self.fields['interval'] = forms.ChoiceField(choices=[(i,i) for i in range(1,11)])
+
+    class Meta:
+        model = Rule
+        exclude = ['schedule']
 
 RuleFormSet = formset_factory(RuleForm, formset=BaseFormSet, extra=1)
 UpdateRuleFormSet = formset_factory(RuleForm, formset=BaseFormSet, extra=0)
