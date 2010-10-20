@@ -74,6 +74,9 @@ class BackupClient(pb.Avatar):
         print 'Client %d (%s) disconnected' % (self.client.pk,
                                             self.client.hostname)
 
+    def perspective_get_paths(self):
+        return [p.path for p in self.client.filepaths.all()]
+
     def perspective_backup_file(self, path):
         return False
 
