@@ -114,6 +114,7 @@ INSTALLED_APPS = (
 	'cecil.apps.hosts',
 	'cecil.apps.clients',
 	'cecil.apps.schedules',
+    'cecil.apps.catalog',
     
     'cecil.server',
 )
