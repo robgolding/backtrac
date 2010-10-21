@@ -44,9 +44,10 @@ class FileTransferAgent(object):
         print 'Done!'
 
 class BackupClient(pb.Referenceable):
-    def __init__(self, server='localhost',
+    def __init__(self, server='localhost', port=8123,
                  hostname=socket.gethostname(), secret_key=''):
         self.server = server
+        self.port = port
         self.hostname = hostname
         self.secret_key = secret_key
         self.connected = False
@@ -71,7 +72,7 @@ class BackupClient(pb.Referenceable):
 
     def connect(self, start_on_connect=False):
         factory = pb.PBClientFactory()
-        reactor.connectTCP(self.server, 8123, factory)
+        reactor.connectTCP(self.server, self.port, factory)
         d = factory.login(
             cred.credentials.UsernamePassword(
                 self.hostname,
