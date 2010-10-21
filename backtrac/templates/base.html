@@ -1,87 +1,86 @@
 <!DOCTYPE HTML>
 <html>
 <head>
-	<meta charset="utf-8">
-	<title>Backtrac Backup System</title>
-	<link rel="stylesheet" href="{{ STATIC_URL }}css/blueprint/screen.css" type="text/css" media="screen, projection">
-	<link rel="stylesheet" href="{{ STATIC_URL }}css/blueprint/plugins/buttons/screen.css" type="text/css" media="screen, projection">
-	<link rel="stylesheet" href="{{ STATIC_URL }}css/blueprint/print.css" type="text/css" media="print">
-	<!--[if lt IE 8]><link rel="stylesheet" href="{{ STATIC_URL }}css/blueprint/ie.css" type="text/css" media="screen, projection"><![endif]-->
-	<link rel="stylesheet" href="{{ STATIC_URL }}css/style.css" type="text/css" media="screen, projection">
-	<!--[if IE]><script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
-	<script src="{{ STATIC_URL }}js/jquery-1.3.2.min.js"></script>
-	<script src="{{ STATIC_URL }}js/jquery.formset.js"></script>
-	<script language="javascript">
-		$(function() {
-			$("div.message a img").parent().click(function() {
-				$(this).parent().remove();
-				return false;
-			});
-		});
-	</script>
+    <meta charset="utf-8">
+    <title>Backtrac Backup System</title>
+    <link rel="stylesheet" href="{{ STATIC_URL }}css/blueprint/screen.css" type="text/css" media="screen, projection">
+    <link rel="stylesheet" href="{{ STATIC_URL }}css/blueprint/plugins/buttons/screen.css" type="text/css" media="screen, projection">
+    <link rel="stylesheet" href="{{ STATIC_URL }}css/blueprint/print.css" type="text/css" media="print">
+    <!--[if lt IE 8]><link rel="stylesheet" href="{{ STATIC_URL }}css/blueprint/ie.css" type="text/css" media="screen, projection"><![endif]-->
+    <link rel="stylesheet" href="{{ STATIC_URL }}css/style.css" type="text/css" media="screen, projection">
+    <!--[if IE]><script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+    <script src="{{ STATIC_URL }}js/jquery-1.3.2.min.js"></script>
+    <script src="{{ STATIC_URL }}js/jquery.formset.js"></script>
+    <script language="javascript">
+        $(function() {
+            $("div.message a img").parent().click(function() {
+                $(this).parent().remove();
+                return false;
+            });
+        });
+    </script>
 </head>
 <body id="{% block page_id %}{% endblock page_id %}">
-	<div id="wrap"> 
-		<div id="masthead-wrap">
-			<header id="masthead">
-				<div class="logo">
-					<a href="{% url index %}">
-						<img src="{{ STATIC_URL }}img/backtrac-6.png" />
-					</a>
-				</div>
-				<div class="text">
-					<h1><a href="{% url index %}">backtrac</a></h1>
-					<h2>backup system</h2>
-				</div>
-				{% if user.is_authenticated %}
-					<div id="userbox" class="menu clearfix">
-						<ul>
-							<li class="username">{% if user.get_full_name %}{{ user.get_full_name }} ({{ user.username }}){% else %}{{ user.username }}{% endif %}</li>
-							{% if user.is_superuser %}
-								<li><a href="{% url admin:index %}">Admin</a></li>
-							{% endif %}
-							<li><a href="{% url auth_logout %}">Logout</a></li>
-						</ul>
-					</div>
-				{% endif %}
-			</header>
-		</div><!-- end #masthead_wrap -->
-		<div id="nav-bar" class="clearfix">
-			{% if user.is_authenticated %}
-			<div id="nav-primary">
-				<ul>
-					<li class="dashboard"><a href="{% url dashboard %}">Dashboard</a></li>
-					<li class="clients"><a href="{% url clients_client_list %}">Clients</a></li>
-					<li class="backups"><a href="{% url backups_backup_list %}">Backups</a></li>
-				</ul>
-			</div>
-			{% endif %}
-		</div>
-		<div id="main">
-		{% block messages %}
-			{% if messages %}
-				<div id="messages" class="container">
-					{% for message in messages %}
-						<div class="message span-24">
-							<p {% if message.tags %} class="{{ message.tags }}"{% endif %}>
-								{{ message }}
-								<a href="" title="Remove message"><img src="{{ STATIC_URL }}css/blueprint/plugins/buttons/icons/cross.png" /></a>
-							</p>
-						</div>
-					{% endfor %}
-				</div>
-			{% endif %}
-		{% endblock messages %}
-		{% block content %}{% endblock content %}
-		</div><!-- end #main -->
-	</div><!-- end #wrap -->
-	<footer>
-		<div class="container">
-			<div class="span-24">
-				<div id="copyright">&copy; Backtrac Backup System 2010</div>
-				<div id="attrs">Icons by <a href="http://www.famfamfam.com/lab/icons/silk/">famfamfam</a></div>
-			</div>
-		</div>
-	</footer>
+    <div id="wrap"> 
+        <div id="masthead-wrap">
+            <header id="masthead">
+                <div class="logo">
+                    <a href="{% url index %}">
+                        <img src="{{ STATIC_URL }}img/backtrac-6.png" />
+                    </a>
+                </div>
+                <div class="text">
+                    <h1><a href="{% url index %}">backtrac</a></h1>
+                    <h2>backup system</h2>
+                </div>
+                {% if user.is_authenticated %}
+                    <div id="userbox" class="menu clearfix">
+                        <ul>
+                            <li class="username">{% if user.get_full_name %}{{ user.get_full_name }} ({{ user.username }}){% else %}{{ user.username }}{% endif %}</li>
+                            {% if user.is_superuser %}
+                                <li><a href="{% url admin:index %}">Admin</a></li>
+                            {% endif %}
+                            <li><a href="{% url auth_logout %}">Logout</a></li>
+                        </ul>
+                    </div>
+                {% endif %}
+            </header>
+        </div><!-- end #masthead_wrap -->
+        <div id="nav-bar" class="clearfix">
+            {% if user.is_authenticated %}
+            <div id="nav-primary">
+                <ul>
+                    <li class="dashboard"><a href="{% url dashboard %}">Dashboard</a></li>
+                    <li class="clients"><a href="{% url clients_client_list %}">Clients</a></li>
+                </ul>
+            </div>
+            {% endif %}
+        </div>
+        <div id="main">
+        {% block messages %}
+            {% if messages %}
+                <div id="messages" class="container">
+                    {% for message in messages %}
+                        <div class="message span-24">
+                            <p {% if message.tags %} class="{{ message.tags }}"{% endif %}>
+                                {{ message }}
+                                <a href="" title="Remove message"><img src="{{ STATIC_URL }}css/blueprint/plugins/buttons/icons/cross.png" /></a>
+                            </p>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endblock messages %}
+        {% block content %}{% endblock content %}
+        </div><!-- end #main -->
+    </div><!-- end #wrap -->
+    <footer>
+        <div class="container">
+            <div class="span-24">
+                <div id="copyright">&copy; Backtrac Backup System 2010</div>
+                <div id="attrs">Icons by <a href="http://www.famfamfam.com/lab/icons/silk/">famfamfam</a></div>
+            </div>
+        </div>
+    </footer>
 </body>
 </html>

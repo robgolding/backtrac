@@ -110,13 +110,8 @@ INSTALLED_APPS = (
     
     # backtrac apps
     'backtrac.apps.core',
-    'backtrac.apps.backups',
-    'backtrac.apps.hosts',
-    'backtrac.apps.clients',
-    'backtrac.apps.schedules',
     'backtrac.apps.catalog',
-    
-    'backtrac.server',
+    'backtrac.apps.clients',
 )
 
 BACKTRAC_BACKUP_ROOT = '/var/lib/backtrac/backups/'

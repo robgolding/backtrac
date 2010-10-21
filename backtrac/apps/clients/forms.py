@@ -7,7 +7,6 @@ class ClientForm(forms.ModelForm):
 
     class Meta:
         model = Client
-        exclude = ['schedule']
 
 class FilePathForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
