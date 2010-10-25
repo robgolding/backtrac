@@ -12,6 +12,8 @@ from twisted.internet.task import deferLater, cooperate
 from twisted.python import log
 from twisted import cred
 
+from backtrac.apps.catalog.models import File, FileVersion
+
 class ClientError(Exception): pass
 
 class TransferPager(FilePager):
@@ -34,7 +36,8 @@ class FileTransferAgent(object):
         self.perspective = perspective
 
     def send(self, path):
-        r = self.perspective.callRemote('put_file', path)
+        stat = os.stat(path)
+        r = self.perspective.callRemote('put_file', path, stat[8], stat[6])
         return r.addCallback(self._transfer, path)
 
     def _transfer(self, collector, path):
@@ -52,8 +55,8 @@ class BackupClient(pb.Referenceable):
         self.secret_key = secret_key
         self.connected = False
 
-    def backup_file(self, result, path):
-        if result:
+    def backup_file(self, backup_required, path):
+        if backup_required:
             print 'Sending: %s' % path
             self.transfer.send(path)
         else:
@@ -67,7 +70,9 @@ class BackupClient(pb.Referenceable):
             for root, dirs, files in os.walk(path):
                 for f in files:
                     path = os.path.join(root, f)
-                    d = self.perspective.callRemote('backup_file', path)
+                    stat = os.stat(path)
+                    d = self.perspective.callRemote('check_file',
+                                                path, stat[8], stat[6])
                     d.addCallback(self.backup_file, path)
 
     def connect(self, start_on_connect=False):

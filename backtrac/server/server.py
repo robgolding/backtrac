@@ -11,9 +11,10 @@ from twisted.spread.pb import PBServerFactory
 from twisted.spread.util import FilePager
 from twisted.internet import defer
 
-from utils import PageCollector
+from utils import PageCollector, get_storage_for
 
 from backtrac.apps.clients.models import Client
+from backtrac.apps.catalog.models import File, FileVersion
 
 class BackupClientAuthChecker:
     implements(checkers.ICredentialsChecker)
@@ -63,6 +64,7 @@ class BackupClient(pb.Avatar):
     def __init__(self, client, server):
         self.client = client
         self.server = server
+        self.storage = get_storage_for(client)
 
     def attached(self, mind):
         self.remote = mind
@@ -77,24 +79,24 @@ class BackupClient(pb.Avatar):
     def perspective_get_paths(self):
         return [p.path for p in self.client.filepaths.all()]
 
-    def perspective_backup_file(self, path):
-        return False
+    def perspective_check_file(self, path, mtime, size):
+        file_obj, _ = File.objects.get_or_create(client=self.client, path=path)
+        versions = file_obj.versions.all()
+        if not versions:
+            return True
+        version = versions.latest()
+        if mtime == version.mtime and size == version.size:
+            return False
+        return True
 
-    def perspective_put_file(self, path):
-        path = os.path.basename(path)
-        collector = PageCollector(path)
+    def perspective_put_file(self, path, mtime, size):
+        file_obj, _ = File.objects.get_or_create(client=self.client, path=path)
+        version_id, fdst = self.storage.add(path)
+        collector = PageCollector(fdst)
+        version_obj, _ = FileVersion.objects.get_or_create(id=version_id,
+                                         file=file_obj, mtime=mtime, size=size)
         return collector
 
 if __name__ == '__main__':
     server = BackupServer()
     server.start()
-
-#    realm = BackupRealm()
-#    realm.server = BackupServer()
-#    checker = checkers.InMemoryUsernamePasswordDatabaseDontUse()
-#    checker.addUser("armstrong", "password")
-#    p = portal.Portal(realm, [checker])
-#
-#    reactor.listenTCP(8123, PBServerFactory(p))
-#    print 'Listening on port 8123'
-#    reactor.run()

@@ -29,18 +29,17 @@ class ClientStorage(object):
     def _get_container(self, path):
         return os.path.join(self.root, self._hash(path))
 
-    def add(self, path, source, version_id=None):
+    def add(self, path, version_id=None):
         if version_id is None:
-            version_id = uuid.uuid4()
+            version_id = str(uuid.uuid4())
         container = self._get_container(path)
         makedirs(container)
-        dst = os.path.join(container, uuid)
+        dst = os.path.join(container, version_id)
         if os.path.exists(dst):
             raise StorageError('Version ID \'%s\' already exists for file: %s'
                                % (version_id, path))
         destination = open(dst, 'wb')
-        shutil.copyfileobj(source, destination)
-        return version_id
+        return version_id, destination
 
     def get(self, path, version_id):
         container = self._get_container(path)
