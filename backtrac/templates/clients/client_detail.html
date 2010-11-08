@@ -1,89 +1,41 @@
 {% extends 'clients/base.html' %}
 
 {% block content %}
-	<div class="container">
-		<section class="span-18">
-			<h1>{{ object.hostname }}</h1>
-			<div class="content clearfix">
-				<h2>Summary</h2>
-				<div class="object-summary host-summary">
-					<dl class="clearfix">
-						<dt>Description:</dt>
-						<dd>{{ object.hostname }}</dd>
-						
-						<dt>Secret key:</dt>
-						<dd><code>{{ object.secret_key }}</code></dd>
-						
-						<dt>Status:</dt>
-						<dd>{{ object.get_status|capfirst }}</dd>
-						
-						<dt>Last backup:</dt>
-						{% with object.get_last_completed_backup as backup %}
-						<dd>
-							{% if backup %}
-								<a href="{{ backup.get_absolute_url }}">{{ backup.started_at }}</a>
-							{% else %}
-								N/A
-							{% endif %}
-						</dd>
-						{% endwith %}
-						
-						<dt>Last result:</dt>
-						<dd><span class="{{ object.get_last_backup_status }}">{{ object.get_last_backup_status|capfirst }}</span></dd>
-						
-						<dt>Next backup:</dt>
-						{% with object.get_next_backup as b %}
-						<dd>
-							{% if b %}
-								<a href="{{ b.get_absolute_url }}">{{ b.name }}</a> <small>({{ b.next_run }})</small>
-							{% else %}
-								N/A
-							{% endif %}
-						</dd>
-						{% endwith %}
-					</dl>
-					<div class="actions">
-						<span>Actions:</span>
-						<ul class="actions">
-							<li class="update"><a href="{% url clients_update_client object.id %}" title="Update client">Update</a></li>
-							<li class="delete"><a href="{% url clients_delete_client object.id %}" title="Delete client">Delete</a></li>
-						</ul>
-					</div>
-				</div>
-				<hr />
-				<h2>Results</h2>
-				<table class="object_list">
-					<thead>
-						<tr>
-							<th class="icon"></th><th>Started</th><th>Duration</th><th>Status</th>
-						</tr>
-					</thead>
-					<tbody>
-						{% if object.backups.finished %}
-							{% for backup in object.backups.finished %}
-								<tr>
-									<td class="icon"><img src="{{ STATIC_URL }}img/icons/famfamfam/{% if backup.successful %}accept.png{% else %}exclamation.png{% endif %}" /></td>
-									<td class="started"><a href="{{ backup.get_absolute_url }}">{{ backup.started_at }}</a></td>
-									<td class="finished">{{ backup.started_at|timesince:backup.finished_at }}</td>
-									<td class="status">{% if backup.successful %}Success{% else %}Error{% endif %}</td>
-								</tr>
-							{% endfor %}
-						{% else %}
-							<tr class="info">
-								<td colspan="6">
-									This client has not yet been backed up.
-								</td>
-							</tr>
-						{% endif %}
-					</tbody>
-				</table>
-			</div>
-		</section>
-		<section class="span-6 last">
-			<h1>Help</h1>
-			<div class="content menu clearfix">
-				<p>Possibly help or something else here...</p>
-			</div>
-		</section>
-	</div>
+    <div class="container">
+        <section class="span-18">
+            <h1>{{ object.hostname }}</h1>
+            <div class="content clearfix">
+                <h2>Summary</h2>
+                <div class="object-summary host-summary">
+                    <dl class="clearfix">
+                        <dt>Description:</dt>
+                        <dd>{{ object.hostname }}</dd>
+                        
+                        <dt>Secret key:</dt>
+                        <dd><code>{{ object.secret_key }}</code></dd>
+                        
+                        <dt>Status:</dt>
+                        <dd>{{ object.get_status|capfirst }}</dd>
+                    </dl>
+                    <div class="actions">
+                        <span>Actions:</span>
+                        <ul class="actions">
+                            <li class="update">
+                                <a href="{% url clients_update_client object.id %}" title="Update client">Update</a>
+                            </li>
+                            <li class="delete">
+                                <a href="{% url clients_delete_client object.id %}" title="Delete client">Delete</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section class="span-6 last">
+            <h1>Help</h1>
+            <div class="content menu clearfix">
+                <p>Possibly help or something else here...</p>
+            </div>
+        </section>
+    </div>
 {% endblock %}
