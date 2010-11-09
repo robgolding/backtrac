@@ -7,6 +7,7 @@ from django.views.generic.simple import direct_to_template
 def index(request):
     return HttpResponseRedirect(reverse('dashboard'))
 
+@login_required
 def dashboard(request, *args, **kwargs):
     kwargs.update({'template': 'dashboard.html'})
     return direct_to_template(request, *args, **kwargs)

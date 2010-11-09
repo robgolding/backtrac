@@ -1,17 +1,19 @@
 from django.conf.urls.defaults import *
+from django.contrib.auth.decorators import login_required
+from django.views.generic.list_detail import object_list, object_detail
 
 from models import Client
 import views
 
 urlpatterns = patterns('',
 
-    url(r'^$', 'django.views.generic.list_detail.object_list', {
+    url(r'^$', login_required(object_list), {
                     'template_name': 'clients/client_list.html',
                         'queryset': Client.objects.select_related()},
                     name='clients_client_list'),
 
     url(r'^(?P<object_id>\d+)/$',
-                    'django.views.generic.list_detail.object_detail', {
+                    login_required(object_detail), {
                         'template_name': 'clients/client_detail.html',
                         'queryset': Client.objects.select_related()},
                     name='clients_client_detail'),

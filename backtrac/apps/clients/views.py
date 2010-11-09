@@ -1,5 +1,6 @@
 from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render_to_response, get_object_or_404
 from django.views.generic.list_detail import object_detail
 from django.db import transaction
@@ -9,6 +10,7 @@ from django.contrib import messages
 from models import Client
 from forms import ClientForm, FilePathFormSet, UpdateFilePathFormSet
 
+@login_required
 @transaction.commit_on_success
 def create_client(request, template_name='clients/client_form.html'):
     if request.method == 'POST':
@@ -33,6 +35,7 @@ def create_client(request, template_name='clients/client_form.html'):
     }
     return render_to_response(template_name, data, context_instance=RequestContext(request))
 
+@login_required
 @transaction.commit_on_success
 def update_client(request, client_id, template_name='clients/client_form.html'):
     client = get_object_or_404(Client, pk=client_id)
@@ -69,6 +72,7 @@ def update_client(request, client_id, template_name='clients/client_form.html'):
     }
     return render_to_response(template_name, data, context_instance=RequestContext(request))
 
+@login_required
 def pause_client(request, client_id, next=None):
     client = get_object_or_404(Client, pk=client_id)
     client.active = False
@@ -82,6 +86,7 @@ def pause_client(request, client_id, next=None):
     messages.success(request, 'Client updated successfully.')
     return HttpResponseRedirect(next)
 
+@login_required
 def resume_client(request, client_id, next=None):
     client = get_object_or_404(Client, pk=client_id)
     client.active = True
@@ -95,6 +100,7 @@ def resume_client(request, client_id, next=None):
     messages.success(request, 'Client updated successfully.')
     return HttpResponseRedirect(next)
 
+@login_required
 def delete_client(request, client_id, template_name='clients/delete_client.html'):
     client = get_object_or_404(Client, pk=client_id)
     referrer = request.META['HTTP_REFERER'].strip(' ?')
