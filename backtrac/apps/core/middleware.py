@@ -7,7 +7,6 @@ class RequireLoginMiddleware(object):
     EXCLUDED_URLS = (
         '/accounts/login/',
         '/__debug__/',
-        '/api/',
         settings.STATIC_URL,
     )
 

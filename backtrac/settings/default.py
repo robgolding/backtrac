@@ -77,7 +77,6 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    'backtrac.apps.core.middleware.RequireLoginMiddleware',
 )
 
 ROOT_URLCONF = 'backtrac.urls'

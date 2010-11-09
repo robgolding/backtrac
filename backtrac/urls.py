@@ -15,7 +15,7 @@ urlpatterns = patterns('',
     url(r'^dashboard/$', views.dashboard, name='dashboard'),
 
     url(r'^accounts/login/', 'django.contrib.auth.views.login',
-                {'template_name': 'auth/login.html'}, name='auth_login'),
+                name='auth_login'),
 
     url(r'^accounts/logout/', 'django.contrib.auth.views.logout_then_login',
                 name='auth_logout'),
