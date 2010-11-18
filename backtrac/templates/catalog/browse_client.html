@@ -1,0 +1,35 @@
+{% extends 'catalog/base.html' %}
+
+{% block content %}
+    <div class="container">
+        <section class="span-24">
+        <h1>Catalog: {{ client.hostname }}</h1>
+            <div class="content">
+                <table class="object_list">
+                    <thead>
+                        <tr>
+                            <th class="icon"></th><th>Name</th><th>Age</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if items %}
+                            {% for item in items %}
+                                <tr>
+                                    <td class="icon"></td>
+                                    <td class="name"><a href="{{ item.get_absolute_url }}">{{ item.get_name }}</a></td>
+                                    <td class="age">(age)</td>
+                                </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr class="info">
+                                <td colspan="6">
+                                    There are no files in the selected directory.
+                                </td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+{% endblock %}

@@ -234,8 +234,8 @@ span.error {
 }
 
 body#dashboard #nav-primary ul li.dashboard a,
-body#backups #nav-primary ul li.backups a,
-body#clients #nav-primary ul li.clients a {
+body#clients #nav-primary ul li.clients a,
+body#browse #nav-primary ul li.browse a {
 	background-color: #eee;
 }
 

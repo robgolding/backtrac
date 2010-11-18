@@ -1,38 +1,38 @@
 from django.db import models
 
-class Directory(models.Model):
+ITEM_TYPE_CHOICES = (
+    ('d', 'Directory'),
+    ('f', 'File'),
+)
+
+class Item(models.Model):
+    client = models.ForeignKey('clients.Client', related_name='items')
     parent = models.ForeignKey('self', null=True, blank=True)
     name = models.CharField(max_length=255)
+    type = models.CharField(max_length=2, choices=ITEM_TYPE_CHOICES)
+
+    def get_name(self):
+        if self.type == 'f':
+            return self.name
+        if self.type == 'd':
+            return self.name + '/'
 
     def _get_path(self):
         if self.parent is not None:
-            return self.parent.path + self.name + '/'
-        return '/%s/' % self.name
+            return self.parent.path + self.get_name()
+        return '/' + self.get_name()
     path = property(_get_path)
+
+    @models.permalink
+    def get_absolute_url(self):
+        return ('catalog_browse_client', [self.client.id, self.get_name()])
 
     def __unicode__(self):
         return self.path
 
-    class Meta:
-        verbose_name_plural = 'directories'
-
-class File(models.Model):
-    client = models.ForeignKey('clients.Client', related_name='files')
-    directory = models.ForeignKey(Directory, null=True, blank=True)
-    name = models.CharField(max_length=255)
-
-    def _get_path(self):
-        if self.directory is not None:
-            return self.directory.path + self.name
-        return '/%s' % self.name
-    path = property(_get_path)
-
-    def __unicode__(self):
-        return self.path
-
-class FileVersion(models.Model):
+class Version(models.Model):
     id = models.CharField('ID', max_length=36, primary_key=True)
-    file = models.ForeignKey(File, related_name='versions')
+    item = models.ForeignKey(Item, related_name='versions')
     backed_up_at = models.DateTimeField(auto_now_add=True)
     mtime = models.IntegerField('Modified time')
     size = models.BigIntegerField()
@@ -41,4 +41,4 @@ class FileVersion(models.Model):
         get_latest_by = 'backed_up_at'
 
     def __unicode__(self):
-        return '%s [%s]' % (self.file.path, self.backed_up_at)
+        return '%s [%s]' % (self.item.path, self.backed_up_at)

@@ -22,6 +22,8 @@ urlpatterns = patterns('',
 
     (r'^clients/', include('backtrac.apps.clients.urls')),
 
+    (r'^browse/', include('backtrac.apps.catalog.urls')),
+
 )
 
 from django.conf import settings

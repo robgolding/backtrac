@@ -1,7 +1,6 @@
 from django.contrib import admin
 
-from models import Directory, File, FileVersion
+from models import Item, Version
 
-admin.site.register(Directory)
-admin.site.register(File)
-admin.site.register(FileVersion)
+admin.site.register(Item)
+admin.site.register(Version)
