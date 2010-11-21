@@ -14,11 +14,13 @@
                     <tbody>
                         {% if items %}
                             {% for item in items %}
+                            {% with item.get_last_modified_version.backed_up_at|timesince as age %}
                                 <tr>
-                                    <td class="icon"></td>
+                                    <td class="icon">{% include 'catalog/item_icon.html' %}</td>
                                     <td class="name"><a href="{{ item.get_absolute_url }}">{{ item.get_name }}</a></td>
-                                    <td class="age">(age)</td>
+                                    <td class="age">{{ age|default:"N/A" }}</td>
                                 </tr>
+                               {% endwith %}
                             {% endfor %}
                         {% else %}
                             <tr class="info">

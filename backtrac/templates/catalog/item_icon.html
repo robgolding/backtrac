@@ -1,0 +1,9 @@
+{% spaceless %}
+{% if item.type == "f" %}
+    <img src="{{ STATIC_URL }}img/icons/famfamfam/page.png" />
+{% else %}
+    {% if item.type == "d" %}
+        <img src="{{ STATIC_URL }}img/icons/famfamfam/folder.png" />
+    {% endif %}
+{% endif %}
+{% endspaceless %}

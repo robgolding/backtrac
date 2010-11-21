@@ -7,16 +7,18 @@
             <div class="content clearfix">
                 <h2>Details</h2>
                 <div class="object-summary file-summary">
+                    {% with item.get_last_modified_version.backed_up_at|timesince as age %}
                     <dl class="clearfix">
                         <dt>Path:</dt>
                         <dd>{{ item.path }}</dd>
                         
                         <dt>Last modified:</dt>
-                        <dd>(last modified)</dd>
+                        <dd>{{ age|default:"N/A" }} ago</dd>
                         
                         <dt>Size:</dt>
                         <dd>{{ item.size|filesizeformat }}</dd>
                     </dl>
+                    {% endwith %}
                     <div class="actions">
                         <span>Actions:</span>
                         <ul class="actions">

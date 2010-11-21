@@ -27,6 +27,13 @@ class Item(models.Model):
     def get_absolute_url(self):
         return ('catalog_browse_route', [self.client.id, self.path[1:]])
 
+    def get_last_modified_version(self):
+        from backtrac.apps.catalog.models import Version
+        try:
+            return Version.objects.filter(item=self).latest()
+        except Version.DoesNotExist:
+            return None
+
     def __unicode__(self):
         return self.path
 
