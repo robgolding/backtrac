@@ -3,7 +3,7 @@
 {% block content %}
     <div class="container">
         <section class="span-24">
-        <h1>Catalog: {{ client.hostname }}</h1>
+        <h1>{{ client.hostname }}: {{ item.path|default:"/" }}</h1>
             <div class="content">
                 <table class="object_list">
                     <thead>

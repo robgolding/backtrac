@@ -13,7 +13,7 @@ urlpatterns = patterns('',
 
     url(r'^$', views.browse, name='catalog_browse'),
 
-    url(r'^(?P<client_id>\d+)/(?P<path>.*)$', views.browse_client,
-                    name='catalog_browse_client'),
+    url(r'^(?P<client_id>\d+)/(?P<path>.*)$', views.browse_route,
+                    name='catalog_browse_route'),
 
 )
