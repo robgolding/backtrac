@@ -25,7 +25,7 @@ class Item(models.Model):
 
     @models.permalink
     def get_absolute_url(self):
-        return ('catalog_browse_client', [self.client.id, self.get_name()])
+        return ('catalog_browse_client', [self.client.id, self.path[1:]])
 
     def __unicode__(self):
         return self.path

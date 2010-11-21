@@ -11,10 +11,6 @@ from backtrac.apps.clients.models import Client
 from models import Item, Version
 
 @login_required
-def browse(request, template_name='catalog/browse.html'):
-    pass
-
-@login_required
 def browse_client(request, client_id, path='/',
                   template_name='catalog/browse_client.html'):
     client = get_object_or_404(Client, pk=client_id)
@@ -25,7 +21,6 @@ def browse_client(request, client_id, path='/',
         item = get_object_or_404(Item, client=client, parent=item, name=name)
 
     items = Item.objects.filter(client=client, parent=item)
-    print items
 
     data = {
         'items': items,

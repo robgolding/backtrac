@@ -1,0 +1,35 @@
+{% extends 'catalog/base.html' %}
+
+{% block content %}
+    <div class="container">
+        <section class="span-24">
+            <h1>Browse Catalog</h1>
+            <div class="content">
+                <table class="object_list">
+                    <thead>
+                        <tr>
+                            <th class="icon"></th><th>Client</th><th>Last Modified</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if object_list %}
+                            {% for client in object_list %}
+                                <tr>
+                                    <td class="icon">{% include 'clients/client_icon.html' %}</td>
+                                    <td class="name"><a href="{% url catalog_browse_client client.id %}">{{ client.hostname }}</a></td>
+                                    <td class="lastmod">(last modified)</td>
+                                </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr class="info">
+                                <td colspan="6">
+                                    There are no clients at present. To create one, <a href="{% url clients_create_client %}">click here</a>.
+                                </td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+{% endblock %}
