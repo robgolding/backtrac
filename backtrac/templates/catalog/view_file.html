@@ -1,0 +1,41 @@
+{% extends 'catalog/base.html' %}
+
+{% block content %}
+    <div class="container">
+        <section class="span-18">
+            <h1>{{ client.hostname }}: {{ item.path }}</h1>
+            <div class="content clearfix">
+                <h2>Details</h2>
+                <div class="object-summary file-summary">
+                    <dl class="clearfix">
+                        <dt>Path:</dt>
+                        <dd>{{ item.path }}</dd>
+                        
+                        <dt>Last modified:</dt>
+                        <dd>(last modified)</dd>
+                        
+                        <dt>Size:</dt>
+                        <dd>{{ item.size|filesizeformat }}</dd>
+                    </dl>
+                    <div class="actions">
+                        <span>Actions:</span>
+                        <ul class="actions">
+                            <li class="download">
+                                <a href="" title="Download file">Download</a>
+                            </li>
+                            <li class="restore">
+                                <a href="" title="Restore file">Restore</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section class="span-6 last">
+            <h1>Help</h1>
+            <div class="content menu clearfix">
+                <p>Possibly help or something else here...</p>
+            </div>
+        </section>
+    </div>
+{% endblock %}

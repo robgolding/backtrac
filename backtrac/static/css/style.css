@@ -488,7 +488,7 @@ table.backedup_file_list tbody td.path, table.backedup_file_list tbody td.size {
 	clear: left;
 	float: left;
 	color: #888;
-	width: 100px;
+	width: 105px;
 	text-align: right;
 	font-weight: normal;
 	margin-bottom: 10px;
@@ -548,6 +548,13 @@ ul.actions li.resume a {
 	background-image: url("../img/icons/controls_play_16.png");
 }
 
+ul.actions li.download a {
+	background-image: url("../img/icons/download_16.png");
+}
+
+ul.actions li.restore a {
+	background-image: url("../img/icons/copy_16.png");
+}
 
 .backup-summary {
 	background: url("../img/icons/backup_32.png") no-repeat 0 4px;
@@ -559,6 +566,10 @@ ul.actions li.resume a {
 
 .host-summary {
 	background: url("../img/icons/server_32.png") no-repeat 0 4px;
+}
+
+.file-summary {
+	background: url("../img/icons/filepath_32.png") no-repeat 0 4px;
 }
 
 /* Footer */

@@ -16,7 +16,7 @@
                             {% for client in object_list %}
                                 <tr>
                                     <td class="icon">{% include 'clients/client_icon.html' %}</td>
-                                    <td class="name"><a href="{% url catalog_browse_client client.id %}">{{ client.hostname }}</a></td>
+                                    <td class="name"><a href="{% url catalog_browse_route client.id %}">{{ client.hostname }}</a></td>
                                     <td class="lastmod">(last modified)</td>
                                 </tr>
                             {% endfor %}
