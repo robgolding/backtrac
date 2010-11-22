@@ -16,7 +16,7 @@
                         <dd>{{ age|default:"N/A" }} ago</dd>
                         
                         <dt>Size:</dt>
-                        <dd>{{ item.size|filesizeformat }}</dd>
+                        <dd>{{ item.get_last_modified_version.size|filesizeformat }}</dd>
                     </dl>
                     {% endwith %}
                     <div class="actions">
