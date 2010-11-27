@@ -1,23 +1,25 @@
 """
-This file demonstrates two different styles of tests (one doctest and one
-unittest). These will both pass when you run "manage.py test".
-
-Replace these with more appropriate tests for your application.
+Tests for the `catalog' application.
 """
+import uuid
 
 from django.test import TestCase
 
-class SimpleTest(TestCase):
-    def test_basic_addition(self):
+from backtrac.apps.clients.models import Client
+from models import Item, Version
+
+class LatestVersionTest(TestCase):
+    def setUp(self):
+        uid = str(uuid.uuid4())
+        c = Client.objects.create(hostname='testclient', secret_key='')
+        i = Item.objects.create(client=c, name='test', type='f')
+        v = Version.objects.create(id=uid, item=i, mtime=12345, size=12345)
+        self.item = i
+        self.version = v
+
+    def test_latest_version(self):
         """
-        Tests that 1 + 1 always equals 2.
+        Tests that the latest version is correct.
         """
-        self.failUnlessEqual(1 + 1, 2)
-
-__test__ = {"doctest": """
-Another way to test that 1 + 1 is equal to 2.
-
->>> 1 + 1 == 2
-True
-"""}
-
+        self.failUnlessEqual(self.item.get_last_modified_version().id,
+                             self.version.id)
