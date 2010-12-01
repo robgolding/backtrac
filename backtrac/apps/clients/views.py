@@ -78,7 +78,7 @@ def pause_client(request, client_id, next=None):
     client.active = False
     client.save()
     if next is None:
-        referrer = request.META['HTTP_REFERER'].strip(' ?')
+        referrer = request.META.get('HTTP_REFERER', '').strip(' ?')
         if referrer.endswith(client.get_absolute_url()):
             next = client.get_absolute_url()
         else:
@@ -92,7 +92,7 @@ def resume_client(request, client_id, next=None):
     client.active = True
     client.save()
     if next is None:
-        referrer = request.META['HTTP_REFERER'].strip(' ?')
+        referrer = request.META.get('HTTP_REFERER', '').strip(' ?')
         if referrer.endswith(client.get_absolute_url()):
             next = client.get_absolute_url()
         else:
@@ -103,7 +103,7 @@ def resume_client(request, client_id, next=None):
 @login_required
 def delete_client(request, client_id, template_name='clients/delete_client.html'):
     client = get_object_or_404(Client, pk=client_id)
-    referrer = request.META['HTTP_REFERER'].strip(' ?')
+    referrer = request.META.get('HTTP_REFERER', '').strip(' ?')
     if request.method == 'POST':
         if request.POST.get('confirm', False):
             client.delete()

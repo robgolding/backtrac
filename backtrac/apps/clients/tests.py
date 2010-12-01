@@ -50,7 +50,7 @@ class UpdateClientTest(TestCase):
         self.hostname = 'newhostname'
         self.secret_key = 'new_secret_key'
 
-    def test_create_client_view(self):
+    def test_update_client_view(self):
         """
         Login using the test user, then POST to the update_client view. Check
         that the response code is OK and that the client has been updated
@@ -71,3 +71,31 @@ class UpdateClientTest(TestCase):
 
         self.assertEqual(response.context['object'].hostname, self.hostname)
         self.assertEqual(response.context['object'].secret_key, self.secret_key)
+
+class DeleteClientTest(TestCase):
+    def setUp(self):
+        """
+        Create a test user and an initial Client object to delete in the test.
+        """
+        User.objects.create_user('test', 'test@test.com', 'test')
+
+        self.client_obj = Client.objects.create(hostname='test',
+                                            secret_key='secret')
+
+    def test_delete_client_view(self):
+        """
+        Login using the test user, then POST to the delete_client view. Check
+        that the response code is OK and that the client has been updated
+        correctly.
+        """
+        self.client.login(username='test', password='test')
+
+        response = self.client.post('/clients/%d/delete/' %
+                                    self.client_obj.id, {
+                                        'confirm': True,
+                                    }, follow=True)
+
+        self.assertEqual(response.status_code, 200)
+
+        self.assertRaises(Client.DoesNotExist, Client.objects.get,
+                          pk=self.client_obj.id)
