@@ -20,11 +20,11 @@ class ItemGetNameTest(TestCase):
 
     def test_dir_get_name(self):
         """Test that the directory name ends in a slash"""
-        self.failUnless(self.item_dir.get_name().endswith('/'))
+        self.assertTrue(self.item_dir.get_name().endswith('/'))
 
     def test_file_get_name(self):
         """Test that the file name doesn't end in a slash"""
-        self.failIf(self.item_file.get_name().endswith('/'))
+        self.assertFalse(self.item_file.get_name().endswith('/'))
 
 class LatestVersionTest(TestCase):
     def _add_version_to_item(self, item):
@@ -56,11 +56,11 @@ class LatestVersionTest(TestCase):
         Test that the returned 'latest' version is the last one that was
         added.
         """
-        self.failUnlessEqual(self.item.get_last_modified_version().id,
+        self.assertEqual(self.item.get_last_modified_version().id,
                              self.version.id)
-        self.failUnlessEqual(self.item.get_last_modified_version().item,
+        self.assertEqual(self.item.get_last_modified_version().item,
                              self.version.item)
-        self.failUnlessEqual(self.item.get_last_modified_version().mtime,
+        self.assertEqual(self.item.get_last_modified_version().mtime,
                              self.version.mtime)
-        self.failUnlessEqual(self.item.get_last_modified_version().size,
+        self.assertEqual(self.item.get_last_modified_version().size,
                              self.version.size)
