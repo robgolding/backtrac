@@ -1,0 +1,2 @@
+django==1.2.3
+twisted==10.2.0
