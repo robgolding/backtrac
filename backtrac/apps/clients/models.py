@@ -9,13 +9,6 @@ class Client(models.Model):
     def get_absolute_url(self):
         return ('clients_client_detail', [self.id])
 
-    def get_last_modified_version(self):
-        from backtrac.apps.catalog.models import Version
-        try:
-            return Version.objects.filter(item__client=self).latest()
-        except Version.DoesNotExist:
-            return None
-
     def __unicode__(self):
         return self.hostname
 
