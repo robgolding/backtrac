@@ -19,18 +19,40 @@
                         <dd>{{ item.get_last_modified_version.size|filesizeformat }}</dd>
                     </dl>
                     {% endwith %}
-                    <div class="actions">
-                        <span>Actions:</span>
-                        <ul class="actions">
-                            <li class="download">
-                                <a href="" title="Download file">Download</a>
-                            </li>
-                            <li class="restore">
-                                <a href="" title="Restore file">Restore</a>
-                            </li>
-                        </ul>
-                    </div>
                 </div>
+                <hr />
+                <h2>Versions</h2>
+                <table class="object_list">
+                    <thead>
+                        <tr>
+                            <th>Date/Time</th><th>Size</th><th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if item.versions.all %}
+                            {% for version in item.versions.all %}
+                                <tr>
+                                    <td class="datetime"><a href="">{{ version.backed_up_at|date:"SHORT_DATETIME_FORMAT" }}</a></td>
+                                    <td class="size">{{ version.size|filesizeformat }}</td>
+                                    <td class="actions">
+                                        <a href="{% url catalog_download_version version.id %}" title="Download version">
+                                            <img src="{{ STATIC_URL}}/img/icons/download_16.png" />
+                                        </a>
+                                        <a href="" title="Restore version">
+                                            <img src="{{ STATIC_URL}}/img/icons/copy_16.png" />
+                                        </a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr class="error">
+                                <td colspan="6">
+                                    There are no versions in the catalog for this file.
+                                </td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
             </div>
         </section>
         <section class="span-6 last">

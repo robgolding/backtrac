@@ -455,6 +455,10 @@ table.object_list tbody td.actions {
 	width: 70px;
 }
 
+table.object_list tbody td.actions a {
+	margin-right: 5px;
+}
+
 table.object_list tbody tr.info td {
 	background-color: #E8F6FD;
 	border-bottom: 1px solid #B8F0FA;
