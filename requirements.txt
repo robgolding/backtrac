@@ -1,2 +1,2 @@
-django==1.2.3
+-e svn+http://code.djangoproject.com/svn/django/trunk#egg=Django
 twisted==10.2.0
