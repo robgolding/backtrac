@@ -5,6 +5,17 @@ ITEM_TYPE_CHOICES = (
     ('f', 'File'),
 )
 
+def get_or_create_item(client, path, type):
+    names = path.strip('/').split('/')
+    item, created = None, False
+    types = ['f' if i == (len(names) - 1) else 'd' for i in range(len(names))]
+    for name, type in zip(names, types):
+        item, created = Item.objects.get_or_create(client=client,
+                                                   parent=item,
+                                                   name=name,
+                                                   type=type)
+    return item, created
+
 class Item(models.Model):
     client = models.ForeignKey('clients.Client', related_name='items')
     parent = models.ForeignKey('self', null=True, blank=True)

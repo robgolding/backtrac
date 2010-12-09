@@ -45,8 +45,7 @@ class LatestVersionTest(TestCase):
         Create a single client and a single item within that client. Then, add
         10 new versions to that item.
         """
-        self.client = Client.objects.create(hostname='test',
-                                            secret_key='')
+        self.client = Client.objects.create(hostname='test', secret_key='')
         self.item = Item.objects.create(client=self.client,
                                         name='test',
                                         type='f')
@@ -66,3 +65,26 @@ class LatestVersionTest(TestCase):
                              self.version.mtime)
         self.assertEqual(self.item.get_last_modified_version().size,
                              self.version.size)
+
+class GetOrCreateItemTest(TestCase):
+    def setUp(self):
+        """
+        Create a client to use within the test.
+        """
+        self.client = Client.objects.create(hostname='test', secret_key='')
+        self.path = '/testing/get/or/create/item'
+        self.type = 'f'
+
+    def test_get_or_create_item(self):
+        """
+        Test that catalog.models.get_or_create_item works as expected.
+        """
+        from backtrac.apps.catalog.models import get_or_create_item
+
+        item, created = get_or_create_item(self.client, self.path, self.type)
+
+        self.assertEqual(created, True)
+        self.assertEqual(item.path, self.path)
+        self.assertEqual(item.type, self.type)
+        self.assertEqual(item.client.pk, self.client.pk)
+        self.assertEqual(item.client.hostname, self.client.hostname)
