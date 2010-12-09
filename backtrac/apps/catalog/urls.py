@@ -13,10 +13,13 @@ urlpatterns = patterns('',
                         'queryset': Client.objects.select_related()},
                     name='catalog_browse'),
 
-   url(r'^(?P<client_id>\d+)/$', views.browse_route, {'path': '/'},
+    url(r'^(?P<client_id>\d+)/$', views.browse_route, {'path': '/'},
                     name='catalog_browse_route'),
 
     url(r'^(?P<client_id>\d+)/(?P<path>.*)$', views.browse_route,
                     name='catalog_browse_route'),
+
+    url(r'^download/(?P<version_id>[\w-]+)/$', views.download_version,
+                    name='catalog_download_version'),
 
 )

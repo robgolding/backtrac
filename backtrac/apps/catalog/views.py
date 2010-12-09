@@ -1,4 +1,5 @@
-from django.http import HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect
+from django.core.servers.basehttp import FileWrapper
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render_to_response, get_object_or_404
@@ -6,6 +7,8 @@ from django.views.generic.list_detail import object_detail
 from django.db import transaction
 from django.template.context import RequestContext
 from django.contrib import messages
+
+from backtrac.server.utils import get_storage_for
 
 from backtrac.apps.clients.models import Client
 from models import Item, Version
@@ -51,3 +54,14 @@ def browse_directory(request, client_id, item,
 
     return render_to_response(template_name, data,
                               context_instance=RequestContext(request))
+
+@login_required
+def download_version(request, version_id):
+    version = get_object_or_404(Version, pk=version_id)
+    item = version.item
+    storage = get_storage_for(item.client)
+    f = storage.get(item.path, version.pk)
+    response = HttpResponse(FileWrapper(f),
+                            content_type='application/octet-stream')
+    response['Content-Disposition'] = 'attachment; filename=%s' % item.name
+    return response

@@ -8,6 +8,8 @@ from django.test import TestCase
 from backtrac.apps.clients.models import Client
 from models import Item, Version
 
+#TODO: Write a test for the download_version view
+
 class ItemGetNameTest(TestCase):
     def setUp(self):
         """
