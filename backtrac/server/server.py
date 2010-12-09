@@ -14,7 +14,7 @@ from twisted.internet import defer
 from utils import PageCollector, get_storage_for
 
 from backtrac.apps.clients.models import Client
-from backtrac.apps.catalog.models import File, FileVersion
+from backtrac.apps.catalog.models import Item, Version
 
 class BackupClientAuthChecker:
     implements(checkers.ICredentialsChecker)
