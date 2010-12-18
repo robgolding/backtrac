@@ -19,7 +19,12 @@ urlpatterns = patterns('',
     url(r'^(?P<client_id>\d+)/(?P<path>.*)$', views.browse_route,
                     name='catalog_browse_route'),
 
-    url(r'^download/(?P<version_id>[\w-]+)/$', views.download_version,
+    url(r'^download/(?P<version_id>[\w-]+)/$', views.download_version, {
+                        'view_file': False,},
                     name='catalog_download_version'),
+
+    url(r'^view/(?P<version_id>[\w-]+)/$', views.download_version, {
+                        'view_file': True,},
+                    name='catalog_view_version'),
 
 )
