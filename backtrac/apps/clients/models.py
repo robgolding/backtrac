@@ -28,3 +28,6 @@ class Status(models.Model):
 
     def __unicode__(self):
         return '[Status] %s' % self.client
+
+    class Meta:
+        verbose_name_plural = 'statuses'
