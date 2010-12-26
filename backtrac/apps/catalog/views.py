@@ -61,11 +61,19 @@ def download_version(request, version_id, view_file=True):
     version = get_object_or_404(Version, pk=version_id)
     item = version.item
     storage = get_storage_for(item.client)
+
     f = storage.get(item.path, version.pk)
-    mimetype = mimetypes.guess_type(item.name)[0]
-    response = HttpResponse(FileWrapper(f),
-                            content_type=mimetype)
+    contents = f.read()
+    mimetype, encoding = mimetypes.guess_type(item.name)
+    mimetype = mimetype or 'application/octet-stream'
+    content_disposition = 'filename=%s' % item.name
     if not view_file:
-        response['Content-Disposition'] = 'attachment; filename=%s' % item.name
-    response['Content-Length'] = os.fstat(f.fileno())[6]
+        content_disposition = 'attachment; ' + content_disposition
+
+    response = HttpResponse(FileWrapper(f), content_type=mimetype)
+    response = HttpResponse(contents, mimetype=mimetype)
+    response['Content-Length'] = len(contents)
+    response['Content-Disposition'] = content_disposition
+    if encoding:
+        response['Content-Encoding'] = encoding
     return response
