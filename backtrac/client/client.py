@@ -12,8 +12,6 @@ from twisted.internet.task import deferLater, cooperate
 from twisted.python import log
 from twisted import cred
 
-from backtrac.apps.catalog.models import File, FileVersion
-
 class ClientError(Exception): pass
 
 class TransferPager(FilePager):

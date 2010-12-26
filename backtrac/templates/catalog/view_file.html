@@ -32,7 +32,7 @@
                         {% if item.versions.all %}
                             {% for version in item.versions.all %}
                                 <tr>
-                                    <td class="datetime"><a href="">{{ version.backed_up_at|date:"SHORT_DATETIME_FORMAT" }}</a></td>
+                                    <td class="datetime"><a href="{% url catalog_view_version version.id %}">{{ version.backed_up_at|date:"SHORT_DATETIME_FORMAT" }}</a></td>
                                     <td class="size">{{ version.size|filesizeformat }}</td>
                                     <td class="actions">
                                         <a href="{% url catalog_download_version version.id %}" title="Download version">

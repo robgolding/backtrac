@@ -20,3 +20,4 @@ class PageCollector(Referenceable):
 
     def remote_endedPaging(self):
         print 'Received file'
+        self.fdst.close()

@@ -14,7 +14,7 @@ from twisted.internet import defer
 from utils import PageCollector, get_storage_for
 
 from backtrac.apps.clients.models import Client
-from backtrac.apps.catalog.models import Item, Version
+from backtrac.apps.catalog.models import Item, Version, get_or_create_item
 
 class BackupClientAuthChecker:
     implements(checkers.ICredentialsChecker)
@@ -80,8 +80,8 @@ class BackupClient(pb.Avatar):
         return [p.path for p in self.client.filepaths.all()]
 
     def perspective_check_file(self, path, mtime, size):
-        file_obj, _ = File.objects.get_or_create(client=self.client, path=path)
-        versions = file_obj.versions.all()
+        item, created = get_or_create_item(self.client, path, 'f')
+        versions = item.versions.all()
         if not versions:
             return True
         version = versions.latest()
@@ -90,11 +90,11 @@ class BackupClient(pb.Avatar):
         return True
 
     def perspective_put_file(self, path, mtime, size):
-        file_obj, _ = File.objects.get_or_create(client=self.client, path=path)
+        item, created = get_or_create_item(self.client, path, 'f')
         version_id, fdst = self.storage.add(path)
         collector = PageCollector(fdst)
-        version_obj, _ = FileVersion.objects.get_or_create(id=version_id,
-                                         file=file_obj, mtime=mtime, size=size)
+        version, _ = Version.objects.get_or_create(id=version_id,
+                                         item=item, mtime=mtime, size=size)
         return collector
 
 if __name__ == '__main__':
