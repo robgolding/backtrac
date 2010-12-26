@@ -6,6 +6,9 @@ ITEM_TYPE_CHOICES = (
 )
 
 class Item(models.Model):
+    """
+    An 'item' is a file or directory that has been backed up.
+    """
     client = models.ForeignKey('clients.Client', related_name='items')
     parent = models.ForeignKey('self', null=True, blank=True)
     name = models.CharField(max_length=255)
