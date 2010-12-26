@@ -1,4 +1,8 @@
+import datetime
+
 from django.db import models
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 class Client(models.Model):
     hostname = models.CharField(max_length=255, unique=True, db_index=True)
@@ -31,3 +35,10 @@ class Status(models.Model):
 
     class Meta:
         verbose_name_plural = 'statuses'
+
+@receiver(post_save, sender=Client)
+def create_initial_status(sender, instance=None, **kwargs):
+    try:
+        status = instance.status
+    except Status.DoesNotExist:
+        Status.objects.create(client=instance, last_seen=datetime.datetime.min)
