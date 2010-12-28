@@ -1,5 +1,6 @@
 from django.conf.urls.defaults import *
 
+from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.contrib import admin
 admin.autodiscover()
 
@@ -14,6 +15,8 @@ urlpatterns = patterns('',
 
     url(r'^dashboard/$', views.dashboard, name='dashboard'),
 
+    url(r'^status/', views.status, name='status'),
+
     url(r'^accounts/login/', 'django.contrib.auth.views.login',
                 name='auth_login'),
 
@@ -26,12 +29,4 @@ urlpatterns = patterns('',
 
 )
 
-from django.conf import settings
-
-if settings.SERVE_STATIC:
-    urlpatterns += patterns('',
-        (r'^%s(?P<path>.*)$' % settings.STATIC_URL[1:],
-                            'django.views.static.serve',
-                            { 'document_root': settings.STATIC_ROOT }
-        ),
-    )
+urlpatterns += staticfiles_urlpatterns()

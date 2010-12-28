@@ -11,10 +11,17 @@ from twisted.spread.pb import PBServerFactory
 from twisted.spread.util import FilePager
 from twisted.internet import defer
 
+from django.conf import settings
+
 from utils import PageCollector, get_storage_for
 
 from backtrac.apps.clients.models import Client
 from backtrac.apps.catalog.models import Item, Version, get_or_create_item
+
+class DummyClient(object):
+    id = 0
+    pk = 0
+    hostname = 'localhost'
 
 class BackupClientAuthChecker:
     implements(checkers.ICredentialsChecker)
@@ -28,6 +35,12 @@ class BackupClientAuthChecker:
             return failure.Failure(error.UnauthorizedLogin())
 
     def requestAvatarId(self, credentials):
+        print credentials.username, settings.SECRET_KEY
+        if credentials.username == 'localhost':
+            return defer.maybeDeferred(
+                credentials.checkPassword,
+                settings.SECRET_KEY).addCallback(self._passwordMatch,
+                                                 'localhost')
         try:
             client = Client.objects.get(hostname=credentials.username)
             return defer.maybeDeferred(
@@ -55,7 +68,11 @@ class BackupRealm(object):
 
     def requestAvatar(self, client_id, mind, *interfaces):
         assert pb.IPerspective in interfaces
-        client_obj = Client.objects.get(hostname=client_id)
+        print client_id
+        if client_id == 'localhost':
+            client_obj = DummyClient()
+        else:
+            client_obj = Client.objects.get(hostname=client_id)
         avatar = BackupClient(client_obj, self.server)
         avatar.attached(mind)
         return pb.IPerspective, avatar, lambda a=avatar:a.detached(mind)
