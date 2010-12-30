@@ -20,10 +20,10 @@
                                     <td class="status">{{ client.get_status|capfirst }}</td>
                                     <td class="actions">
                                         <a href="{% url clients_update_client client.id %}" title="Update client">
-                                            <img src="{{ STATIC_URL}}/img/icons/edit_16.png" />
+                                            <img src="{{ STATIC_URL}}img/icons/edit_16.png" />
                                         </a>
                                         <a href="{% url clients_delete_client client.id %}" title="Delete client">
-                                            <img src="{{ STATIC_URL}}/img/icons/cancel_16.png" /></td>
+                                            <img src="{{ STATIC_URL}}img/icons/cancel_16.png" /></td>
                                         </a>
                                 </tr>
                             {% endfor %}
