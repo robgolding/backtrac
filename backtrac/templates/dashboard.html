@@ -2,6 +2,30 @@
 
 {% block page_id %}dashboard{% endblock page_id %}
 
+{% block js %}
+    <script language="javascript">
+        function setStatus(status) {
+            if (status) {
+                $("#system-status").removeClass("notice").removeClass("checking").addClass("success");
+                $("#system-status").html("Server running.");
+                } else {
+                $("#system-status").removeClass("notice").removeClass("checking").addClass("error");
+                $("#system-status").html("Server not running.");
+            }
+        }
+
+        $(function() {
+            $("#system-status").addClass("checking");
+            $("#system-status").html("Checking system status...");
+
+            $.ajax({ url:     '/status/',
+                     success: function(data, textStatus) { setStatus(true); },
+                     error:   function(XMLHttpRequest, textStatus) { setStatus(false); }
+            });
+        });
+    </script>
+{% endblock js %}
+
 {% block content %}
     <div class="container">
         <section class="span-18">
@@ -14,11 +38,9 @@
         </section>
         
         <section class="span-6 last">
-            <h1>Recent Events</h1>
+            <h1>System Status</h1>
             <div class="content">
-                <p>
-                    Stuff that's just happened...
-                </p>
+                    <div id="system-status" class="notice">Javascript required.</div>
             </div>
         </section>
     </div>
