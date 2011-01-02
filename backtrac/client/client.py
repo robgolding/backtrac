@@ -58,15 +58,13 @@ class BackupClient(pb.Referenceable):
         if backup_required:
             print 'Sending: %s' % path
             self.transfer.send(path)
-        else:
-            print 'Skipping: %s' % path
 
     def start(self):
         self.perspective.callRemote('get_paths').addCallback(self._started)
 
     def handle_fs_event(self, watch, filepath, mask):
-        print "event %s on %s" % (
-            ', '.join(inotify.humanReadableMask(mask)), filepath)
+        if mask & inotify.IN_MODIFY:
+            self.queue.put(filepath.path)
 
     def consumer(self, path):
         stat = os.stat(path)
@@ -77,7 +75,8 @@ class BackupClient(pb.Referenceable):
     def _started(self, paths):
         self.queue.get().addCallback(self.consumer)
         for path in paths:
-            self.notifier.watch(filepath.FilePath(path),
+            self.notifier.watch(filepath.FilePath(path), autoAdd=True,
+                                recursive=True,
                                 callbacks=[self.handle_fs_event])
             for root, dirs, files in os.walk(path):
                 for f in files:
