@@ -1,5 +1,4 @@
 import os, sys, socket
-from threading import Thread
 
 from twisted.python import util
 from twisted.spread import pb
@@ -7,9 +6,9 @@ from twisted.spread.util import FilePager
 from twisted.spread.flavors import Referenceable
 from twisted.internet.defer import Deferred, DeferredQueue
 from twisted.internet.error import ConnectionRefusedError
-from twisted.internet import reactor
+from twisted.internet import reactor, inotify
 from twisted.internet.task import deferLater, cooperate
-from twisted.python import log
+from twisted.python import log, filepath
 from twisted import cred
 
 class ClientError(Exception): pass
@@ -52,6 +51,8 @@ class BackupClient(pb.Referenceable):
         self.hostname = hostname
         self.secret_key = secret_key
         self.connected = False
+        self.queue = DeferredQueue()
+        self.notifier = inotify.INotify()
 
     def backup_file(self, backup_required, path):
         if backup_required:
@@ -63,15 +64,26 @@ class BackupClient(pb.Referenceable):
     def start(self):
         self.perspective.callRemote('get_paths').addCallback(self._started)
 
+    def handle_fs_event(self, watch, filepath, mask):
+        print "event %s on %s" % (
+            ', '.join(inotify.humanReadableMask(mask)), filepath)
+
+    def consumer(self, path):
+        stat = os.stat(path)
+        d = self.perspective.callRemote('check_file', path, stat[8], stat[6])
+        d.addCallback(self.backup_file, path)
+        self.queue.get().addCallback(self.consumer)
+
     def _started(self, paths):
+        self.queue.get().addCallback(self.consumer)
         for path in paths:
+            self.notifier.watch(filepath.FilePath(path),
+                                callbacks=[self.handle_fs_event])
             for root, dirs, files in os.walk(path):
                 for f in files:
                     path = os.path.join(root, f)
-                    stat = os.stat(path)
-                    d = self.perspective.callRemote('check_file',
-                                                path, stat[8], stat[6])
-                    d.addCallback(self.backup_file, path)
+                    self.queue.put(path)
+        self.notifier.startReading()
 
     def connect(self, start_on_connect=False):
         factory = pb.PBClientFactory()
