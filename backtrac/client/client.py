@@ -16,13 +16,11 @@ class ClientError(Exception): pass
 class TransferPager(FilePager):
     def __init__(self, collector, path):
         self._deferred = Deferred()
-        print "%s, %d bytes" % (path, os.path.getsize(path))
         fd = open(path, 'rb')
         p = FilePager.__init__(self, collector, fd, callback=self.done)
         self.sendNextPage()
 
     def done(self):
-        print 'File sent!'
         self._deferred.callback(self.collector)
 
     def wait(self):
@@ -56,14 +54,14 @@ class BackupClient(pb.Referenceable):
 
     def backup_file(self, backup_required, path):
         if backup_required:
-            print 'Sending: %s' % path
+            print "%s, %d bytes" % (path, os.path.getsize(path))
             self.transfer.send(path)
 
     def start(self):
         self.perspective.callRemote('get_paths').addCallback(self._started)
 
     def handle_fs_event(self, watch, filepath, mask):
-        if mask & inotify.IN_MODIFY:
+        if mask & inotify.IN_CREATE or mask & inotify.IN_MODIFY:
             self.queue.put(filepath.path)
 
     def consumer(self, path):
