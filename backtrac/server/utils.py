@@ -15,9 +15,7 @@ class PageCollector(Referenceable):
         self.fdst = fdst
 
     def remote_gotPage(self, page):
-        print 'Writing page (%d bytes)' % len(page)
         self.fdst.write(page)
 
     def remote_endedPaging(self):
-        print 'Received file'
         self.fdst.close()
