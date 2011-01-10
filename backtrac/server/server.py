@@ -18,11 +18,6 @@ from utils import PageCollector, get_storage_for
 from backtrac.apps.clients.models import Client
 from backtrac.apps.catalog.models import Item, Version, get_or_create_item
 
-class DummyClient(object):
-    id = 0
-    pk = 0
-    hostname = 'localhost'
-
 class BackupClientAuthChecker:
     implements(checkers.ICredentialsChecker)
     credentialInterfaces = (credentials.IUsernamePassword,
@@ -35,7 +30,6 @@ class BackupClientAuthChecker:
             return failure.Failure(error.UnauthorizedLogin())
 
     def requestAvatarId(self, credentials):
-        print credentials.username, settings.SECRET_KEY
         if credentials.username == 'localhost':
             return defer.maybeDeferred(
                 credentials.checkPassword,
@@ -45,13 +39,15 @@ class BackupClientAuthChecker:
             client = Client.objects.get(hostname=credentials.username)
             return defer.maybeDeferred(
                 credentials.checkPassword,
-                client.secret_key).addCallback(self._passwordMatch, client)
+                client.secret_key).addCallback(self._passwordMatch,
+                                               client.hostname)
         except Client.DoesNotExist:
             return defer.fail(error.UnauthorizedLogin())
 
 class BackupServer(object):
     def __init__(self, port=8123):
         self.port = port
+        self.clients = []
 
     def start(self):
         realm = BackupRealm()
@@ -68,14 +64,26 @@ class BackupRealm(object):
 
     def requestAvatar(self, client_id, mind, *interfaces):
         assert pb.IPerspective in interfaces
-        print client_id
         if client_id == 'localhost':
-            client_obj = DummyClient()
+            avatar = ManagementClient(self.server)
         else:
             client_obj = Client.objects.get(hostname=client_id)
-        avatar = BackupClient(client_obj, self.server)
+            avatar = BackupClient(client_obj, self.server)
         avatar.attached(mind)
         return pb.IPerspective, avatar, lambda a=avatar:a.detached(mind)
+
+class ManagementClient(pb.Avatar):
+    def __init__(self, server):
+        self.server = server
+
+    def attached(self, mind):
+        self.remote = mind
+
+    def detached(self, mind):
+        self.remote = None
+
+    def perspective_num_clients(self):
+        return len(self.server.clients)
 
 class BackupClient(pb.Avatar):
     def __init__(self, client, server):
@@ -85,13 +93,13 @@ class BackupClient(pb.Avatar):
 
     def attached(self, mind):
         self.remote = mind
-        print 'Client %d (%s) connected' % (self.client.pk,
-                                            self.client.hostname)
+        self.server.clients.append(self)
+        print 'Client \'%s\' connected' % self.client.hostname
 
     def detached(self, mind):
         self.remote = None
-        print 'Client %d (%s) disconnected' % (self.client.pk,
-                                            self.client.hostname)
+        self.server.clients.remove(self)
+        print 'Client \'%s\' disconnected' % self.client.hostname
 
     def perspective_get_paths(self):
         return [p.path for p in self.client.filepaths.all()]
