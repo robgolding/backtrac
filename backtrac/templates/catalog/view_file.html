@@ -7,7 +7,8 @@
             <div class="content clearfix">
                 <h2>Details</h2>
                 <div class="object-summary file-summary">
-                    {% with item.get_last_modified_version.backed_up_at|timesince as age %}
+                    {% with item.get_last_modified_version as latest %}
+                    {% with latest.backed_up_at|timesince as age %}
                     <dl class="clearfix">
                         <dt>Path:</dt>
                         <dd>{{ item.path }}</dd>
@@ -16,8 +17,9 @@
                         <dd>{{ age|default:"N/A" }} ago</dd>
                         
                         <dt>Size:</dt>
-                        <dd>{{ item.get_last_modified_version.size|filesizeformat }}</dd>
+                        <dd>{{ latest.size|filesizeformat }}</dd>
                     </dl>
+                    {% endwith %}
                     {% endwith %}
                 </div>
                 <hr />
@@ -29,8 +31,9 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% if item.versions.all %}
-                            {% for version in item.versions.all %}
+                        {% with item.versions.all as versions %}
+                        {% if versions %}
+                            {% for version in versions %}
                                 <tr>
                                     <td class="datetime"><a href="{% url catalog_view_version version.id %}">{{ version.backed_up_at|date:"SHORT_DATETIME_FORMAT" }}</a></td>
                                     <td class="size">{{ version.size|filesizeformat }}</td>
@@ -51,6 +54,7 @@
                                 </td>
                             </tr>
                         {% endif %}
+                        {% endwith %}
                     </tbody>
                 </table>
             </div>

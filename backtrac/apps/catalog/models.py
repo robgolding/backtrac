@@ -24,23 +24,18 @@ class Item(models.Model):
     """
     client = models.ForeignKey('clients.Client', related_name='items',
                                db_index=True)
-    parent = models.ForeignKey('self', null=True, blank=True, db_index=True)
+    parent = models.ForeignKey('self', null=True, blank=True, db_index=True,
+                               related_name='children')
     name = models.CharField(max_length=255)
     type = models.CharField(max_length=2, choices=ITEM_TYPE_CHOICES,
                             db_index=True)
     path = models.CharField(max_length=255, null=True, blank=True,
                             db_index=True)
 
-    def get_name(self):
-        if self.type == 'f':
-            return self.name
-        if self.type == 'd':
-            return self.name + '/'
-
     def _get_path(self):
         if self.parent is not None:
-            return self.parent.path + self.get_name()
-        return '/' + self.get_name()
+            return '%s/%s' % (self.parent.path, self.name)
+        return '/' + self.name
 
     @models.permalink
     def get_absolute_url(self):

@@ -10,28 +10,29 @@ from django.template.context import RequestContext
 from django.contrib import messages
 
 from backtrac.server.utils import get_storage_for
-
 from backtrac.apps.clients.models import Client
+
 from models import Item, Version
+from utils import normpath
 
 @login_required
 def browse_route(request, client_id, path='/'):
     client = get_object_or_404(Client, pk=client_id)
-    path = filter(lambda x:x, path.split('/'))
+    path = normpath(path)
 
-    item = None
-    for name in path:
-        item = get_object_or_404(Item, client=client, parent=item, name=name)
+    if path == '/':
+        item = None
+    else:
+        item = get_object_or_404(Item, client=client, path=path)
 
     if item is None or item.type == 'd':
-        return browse_directory(request, client_id, item)
+        return browse_directory(request, client, item)
     elif item.type == 'f':
-        return view_file(request, client_id, item)
+        return view_file(request, client, item)
 
 @login_required
-def view_file(request, client_id, item,
+def view_file(request, client, item,
                   template_name='catalog/view_file.html'):
-    client = get_object_or_404(Client, pk=client_id)
 
     data = {
         'client': client,
@@ -42,9 +43,8 @@ def view_file(request, client_id, item,
                               context_instance=RequestContext(request))
 
 @login_required
-def browse_directory(request, client_id, item,
+def browse_directory(request, client, item,
                   template_name='catalog/browse_client.html'):
-    client = get_object_or_404(Client, pk=client_id)
     items = Item.objects.filter(client=client, parent=item).select_related()
 
     data = {

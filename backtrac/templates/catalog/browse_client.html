@@ -18,7 +18,7 @@
                             {% with latest.backed_up_at|timesince as age %}
                                 <tr>
                                     <td class="icon">{% include 'catalog/item_icon.html' %}</td>
-                                    <td class="name"><a href="{{ item.get_absolute_url }}">{{ item.get_name }}</a></td>
+                                    <td class="name"><a href="{{ item.get_absolute_url }}">{{ item.name }}{% ifequal item.type 'd' %}/{% endifequal %}</a></td>
                                     <td class="size">{{ latest.size|filesizeformat }}</td>
                                     <td class="age">{{ age|default:"N/A" }}</td>
                                 </tr>
