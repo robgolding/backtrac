@@ -45,7 +45,11 @@ def view_file(request, client, item,
 @login_required
 def browse_directory(request, client, item,
                   template_name='catalog/browse_client.html'):
-    items = Item.objects.filter(client=client, parent=item).select_related()
+    if item is None:
+        items = client.items.filter(parent=None).select_related('client',
+                                                            'latest_version')
+    else:
+        items = item.children.select_related('client', 'latest_version')
 
     data = {
         'client': client,
