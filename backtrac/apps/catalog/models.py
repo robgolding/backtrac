@@ -25,12 +25,15 @@ class Item(models.Model):
     client = models.ForeignKey('clients.Client', related_name='items',
                                db_index=True)
     parent = models.ForeignKey('self', null=True, blank=True, db_index=True,
-                               related_name='children')
+                                            related_name='children')
     name = models.CharField(max_length=255)
     type = models.CharField(max_length=2, choices=ITEM_TYPE_CHOICES,
-                            db_index=True)
+                                            db_index=True)
     path = models.CharField(max_length=255, null=True, blank=True,
-                            db_index=True)
+                                            db_index=True)
+    latest_version = models.ForeignKey('catalog.Version', null=True,
+                                            blank=True, db_index=True,
+                                            related_name='item_latest_set')
 
     def _get_path(self):
         if self.parent is not None:
@@ -40,12 +43,6 @@ class Item(models.Model):
     @models.permalink
     def get_absolute_url(self):
         return ('catalog_browse_route', [self.client.id, self.path[1:]])
-
-    def get_last_modified_version(self):
-        try:
-            return self.versions.latest()
-        except Version.DoesNotExist:
-            return None
 
     def __unicode__(self):
         return self.path
@@ -72,3 +69,8 @@ def update_children(sender, instance=None, **kwargs):
     children = Item.objects.filter(parent=instance)
     for item in children:
         item.save()
+
+@receiver(post_save, sender=Version)
+def update_latest_version(sender, instance=None, **kwargs):
+    instance.item.latest_version = instance
+    instance.item.save()
