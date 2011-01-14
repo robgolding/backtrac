@@ -45,7 +45,7 @@ def view_file(request, client_id, item,
 def browse_directory(request, client_id, item,
                   template_name='catalog/browse_client.html'):
     client = get_object_or_404(Client, pk=client_id)
-    items = Item.objects.filter(client=client, parent=item)
+    items = Item.objects.filter(client=client, parent=item).select_related()
 
     data = {
         'client': client,

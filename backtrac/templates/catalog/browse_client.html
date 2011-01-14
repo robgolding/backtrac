@@ -14,16 +14,18 @@
                     <tbody>
                         {% if items %}
                             {% for item in items %}
-                            {% with item.get_last_modified_version.backed_up_at|timesince as age %}
+                            {% with item.get_last_modified_version as latest %}
+                            {% with latest.backed_up_at|timesince as age %}
                                 <tr>
                                     <td class="icon">{% include 'catalog/item_icon.html' %}</td>
                                     <td class="name"><a href="{{ item.get_absolute_url }}">{{ item.get_name }}</a></td>
-                                    <td class="size">{{ item.get_last_modified_version.size|filesizeformat }}</td>
+                                    <td class="size">{{ latest.size|filesizeformat }}</td>
                                     <td class="age">{{ age|default:"N/A" }}</td>
                                 </tr>
-                               {% endwith %}
+                            {% endwith %}
+                            {% endwith %}
                             {% endfor %}
-                        {% else %}
+                            {% else %}
                             <tr class="info">
                                 <td colspan="6">
                                     There are no files in the selected directory.
