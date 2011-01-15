@@ -11,7 +11,7 @@ from twisted.python import log
 from twisted.python.filepath import FilePath
 from twisted import cred
 
-from utils import TransferPager
+from utils import ConsumerQueue, TransferPager
 
 class ClientError(Exception): pass
 
@@ -26,28 +26,35 @@ class BackupJob(object):
         self.filepath = filepath
         self.type = type
 
-class BackupQueue(object):
-    def __init__(self, perspective):
-        self.perspective = perspective
-        self.queue = DeferredQueue()
-
-    def add(self, filepath):
-        print '%s, %d bytes' % (filepath.path, filepath.getsize())
-        self.queue.put(filepath)
-
+class TransferQueue(ConsumerQueue):
     def consumer(self, filepath):
         mtime = filepath.getModificationTime()
         size = filepath.getsize()
         r = self.perspective.callRemote('put_file', filepath.path, mtime, size)
         return r.addCallback(self._transfer, filepath)
 
-    def start(self):
-        self.queue.get().addCallback(self.consumer)
-
     def _transfer(self, collector, filepath):
+        print '%s, %d bytes' % (filepath.path, filepath.getsize())
         pager = TransferPager(collector, filepath)
         pager.wait()
-        self.queue.get().addCallback(self.consumer)
+        self.consume_next()
+
+class BackupQueue(ConsumerQueue):
+    def __init__(self, perspective, transfer_queue):
+        super(BackupQueue, self).__init__(perspective)
+        self.transfer_queue = transfer_queue
+
+    def consumer(self, job):
+        path = job.filepath.path
+        mtime = job.filepath.getModificationTime()
+        size = job.filepath.getsize()
+        d = self.perspective.callRemote('check_file', path, mtime, size)
+        d.addCallback(self._backup_file, job.filepath)
+        self.consume_next()
+
+    def _backup_file(self, backup_required, filepath):
+        if backup_required:
+            self.transfer_queue.add(filepath)
 
 class BackupClient(pb.Referenceable):
     def __init__(self, server='localhost', port=8123,
@@ -57,15 +64,11 @@ class BackupClient(pb.Referenceable):
         self.hostname = hostname
         self.secret_key = secret_key
         self.connected = False
-        self.queue = DeferredQueue()
         self.notifier = inotify.INotify()
-
-    def backup_file(self, backup_required, filepath):
-        if backup_required:
-            self.backup_queue.add(filepath)
 
     def start(self):
         self.backup_queue.start()
+        self.transfer_queue.start()
         self.perspective.callRemote('get_paths').addCallback(self._started)
 
     def handle_fs_event(self, watch, filepath, mask):
@@ -77,19 +80,9 @@ class BackupClient(pb.Referenceable):
             type = BackupJob.DELETE
         else:
             return
-        job = BackupJob(filepath, type=type)
-        self.queue.put(job)
-
-    def consumer(self, job):
-        path = job.filepath.path
-        mtime = job.filepath.getModificationTime()
-        size = job.filepath.getsize()
-        d = self.perspective.callRemote('check_file', path, mtime, size)
-        d.addCallback(self.backup_file, job.filepath)
-        self.queue.get().addCallback(self.consumer)
+        self.backup_queue.add(BackupJob(filepath, type=type))
 
     def _started(self, paths):
-        self.queue.get().addCallback(self.consumer)
         for path in paths:
             self.notifier.watch(FilePath(path), autoAdd=True,
                                 recursive=True,
@@ -97,8 +90,7 @@ class BackupClient(pb.Referenceable):
             for root, dirs, files in os.walk(path):
                 for f in files:
                     path = os.path.join(root, f)
-                    job = BackupJob(path)
-                    self.queue.put(job)
+                    self.backup_queue.add(BackupJob(path))
         self.notifier.startReading()
 
     def connect(self, start_on_connect=False):
@@ -118,7 +110,8 @@ class BackupClient(pb.Referenceable):
     def _connected(self, perspective, start_client=False):
         self.connected = True
         self.perspective = perspective
-        self.backup_queue = BackupQueue(perspective)
+        self.transfer_queue = TransferQueue(perspective)
+        self.backup_queue = BackupQueue(perspective, self.transfer_queue)
         print 'Connected to %s' % self.server
         if start_client:
             self.start()

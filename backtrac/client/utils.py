@@ -1,5 +1,22 @@
 from twisted.spread.util import FilePager
-from twisted.internet.defer import Deferred
+from twisted.internet.defer import Deferred, DeferredQueue
+
+class ConsumerQueue(object):
+    def __init__(self, perspective):
+        self.perspective = perspective
+        self.queue = DeferredQueue()
+
+    def add(self, filepath):
+        self.queue.put(filepath)
+
+    def consume_next(self):
+        self.queue.get().addCallback(self.consumer)
+
+    def consumer(self, obj):
+        raise NotImplementedError
+
+    def start(self):
+        self.consume_next()
 
 class TransferPager(FilePager):
     def __init__(self, collector, filepath):
