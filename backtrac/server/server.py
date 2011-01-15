@@ -110,8 +110,9 @@ class BackupClient(pb.Avatar):
         if not versions:
             return True
         version = versions.latest()
-        if mtime == version.mtime and size == version.size:
-            return False
+        if abs(mtime - version.mtime) < 1:
+            if abs(size - version.size) < 1:
+                return False
         return True
 
     def perspective_put_file(self, path, mtime, size):
