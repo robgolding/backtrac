@@ -5,7 +5,8 @@
         <section class="span-18">
             <h1>{{ object.hostname }}</h1>
             <div class="content clearfix">
-                <a class="button" href=""><img src="{{ STATIC_URL }}img/icons/famfamfam/pencil.png" /> Edit</a>
+                <a class="button" href="{% url clients_update_client object.id %}"><img src="{{ STATIC_URL }}img/icons/famfamfam/pencil.png" /> Edit</a>
+                <a class="button" href="{% url clients_delete_client object.id %}"><img src="{{ STATIC_URL }}img/icons/famfamfam/cross.png" /> Delete</a>
                 <div class="object-summary host-summary">
                     <dl class="clearfix">
                         <dt>Description:</dt>
@@ -17,17 +18,6 @@
                         <dt>Status:</dt>
                         <dd>{{ object.get_status|capfirst }}</dd>
                     </dl>
-                    <div class="actions">
-                        <span>Actions:</span>
-                        <ul class="actions">
-                            <li class="update">
-                                <a href="{% url clients_update_client object.id %}" title="Update client">Update</a>
-                            </li>
-                            <li class="delete">
-                                <a href="{% url clients_delete_client object.id %}" title="Delete client">Delete</a>
-                            </li>
-                        </ul>
-                    </div>
                 </div>
             </div>
         </section>
