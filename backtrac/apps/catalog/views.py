@@ -45,16 +45,26 @@ def view_file(request, client, item,
 @login_required
 def browse_directory(request, client, item,
                   template_name='catalog/browse_client.html'):
-    if item is None:
-        items = client.items.filter(parent=None).select_related('client',
-                                                            'latest_version')
+    show_deleted = request.GET.get('deleted', False) == '1'
+
+    items = Item.objects.all()
+    if show_deleted:
+        items = Item.objects.all()
     else:
-        items = item.children.select_related('client', 'latest_version')
+        items = Item.objects.present()
+
+    if item is None:
+        items = items.filter(client=client, parent=None)
+    else:
+        items = items.filter(parent=item)
+
+    items = items.select_related('client', 'latest_version')
 
     data = {
         'client': client,
         'item': item,
         'items': items,
+        'show_deleted': show_deleted,
     }
 
     return render_to_response(template_name, data,

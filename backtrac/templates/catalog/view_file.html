@@ -3,13 +3,17 @@
 {% block content %}
     <div class="container">
         <section class="span-18">
-            <h1>{{ client.hostname }}: {{ item.path }}</h1>
+            <h1>{{ item.name }}</h1>
             <div class="content clearfix">
-                <h2>Details</h2>
+                <a class="button" href="{{ item.parent.get_absolute_url }}"><img src="{{ STATIC_URL }}img/icons/famfamfam/arrow_left.png" /> Back to {{ item.parent.name }}</a>
+                <a class="button" href=""><img src="{{ STATIC_URL }}img/icons/famfamfam/computer_go.png" /> Restore latest version</a>
                 <div class="object-summary file-summary">
-                    {% with item.get_last_modified_version as latest %}
+                    {% with item.latest_version as latest %}
                     {% with latest.backed_up_at|timesince as age %}
                     <dl class="clearfix">
+                        <dt>Client:</dt>
+                        <dd><a href="{{ item.get_absolute_url }}">{{ item.client.hostname }}</a>
+
                         <dt>Path:</dt>
                         <dd>{{ item.path }}</dd>
                         
@@ -17,7 +21,7 @@
                         <dd>{{ age|default:"N/A" }} ago</dd>
                         
                         <dt>Size:</dt>
-                        <dd>{{ latest.size|filesizeformat }}</dd>
+                        <dd>{% if item.deleted %}(deleted){% else %}{{ latest.size|filesizeformat }}{% endif %}</dd>
                     </dl>
                     {% endwith %}
                     {% endwith %}

@@ -2,6 +2,8 @@ from django.db import models
 from django.db.models.signals import pre_save, post_save
 from django.dispatch import receiver
 
+import managers
+
 ITEM_TYPE_CHOICES = (
     ('d', 'Directory'),
     ('f', 'File'),
@@ -36,6 +38,8 @@ class Item(models.Model):
                                             related_name='item_latest_set')
     deleted_at = models.DateTimeField(blank=True, null=True, db_index=True)
     deleted = models.BooleanField(default=False, db_index=True)
+
+    objects = managers.ItemManager()
 
     def _get_path(self):
         if self.parent is not None:

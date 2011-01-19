@@ -5,6 +5,12 @@
         <section class="span-24">
         <h1>{{ client.hostname }}: {{ item.path|default:"/" }}</h1>
             <div class="content">
+                <a class="button" href=""><img src="{{ STATIC_URL }}img/icons/famfamfam/arrow_refresh.png" /> Refresh</a>
+                {% if show_deleted %}
+                    <a class="button" href="?deleted=0"><img src="{{ STATIC_URL }}img/icons/famfamfam/bin_empty.png" /> Hide deleted items</a>
+                {% else %}
+                    <a class="button" href="?deleted=1"><img src="{{ STATIC_URL }}img/icons/famfamfam/bin.png" /> Show deleted items</a>
+                {% endif %}
                 <table class="object_list">
                     <thead>
                         <tr>
@@ -15,10 +21,10 @@
                         {% if items %}
                             {% for item in items %}
                             {% with item.latest_version.backed_up_at|timesince as age %}
-                                <tr>
+                            <tr{% if item.deleted %} class="deleted"{% endif %}>
                                     <td class="icon">{% include 'catalog/item_icon.html' %}</td>
                                     <td class="name"><a href="{{ item.get_absolute_url }}">{{ item.name }}{% ifequal item.type 'd' %}/{% endifequal %}</a></td>
-                                    <td class="size">{{ item.latest_version.size|filesizeformat }}</td>
+                                    <td class="size">{% if item.deleted %}deleted{% else %}{{ item.latest_version.size|filesizeformat }}{% endif %}</td>
                                     <td class="age">{{ age|default:"N/A" }}</td>
                                 </tr>
                             {% endwith %}
