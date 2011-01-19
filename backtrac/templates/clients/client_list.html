@@ -5,6 +5,8 @@
         <section class="span-24">
             <h1>Clients</h1>
             <div class="content">
+                <a class="button" href=""><img src="{{ STATIC_URL }}img/icons/famfamfam/arrow_refresh.png" /> Refresh</a>
+                <a class="button" href="{% url clients_create_client %}"><img src="{{ STATIC_URL }}img/icons/famfamfam/add.png" /> Add a client</a>
                 <table class="object_list">
                     <thead>
                         <tr>
@@ -36,12 +38,6 @@
                         {% endif %}
                     </tbody>
                 </table>
-                <p class="buttons">
-                    <a class="button" href="{% url clients_create_client %}">
-                        <img src="{{ STATIC_URL }}img/icons/famfamfam/add.png" />
-                        Add a client
-                    </a>
-                </p>
             </div>
         </section>
     </div>
