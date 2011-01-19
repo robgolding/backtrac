@@ -35,15 +35,18 @@ class Item(models.Model):
                                             blank=True, db_index=True,
                                             related_name='item_latest_set')
     deleted_at = models.DateTimeField(blank=True, null=True, db_index=True)
+    deleted = models.BooleanField(default=False, db_index=True)
 
     def _get_path(self):
         if self.parent is not None:
             return '%s/%s' % (self.parent.path, self.name)
         return '/' + self.name
 
-    def is_deleted(self):
+    def _is_deleted(self):
         if self.latest_version:
-            return self.latest_version.backed_up_at < self.deleted_at
+            if self.deleted_at:
+                return self.deleted_at > self.latest_version.backed_up_at
+            return False
         return bool(self.deleted_at)
 
     @models.permalink
@@ -67,8 +70,9 @@ class Version(models.Model):
         return '%s [%s]' % (self.item.path, self.backed_up_at)
 
 @receiver(pre_save, sender=Item)
-def update_path(sender, instance=None, **kwargs):
+def update_item(sender, instance=None, **kwargs):
     instance.path = instance._get_path()
+    instance.deleted = instance._is_deleted()
 
 @receiver(post_save, sender=Item)
 def update_children(sender, instance=None, **kwargs):

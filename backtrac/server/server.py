@@ -108,7 +108,7 @@ class BackupClient(pb.Avatar):
     def perspective_check_file(self, path, mtime, size):
         item, created = get_or_create_item(self.client, path, 'f')
         versions = item.versions.all()
-        if not versions:
+        if not versions or item.deleted:
             return True
         version = versions.latest()
         if abs(mtime - version.mtime) < 1:
