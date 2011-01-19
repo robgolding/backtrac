@@ -1,4 +1,5 @@
 import os, random
+import datetime
 
 from zope.interface import implements
 
@@ -114,6 +115,14 @@ class BackupClient(pb.Avatar):
             if abs(size - version.size) < 1:
                 return False
         return True
+
+    def perspective_delete_file(self, path):
+        try:
+            item = Item.objects.get(client=self.client, path=path)
+            item.deleted_at = datetime.datetime.now()
+            item.save()
+        except Item.DoesNotExist:
+            pass
 
     def perspective_put_file(self, path, mtime, size):
         item, created = get_or_create_item(self.client, path, 'f')
