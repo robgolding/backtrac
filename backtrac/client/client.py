@@ -16,45 +16,47 @@ from utils import ConsumerQueue, TransferPager
 class ClientError(Exception): pass
 
 class BackupJob(object):
-    CREATE = 0
-    UPDATE = 1
-    DELETE = 2
+    MODIFY = 0
+    DELETE = 1
 
-    def __init__(self, filepath, type=UPDATE):
+    def __init__(self, filepath, type=MODIFY):
         if isinstance(filepath, basestring):
             filepath = FilePath(filepath)
         self.filepath = filepath
         self.type = type
 
-class TransferQueue(ConsumerQueue):
-    def consumer(self, filepath):
+class BackupQueue(ConsumerQueue):
+    def __init__(self, client, *args, **kwargs):
+        super(BackupQueue, self).__init__(*args, **kwargs)
+        self.client = client
+
+    def consume(self, job):
+        path = job.filepath.path
+        if job.type == BackupJob.MODIFY:
+            mtime = job.filepath.getModificationTime()
+            size = job.filepath.getsize()
+            d = self.client.perspective.callRemote('check_file', path, mtime,
+                                                   size)
+            d.addCallback(self._check_result, path)
+        elif job.type == BackupJob.DELETE:
+            self.client.perspective.callRemote('delete_file', path)
+
+    def _check_result(self, backup_required, path):
+        if backup_required:
+            self.client.transfer_queue.add(FilePath(path))
+
+class TransferQueue(BackupQueue):
+    def consume(self, filepath):
         mtime = filepath.getModificationTime()
         size = filepath.getsize()
-        r = self.perspective.callRemote('put_file', filepath.path, mtime, size)
-        return r.addCallback(self._transfer, filepath)
+        d = self.client.perspective.callRemote('put_file', filepath.path, mtime,
+                                               size)
+        d.addCallback(self._transfer, filepath)
 
     def _transfer(self, collector, filepath):
         print '%s, %d bytes' % (filepath.path, filepath.getsize())
         pager = TransferPager(collector, filepath)
         pager.wait()
-        self.consume_next()
-
-class BackupQueue(ConsumerQueue):
-    def __init__(self, perspective, transfer_queue):
-        super(BackupQueue, self).__init__(perspective)
-        self.transfer_queue = transfer_queue
-
-    def consumer(self, job):
-        path = job.filepath.path
-        mtime = job.filepath.getModificationTime()
-        size = job.filepath.getsize()
-        d = self.perspective.callRemote('check_file', path, mtime, size)
-        d.addCallback(self._backup_file, job.filepath)
-        self.consume_next()
-
-    def _backup_file(self, backup_required, filepath):
-        if backup_required:
-            self.transfer_queue.add(filepath)
 
 class BackupClient(pb.Referenceable):
     def __init__(self, server='localhost', port=8123,
@@ -72,15 +74,18 @@ class BackupClient(pb.Referenceable):
         self.perspective.callRemote('get_paths').addCallback(self._started)
 
     def handle_fs_event(self, watch, filepath, mask):
-        if mask & inotify.IN_CREATE:
-            type = BackupJob.CREATE
-        elif mask & inotify.IN_MODIFY:
-            type = BackupJob.UPDATE
-        elif mask & inotify.IN_DELETE:
+        if mask & inotify.IN_CHANGED or mask & inotify.IN_MOVED_TO:
+            type = BackupJob.MODIFY
+        elif mask & inotify.IN_DELETE or mask & inotify.IN_MOVED_FROM:
             type = BackupJob.DELETE
         else:
             return
         self.backup_queue.add(BackupJob(filepath, type=type))
+
+    def _check_result(self, result):
+        path, required = result
+        if required:
+            self.transfer_queue.add(FilePath(path))
 
     def _started(self, paths):
         for path in paths:
@@ -110,8 +115,8 @@ class BackupClient(pb.Referenceable):
     def _connected(self, perspective, start_client=False):
         self.connected = True
         self.perspective = perspective
-        self.transfer_queue = TransferQueue(perspective)
-        self.backup_queue = BackupQueue(perspective, self.transfer_queue)
+        self.backup_queue = BackupQueue(self)
+        self.transfer_queue = TransferQueue(self)
         print 'Connected to %s' % self.server
         if start_client:
             self.start()
