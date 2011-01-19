@@ -34,11 +34,17 @@ class Item(models.Model):
     latest_version = models.ForeignKey('catalog.Version', null=True,
                                             blank=True, db_index=True,
                                             related_name='item_latest_set')
+    deleted_at = models.DateTimeField(blank=True, null=True, db_index=True)
 
     def _get_path(self):
         if self.parent is not None:
             return '%s/%s' % (self.parent.path, self.name)
         return '/' + self.name
+
+    def is_deleted(self):
+        if self.latest_version:
+            return self.latest_version.backed_up_at < self.deleted_at
+        return bool(self.deleted_at)
 
     @models.permalink
     def get_absolute_url(self):
