@@ -8,10 +8,7 @@ import views
 
 urlpatterns = patterns('',
 
-    url(r'^$', login_required(object_list), {
-                        'template_name': 'catalog/browse.html',
-                        'queryset': Client.objects.select_related()},
-                    name='catalog_browse'),
+    url(r'^$', views.browse_catalog, name='catalog_browse'),
 
     url(r'^(?P<client_id>\d+)/$', views.browse_route, {'path': '/'},
                     name='catalog_browse_route'),

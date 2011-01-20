@@ -4,7 +4,7 @@ from django.core.servers.basehttp import FileWrapper
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render_to_response, get_object_or_404
-from django.views.generic.list_detail import object_detail
+from django.views.generic.list_detail import object_list, object_detail
 from django.db import transaction
 from django.template.context import RequestContext
 from django.contrib import messages
@@ -12,8 +12,19 @@ from django.contrib import messages
 from backtrac.server.utils import get_storage_for
 from backtrac.apps.clients.models import Client
 
-from models import Item, Version
+from models import Item, Version, Event
 from utils import normpath
+
+@login_required
+def browse_catalog(request, template_name='catalog/browse.html'):
+    kwargs = {
+        'queryset': Client.objects.select_related(),
+        'template_name': template_name,
+        'extra_context': {
+            'events': Event.objects.select_related(),
+        }
+     }
+    return object_list(request, **kwargs)
 
 @login_required
 def browse_route(request, client_id, path='/'):

@@ -2,7 +2,7 @@
 
 {% block content %}
     <div class="container">
-        <section class="span-24">
+        <section class="span-18">
             <h1>Browse Catalog</h1>
             <div class="content">
                 <a class="button" href=""><img src="{{ STATIC_URL }}img/icons/famfamfam/arrow_refresh.png" /> Refresh</a>
@@ -32,6 +32,20 @@
                         {% endif %}
                     </tbody>
                 </table>
+            </div>
+        </section>
+        <section class="span-6 last">
+            <h1>Events</h1>
+            <div class="content">
+                {% if events %}
+                    <ul class="events-list">
+                        {% for event in events %}
+                            <li>{{ event.get_type_display }} {{ event.item.name }}</li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p>No events to display.</p>
+                {% endif %}
             </div>
         </section>
     </div>

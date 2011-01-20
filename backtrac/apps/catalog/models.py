@@ -87,10 +87,15 @@ class Version(models.Model):
 
 class Event(models.Model):
     item = models.ForeignKey(Item)
+    occurred_at = models.DateTimeField(auto_now_add=True)
     type = models.CharField(max_length=20, choices=EVENT_TYPE_CHOICES)
 
     def __unicode__(self):
         return '%s %s' % (self.get_type_display(), self.item.name)
+
+    class Meta:
+        ordering = ['-occurred_at']
+        get_latest_by = 'occurred_at'
 
 @dispatch.receiver(pre_save, sender=Item)
 def update_item(sender, instance=None, **kwargs):
