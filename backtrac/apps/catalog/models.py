@@ -1,12 +1,24 @@
+import datetime
+
 from django.db import models
 from django.db.models.signals import pre_save, post_save
-from django.dispatch import receiver
+from django import dispatch
 
 import managers
+
+file_updated = dispatch.Signal(
+                        providing_args=['path', 'mtime', 'size', 'client'])
+file_deleted = dispatch.Signal(providing_args=['path', 'client'])
 
 ITEM_TYPE_CHOICES = (
     ('d', 'Directory'),
     ('f', 'File'),
+)
+
+EVENT_TYPE_CHOICES = (
+    ('created', 'Created'),
+    ('updated', 'Updated'),
+    ('deleted', 'Deleted'),
 )
 
 def get_or_create_item(client, path, type):
@@ -73,18 +85,47 @@ class Version(models.Model):
     def __unicode__(self):
         return '%s [%s]' % (self.item.path, self.backed_up_at)
 
-@receiver(pre_save, sender=Item)
+class Event(models.Model):
+    item = models.ForeignKey(Item)
+    type = models.CharField(max_length=20, choices=EVENT_TYPE_CHOICES)
+
+    def __unicode__(self):
+        return '%s %s' % (self.get_type_display(), self.item.name)
+
+@dispatch.receiver(pre_save, sender=Item)
 def update_item(sender, instance=None, **kwargs):
     instance.path = instance._get_path()
     instance.deleted = instance._is_deleted()
 
-@receiver(post_save, sender=Item)
+@dispatch.receiver(post_save, sender=Item)
 def update_children(sender, instance=None, **kwargs):
     children = Item.objects.filter(parent=instance)
     for item in children:
         item.save()
 
-@receiver(post_save, sender=Version)
+@dispatch.receiver(post_save, sender=Version)
 def update_latest_version(sender, instance=None, **kwargs):
     instance.item.latest_version = instance
     instance.item.save()
+
+@dispatch.receiver(file_updated)
+def file_updated_callback(sender, path, mtime, size, client, version_id,
+                          **kwargs):
+    item, created = get_or_create_item(client, path, 'f')
+    version, _ = Version.objects.get_or_create(id=version_id, item=item,
+                                               mtime=mtime, size=size)
+    if created:
+        type = 'created'
+    else:
+        type = 'updated'
+    Event.objects.create(item=item, type=type)
+
+@dispatch.receiver(file_deleted)
+def file_deleted_callback(sender, path, client, **kwargs):
+    try:
+        item = Item.objects.get(client=client, path=path)
+        item.deleted_at = datetime.datetime.now()
+        item.save()
+        Event.objects.create(item=item, type='deleted')
+    except Item.DoesNotExist:
+        pass

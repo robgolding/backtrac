@@ -16,8 +16,8 @@ from django.conf import settings
 
 from utils import PageCollector, get_storage_for
 
-from backtrac.apps.clients.models import Client
-from backtrac.apps.catalog.models import Item, Version, get_or_create_item
+from backtrac.apps.clients import models as clients
+from backtrac.apps.catalog import models as catalog
 
 class BackupClientAuthChecker:
     implements(checkers.ICredentialsChecker)
@@ -37,12 +37,12 @@ class BackupClientAuthChecker:
                 settings.SECRET_KEY).addCallback(self._passwordMatch,
                                                  'localhost')
         try:
-            client = Client.objects.get(hostname=credentials.username)
+            client = clients.Client.objects.get(hostname=credentials.username)
             return defer.maybeDeferred(
                 credentials.checkPassword,
                 client.secret_key).addCallback(self._passwordMatch,
                                                client.hostname)
-        except Client.DoesNotExist:
+        except clients.Client.DoesNotExist:
             return defer.fail(error.UnauthorizedLogin())
 
 class BackupServer(object):
@@ -68,7 +68,7 @@ class BackupRealm(object):
         if client_id == 'localhost':
             avatar = ManagementClient(self.server)
         else:
-            client_obj = Client.objects.get(hostname=client_id)
+            client_obj = clients.Client.objects.get(hostname=client_id)
             avatar = BackupClient(client_obj, self.server)
         avatar.attached(mind)
         return pb.IPerspective, avatar, lambda a=avatar:a.detached(mind)
@@ -95,11 +95,13 @@ class BackupClient(pb.Avatar):
     def attached(self, mind):
         self.remote = mind
         self.server.clients.append(self)
+        clients.client_connected.send(sender=self, client=self.client)
         print 'Client \'%s\' connected' % self.client.hostname
 
     def detached(self, mind):
         self.remote = None
         self.server.clients.remove(self)
+        clients.client_disconnected.send(sender=self, client=self.client)
         print 'Client \'%s\' disconnected' % self.client.hostname
 
     def perspective_get_paths(self):
@@ -112,14 +114,14 @@ class BackupClient(pb.Avatar):
                 get_children(i, items)
         items = []
         try:
-            item = Item.objects.get(client=self.client, path=path)
+            item = catalog.Item.objects.get(client=self.client, path=path)
             get_children(item, items)
-        except Item.DoesNotExist:
+        except catalog.Item.DoesNotExist:
             pass
         return items
 
     def perspective_check_file(self, path, mtime, size):
-        item, created = get_or_create_item(self.client, path, 'f')
+        item, created = catalog.get_or_create_item(self.client, path, 'f')
         versions = item.versions.all()
         if not versions or item.deleted:
             return True
@@ -130,19 +132,14 @@ class BackupClient(pb.Avatar):
         return True
 
     def perspective_delete_file(self, path):
-        try:
-            item = Item.objects.get(client=self.client, path=path)
-            item.deleted_at = datetime.datetime.now()
-            item.save()
-        except Item.DoesNotExist:
-            pass
+        catalog.file_deleted.send(sender=self, path=path, client=self.client)
 
     def perspective_put_file(self, path, mtime, size):
-        item, created = get_or_create_item(self.client, path, 'f')
         version_id, fdst = self.storage.add(path)
         collector = PageCollector(fdst)
-        version, _ = Version.objects.get_or_create(id=version_id,
-                                         item=item, mtime=mtime, size=size)
+        catalog.file_updated.send(sender=self, path=path, mtime=mtime,
+                                  size=size, client=self.client,
+                                  version_id=version_id)
         return collector
 
 if __name__ == '__main__':
