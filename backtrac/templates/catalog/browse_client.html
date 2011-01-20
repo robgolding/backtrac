@@ -6,6 +6,7 @@
         <h1>{{ client.hostname }}: {{ item.path|default:"/" }}</h1>
             <div class="content">
                 <a class="button" href=""><img src="{{ STATIC_URL }}img/icons/famfamfam/arrow_refresh.png" /> Refresh</a>
+                <a class="button" href="{{ item.parent.get_absolute_url }}"><img src="{{ STATIC_URL }}img/icons/famfamfam/arrow_up.png" /> Parent folder</code></a>
                 {% if show_deleted %}
                     <a class="button" href="?deleted=0"><img src="{{ STATIC_URL }}img/icons/famfamfam/bin_empty.png" /> Hide deleted items</a>
                 {% else %}
