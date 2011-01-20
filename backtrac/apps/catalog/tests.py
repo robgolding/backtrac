@@ -10,24 +10,6 @@ from models import Item, Version
 
 #TODO: Write a test for the download_version view
 
-class ItemGetNameTest(TestCase):
-    def setUp(self):
-        """
-        Create a single client and two items within that client - a file and
-        a directory.
-        """
-        c = Client.objects.create(hostname='testclient', secret_key='')
-        self.item_file = Item.objects.create(client=c, name='file', type='f')
-        self.item_dir = Item.objects.create(client=c, name='dir', type='d')
-
-    def test_dir_get_name(self):
-        """Test that the directory name ends in a slash"""
-        self.assertTrue(self.item_dir.get_name().endswith('/'))
-
-    def test_file_get_name(self):
-        """Test that the file name doesn't end in a slash"""
-        self.assertFalse(self.item_file.get_name().endswith('/'))
-
 class LatestVersionTest(TestCase):
     def _add_version_to_item(self, item):
         """
@@ -57,13 +39,13 @@ class LatestVersionTest(TestCase):
         Test that the returned 'latest' version is the last one that was
         added.
         """
-        self.assertEqual(self.item.get_last_modified_version().id,
+        self.assertEqual(self.item.latest_version.id,
                              self.version.id)
-        self.assertEqual(self.item.get_last_modified_version().item,
+        self.assertEqual(self.item.latest_version.item,
                              self.version.item)
-        self.assertEqual(self.item.get_last_modified_version().mtime,
+        self.assertEqual(self.item.latest_version.mtime,
                              self.version.mtime)
-        self.assertEqual(self.item.get_last_modified_version().size,
+        self.assertEqual(self.item.latest_version.size,
                              self.version.size)
 
 class GetOrCreateItemTest(TestCase):
