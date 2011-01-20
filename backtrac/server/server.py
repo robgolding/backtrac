@@ -105,6 +105,19 @@ class BackupClient(pb.Avatar):
     def perspective_get_paths(self):
         return [p.path for p in self.client.filepaths.all()]
 
+    def perspective_get_present_state(self, path):
+        def get_children(item, items):
+            items.append(item.path)
+            for i in item.children.present():
+                get_children(i, items)
+        items = []
+        try:
+            item = Item.objects.get(client=self.client, path=path)
+            get_children(item, items)
+        except Item.DoesNotExist:
+            pass
+        return items
+
     def perspective_check_file(self, path, mtime, size):
         item, created = get_or_create_item(self.client, path, 'f')
         versions = item.versions.all()

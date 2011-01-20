@@ -13,6 +13,8 @@ from twisted import cred
 
 from utils import ConsumerQueue, TransferPager
 
+from backtrac.apps.catalog.utils import normpath
+
 class ClientError(Exception): pass
 
 class BackupJob(object):
@@ -39,6 +41,7 @@ class BackupQueue(ConsumerQueue):
                                                    size)
             d.addCallback(self._check_result, path)
         elif job.type == BackupJob.DELETE:
+            print '%s deleted' % path
             self.client.perspective.callRemote('delete_file', path)
 
     def _check_result(self, backup_required, path):
@@ -82,6 +85,12 @@ class BackupClient(pb.Referenceable):
             return
         self.backup_queue.add(BackupJob(filepath, type=type))
 
+    def _check_present_state(self, paths):
+        for path in paths:
+            if not os.path.exists(path):
+                job = BackupJob(path, type=BackupJob.DELETE)
+                self.backup_queue.add(job)
+
     def _check_result(self, result):
         path, required = result
         if required:
@@ -89,6 +98,10 @@ class BackupClient(pb.Referenceable):
 
     def _started(self, paths):
         for path in paths:
+            path = normpath(path)
+            self.perspective.callRemote('get_present_state',
+                                        path).addCallback(
+                                            self._check_present_state)
             self.notifier.watch(FilePath(path), autoAdd=True,
                                 recursive=True,
                                 callbacks=[self.handle_fs_event])
