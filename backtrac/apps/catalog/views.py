@@ -70,11 +70,13 @@ def browse_directory(request, client, item,
         items = items.filter(parent=item)
 
     items = items.select_related('client', 'latest_version')
+    events = Event.objects.filter(item__client=client)
 
     data = {
         'client': client,
         'item': item,
         'items': items,
+        'events': events,
         'show_deleted': show_deleted,
     }
 

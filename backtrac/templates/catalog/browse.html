@@ -40,7 +40,7 @@
                 {% if events %}
                     <ul class="events-list">
                         {% for event in events %}
-                            <li class="{{ event.type }}"><a title="{{ event.item.client }}:{{ event.item.path }}" href="{{ event.item.get_absolute_url }}">{{ event.item.name }}</a></li>
+                            <li class="{{ event.type }}"><a title="{{ event.get_type_display }} {{ event.item.path }} on {{ event.item.client }}" href="{{ event.item.get_absolute_url }}">{{ event.item.name }}</a></li>
                         {% endfor %}
                     </ul>
                     <a href="">More events &rarr;</a>
