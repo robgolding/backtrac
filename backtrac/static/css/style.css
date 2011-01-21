@@ -476,6 +476,33 @@ table.backedup_file_list tbody td.path, table.backedup_file_list tbody td.size {
     padding-right: 3px;
 }
 
+/* Events */
+
+ul.events-list {
+    font-size: 14px;
+    margin: 20px 0 20px 0;
+    padding: 0;
+}
+
+ul.events-list li {
+    list-style-type: none;
+    background-repeat: no-repeat;
+    padding-left: 25px;
+    margin-bottom: 5px;
+}
+
+ul.events-list li.created {
+    background-image: url('../img/icons/famfamfam/add.png');
+}
+
+ul.events-list li.updated {
+    background-image: url('../img/icons/famfamfam/pencil.png');
+}
+
+ul.events-list li.deleted {
+    background-image: url('../img/icons/famfamfam/delete.png');
+}
+
 /* Object Summary */
 
 .object-summary {

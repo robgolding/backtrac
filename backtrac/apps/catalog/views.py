@@ -21,7 +21,7 @@ def browse_catalog(request, template_name='catalog/browse.html'):
         'queryset': Client.objects.select_related(),
         'template_name': template_name,
         'extra_context': {
-            'events': Event.objects.select_related(),
+            'events': Event.objects.select_related()[:10],
         }
      }
     return object_list(request, **kwargs)
