@@ -134,13 +134,17 @@ class BackupClient(pb.Avatar):
             pass
         return True
 
-    def perspective_delete_file(self, path):
-        catalog.file_deleted.send(sender=self, path=path, client=self.client)
+    def perspective_create_item(self, path, type):
+        catalog.item_created.send(sender=self, path=path, type=type,
+                                  client=self.client)
+
+    def perspective_delete_item(self, path):
+        catalog.item_deleted.send(sender=self, path=path, client=self.client)
 
     def perspective_put_file(self, path, mtime, size):
         version_id, fdst = self.storage.add(path)
         collector = PageCollector(fdst)
-        catalog.file_updated.send(sender=self, path=path, mtime=mtime,
+        catalog.item_updated.send(sender=self, path=path, mtime=mtime,
                                   size=size, client=self.client,
                                   version_id=version_id)
         return collector

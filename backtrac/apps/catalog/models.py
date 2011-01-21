@@ -6,9 +6,10 @@ from django import dispatch
 
 import managers
 
-file_updated = dispatch.Signal(
+item_created = dispatch.Signal(providing_args=['path', 'type'])
+item_updated = dispatch.Signal(
                         providing_args=['path', 'mtime', 'size', 'client'])
-file_deleted = dispatch.Signal(providing_args=['path', 'client'])
+item_deleted = dispatch.Signal(providing_args=['path', 'client'])
 
 ITEM_TYPE_CHOICES = (
     ('d', 'Directory'),
@@ -24,7 +25,7 @@ EVENT_TYPE_CHOICES = (
 def get_or_create_item(client, path, type):
     names = path.strip('/').split('/')
     item, created = None, False
-    types = ['f' if i == (len(names) - 1) else 'd' for i in range(len(names))]
+    types = [type if i == (len(names) - 1) else 'd' for i in range(len(names))]
     for name, type in zip(names, types):
         item, created = Item.objects.get_or_create(client=client,
                                                    parent=item,
@@ -48,7 +49,6 @@ class Item(models.Model):
     latest_version = models.ForeignKey('catalog.Version', null=True,
                                             blank=True, db_index=True,
                                             related_name='item_latest_set')
-    deleted_at = models.DateTimeField(blank=True, null=True, db_index=True)
     deleted = models.BooleanField(default=False, db_index=True)
 
     objects = managers.ItemManager()
@@ -57,13 +57,6 @@ class Item(models.Model):
         if self.parent is not None:
             return '%s/%s' % (self.parent.path, self.name)
         return '/' + self.name
-
-    def _is_deleted(self):
-        if self.latest_version:
-            if self.deleted_at:
-                return self.deleted_at > self.latest_version.backed_up_at
-            return False
-        return bool(self.deleted_at)
 
     @models.permalink
     def get_absolute_url(self):
@@ -100,7 +93,6 @@ class Event(models.Model):
 @dispatch.receiver(pre_save, sender=Item)
 def update_item(sender, instance=None, **kwargs):
     instance.path = instance._get_path()
-    instance.deleted = instance._is_deleted()
 
 @dispatch.receiver(post_save, sender=Item)
 def update_children(sender, instance=None, **kwargs):
@@ -113,8 +105,17 @@ def update_latest_version(sender, instance=None, **kwargs):
     instance.item.latest_version = instance
     instance.item.save()
 
-@dispatch.receiver(file_updated)
-def file_updated_callback(sender, path, mtime, size, client, version_id,
+@dispatch.receiver(item_created)
+def item_created_callback(sender, path, type, client, **kwargs):
+    item, created = get_or_create_item(client, path, type)
+    if created or item.deleted:
+        if item.deleted:
+            item.deleted = False
+            item.save()
+        Event.objects.create(item=item, type='created')
+
+@dispatch.receiver(item_updated)
+def item_updated_callback(sender, path, mtime, size, client, version_id,
                           **kwargs):
     item, created = get_or_create_item(client, path, 'f')
     version, _ = Version.objects.get_or_create(id=version_id, item=item,
@@ -125,11 +126,11 @@ def file_updated_callback(sender, path, mtime, size, client, version_id,
         type = 'updated'
     Event.objects.create(item=item, type=type)
 
-@dispatch.receiver(file_deleted)
-def file_deleted_callback(sender, path, client, **kwargs):
+@dispatch.receiver(item_deleted)
+def item_deleted_callback(sender, path, client, **kwargs):
     try:
         item = Item.objects.get(client=client, path=path)
-        item.deleted_at = datetime.datetime.now()
+        item.deleted = True
         item.save()
         Event.objects.create(item=item, type='deleted')
     except Item.DoesNotExist:

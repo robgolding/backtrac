@@ -19,8 +19,9 @@ from backtrac.apps.catalog.utils import normpath
 class ClientError(Exception): pass
 
 class BackupJob(object):
-    MODIFY = 0
-    DELETE = 1
+    CREATE = 0
+    MODIFY = 1
+    DELETE = 2
 
     def __init__(self, filepath, type=MODIFY):
         if isinstance(filepath, basestring):
@@ -35,7 +36,10 @@ class BackupQueue(ConsumerQueue):
 
     def consume(self, job):
         path = job.filepath.path
-        if job.type == BackupJob.MODIFY:
+        if job.type == BackupJob.CREATE:
+            type = 'd' if job.filepath.isdir() else 'f'
+            self.client.perspective.callRemote('create_item', path, type)
+        elif job.type == BackupJob.MODIFY:
             mtime = job.filepath.getModificationTime()
             size = job.filepath.getsize()
             d = self.client.perspective.callRemote('check_file', path, mtime,
@@ -43,7 +47,7 @@ class BackupQueue(ConsumerQueue):
             d.addCallback(self._check_result, path)
         elif job.type == BackupJob.DELETE:
             print '%s deleted' % path
-            self.client.perspective.callRemote('delete_file', path)
+            self.client.perspective.callRemote('delete_item', path)
 
     def _check_result(self, backup_required, path):
         if backup_required:
@@ -86,7 +90,10 @@ class BackupClient(pb.Referenceable):
         self.notifier.startReading()
 
     def handle_fs_event(self, watch, filepath, mask):
-        if mask & inotify.IN_CHANGED or mask & inotify.IN_MOVED_TO:
+        print 'Got event:', inotify.humanReadableMask(mask)
+        if mask & inotify.IN_CREATE:
+            type = BackupJob.CREATE
+        elif mask & inotify.IN_CHANGED or mask & inotify.IN_MOVED_TO:
             type = BackupJob.MODIFY
         elif mask & inotify.IN_DELETE or mask & inotify.IN_MOVED_FROM:
             type = BackupJob.DELETE
@@ -110,6 +117,7 @@ class BackupClient(pb.Referenceable):
 
     def walk_path(self, path):
         for root, dirs, files in os.walk(path):
+            self.backup_queue.add(BackupJob(root, type=BackupJob.CREATE))
             for f in files:
                 path = os.path.join(root, f)
                 self.backup_queue.add(BackupJob(path))
