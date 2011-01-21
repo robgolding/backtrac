@@ -3,7 +3,8 @@ import os, sys, socket
 from twisted.python import util
 from twisted.spread import pb
 from twisted.spread.flavors import Referenceable
-from twisted.internet.defer import Deferred, DeferredQueue
+from twisted.internet import defer
+from twisted.internet.defer import Deferred, DeferredQueue, DeferredList
 from twisted.internet.error import ConnectionRefusedError
 from twisted.internet import reactor, inotify
 from twisted.internet.task import deferLater, cooperate
@@ -71,10 +72,18 @@ class BackupClient(pb.Referenceable):
         self.connected = False
         self.notifier = inotify.INotify()
 
+    @defer.inlineCallbacks
     def start(self):
         self.backup_queue.start()
         self.transfer_queue.start()
-        self.perspective.callRemote('get_paths').addCallback(self._started)
+        d = self.perspective.callRemote('get_paths')
+        paths = yield d
+        for path in paths:
+            path = normpath(path)
+            self.check_present_state(path)
+            self.walk_path(path)
+            self.add_watch(path)
+        self.notifier.startReading()
 
     def handle_fs_event(self, watch, filepath, mask):
         if mask & inotify.IN_CHANGED or mask & inotify.IN_MOVED_TO:
@@ -85,31 +94,25 @@ class BackupClient(pb.Referenceable):
             return
         self.backup_queue.add(BackupJob(filepath, type=type))
 
-    def _check_present_state(self, paths):
+    @defer.inlineCallbacks
+    def check_present_state(self, path):
+        d = self.perspective.callRemote('get_present_state', path)
+        paths = yield d
         for path in paths:
             if not os.path.exists(path):
                 job = BackupJob(path, type=BackupJob.DELETE)
                 self.backup_queue.add(job)
 
-    def _check_result(self, result):
-        path, required = result
-        if required:
-            self.transfer_queue.add(FilePath(path))
+    def add_watch(self, path):
+        self.notifier.watch(FilePath(path), autoAdd=True,
+                            recursive=True,
+                            callbacks=[self.handle_fs_event])
 
-    def _started(self, paths):
-        for path in paths:
-            path = normpath(path)
-            self.perspective.callRemote('get_present_state',
-                                        path).addCallback(
-                                            self._check_present_state)
-            self.notifier.watch(FilePath(path), autoAdd=True,
-                                recursive=True,
-                                callbacks=[self.handle_fs_event])
-            for root, dirs, files in os.walk(path):
-                for f in files:
-                    path = os.path.join(root, f)
-                    self.backup_queue.add(BackupJob(path))
-        self.notifier.startReading()
+    def walk_path(self, path):
+        for root, dirs, files in os.walk(path):
+            for f in files:
+                path = os.path.join(root, f)
+                self.backup_queue.add(BackupJob(path))
 
     def connect(self, start_on_connect=False):
         factory = pb.PBClientFactory()
