@@ -2,20 +2,29 @@ from twisted.spread.util import FilePager
 from twisted.internet.defer import Deferred, DeferredQueue
 
 class ConsumerQueue(object):
-    def __init__(self):
+    def __init__(self, stop_on_error=False):
+        self.stop_on_error = stop_on_error
         self.queue = DeferredQueue()
 
     def _consume_next(self, *args):
-        self.queue.get().addCallback(self._consumer)
+        self.queue.get().addCallbacks(self._consumer, self._error)
 
     def _consumer(self, obj):
         self.consume(obj)
         self._consume_next()
 
+    def _error(self, fail):
+        self.error(fail)
+        if not self.stop_on_error:
+            self._consume_next()
+
     def add(self, filepath):
         self.queue.put(filepath)
 
     def consume(self, obj):
+        raise NotImplementedError
+    
+    def fail(self, fail):
         raise NotImplementedError
 
     def start(self):

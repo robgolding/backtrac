@@ -36,18 +36,24 @@ class BackupQueue(ConsumerQueue):
 
     def consume(self, job):
         path = job.filepath.path
-        if job.type == BackupJob.CREATE:
-            type = 'd' if job.filepath.isdir() else 'f'
-            self.client.perspective.callRemote('create_item', path, type)
+        if job.type == BackupJob.CREATE and job.filepath.isdir():
+            if job.filepath.exists():
+                self.client.perspective.callRemote('create_item', path, 'd')
         elif job.type == BackupJob.MODIFY:
-            mtime = job.filepath.getModificationTime()
-            size = job.filepath.getsize()
-            d = self.client.perspective.callRemote('check_file', path, mtime,
-                                                   size)
-            d.addCallback(self._check_result, path)
+            try:
+                mtime = job.filepath.getModificationTime()
+                size = job.filepath.getsize()
+                d = self.client.perspective.callRemote('check_file', path,
+                                                       mtime, size)
+                d.addCallback(self._check_result, path)
+            except (OSError, IOError):
+                pass
         elif job.type == BackupJob.DELETE:
             print '%s deleted' % path
             self.client.perspective.callRemote('delete_item', path)
+
+    def error(self, fail):
+        print fail
 
     def _check_result(self, backup_required, path):
         if backup_required:
@@ -55,16 +61,25 @@ class BackupQueue(ConsumerQueue):
 
 class TransferQueue(BackupQueue):
     def consume(self, filepath):
-        mtime = filepath.getModificationTime()
-        size = filepath.getsize()
+        try:
+            mtime = filepath.getModificationTime()
+            size = filepath.getsize()
+        except (OSError, IOError):
+            return
         d = self.client.perspective.callRemote('put_file', filepath.path, mtime,
                                                size)
         d.addCallback(self._transfer, filepath)
 
+    def error(self, fail):
+        print fail
+
     def _transfer(self, collector, filepath):
-        print '%s, %d bytes' % (filepath.path, filepath.getsize())
-        pager = TransferPager(collector, filepath)
-        pager.wait()
+        try:
+            pager = TransferPager(collector, filepath)
+            pager.wait()
+            print '%s, %d bytes' % (filepath.path, filepath.getsize())
+        except (OSError, IOError):
+            pass
 
 class BackupClient(pb.Referenceable):
     def __init__(self, server='localhost', port=8123,
@@ -90,7 +105,8 @@ class BackupClient(pb.Referenceable):
         self.notifier.startReading()
 
     def handle_fs_event(self, watch, filepath, mask):
-        print 'Got event:', inotify.humanReadableMask(mask)
+        def add_to_queue(job):
+            self.backup_queue.add(job)
         if mask & inotify.IN_CREATE:
             type = BackupJob.CREATE
         elif mask & inotify.IN_CHANGED or mask & inotify.IN_MOVED_TO:
@@ -99,7 +115,8 @@ class BackupClient(pb.Referenceable):
             type = BackupJob.DELETE
         else:
             return
-        self.backup_queue.add(BackupJob(filepath, type=type))
+        job = BackupJob(filepath, type=type)
+        reactor.callLater(1, add_to_queue, job)
 
     @defer.inlineCallbacks
     def check_present_state(self, path):
