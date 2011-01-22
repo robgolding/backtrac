@@ -123,12 +123,10 @@ class BackupClient(pb.Avatar):
     def perspective_check_file(self, path, mtime, size):
         try:
             item = catalog.Item.objects.get(client=self.client, path=path)
-            versions = item.versions.all()
-            if not versions or item.deleted:
+            if not item.latest_version or item.deleted:
                 return True
-            version = versions.latest()
-            if abs(mtime - version.mtime) < 1:
-                if abs(size - version.size) < 1:
+            if abs(mtime - item.latest_version.mtime) < 1:
+                if abs(size - item.latest_version.size) < 1:
                     return False
         except catalog.Item.DoesNotExist:
             pass
