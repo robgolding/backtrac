@@ -18,7 +18,7 @@
                                 <tr>
                                     <td class="icon">{% include 'clients/client_icon.html' %}</td>
                                     <td class="name"><a href="{{ client.get_absolute_url }}">{{ client.hostname }}</a></td>
-                                    <td class="status">{{ client.get_status|capfirst }}</td>
+                                    <td class="status">{% if client.status.connected %}Connected{% else %}Disconnected{% endif %}</td>
                                     <td class="actions">
                                         <a href="{% url clients_update_client client.id %}" title="Update client">
                                             <img src="{{ STATIC_URL}}img/icons/edit_16.png" />

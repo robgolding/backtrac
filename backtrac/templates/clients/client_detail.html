@@ -16,7 +16,7 @@
                         <dd><code>{{ object.secret_key }}</code></dd>
                         
                         <dt>Status:</dt>
-                        <dd>{{ object.get_status|capfirst }}</dd>
+                        <dd>{% if object.status.connected %}Connected{% else %}Disconnected{% endif %}</dd>
                     </dl>
                 </div>
             </div>

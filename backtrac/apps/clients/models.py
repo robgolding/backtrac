@@ -31,10 +31,11 @@ class FilePath(models.Model):
 
 class Status(models.Model):
     client = models.OneToOneField(Client, primary_key=True)
-    last_seen = models.DateTimeField(auto_now_add=True, auto_now=True)
+    connected = models.BooleanField(default=False, db_index=True)
 
     def __unicode__(self):
-        return '[Status] %s' % self.client
+        c = 'connected' if self.connected else 'disconnected'
+        return '%s %s' % (self.client.hostname, c)
 
     class Meta:
         verbose_name_plural = 'statuses'
@@ -44,4 +45,14 @@ def create_initial_status(sender, instance=None, **kwargs):
     try:
         status = instance.status
     except Status.DoesNotExist:
-        Status.objects.create(client=instance, last_seen=datetime.datetime.min)
+        Status.objects.create(client=instance)
+
+@dispatch.receiver(client_connected)
+def client_connected_callback(sender, client, **kwargs):
+    client.status.connected = True
+    client.status.save()
+
+@dispatch.receiver(client_disconnected)
+def client_disconnected_callback(sender, client, **kwargs):
+    client.status.connected = False
+    client.status.save()
