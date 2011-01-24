@@ -199,19 +199,19 @@ span.error {
     height: 47px;
 }
 
-#nav-primary {
+#nav-container {
     width: 960px;
     margin: 0 auto;
-    padding: 0;
 }
 
-#nav-primary ul {
+ul#nav-primary {
+    float: left;
     list-display: none;
     margin: 0;
     padding: 0;
 }
 
-#nav-primary ul li {
+ul#nav-primary li {
     list-style: none;
     float: left;
     margin: 0;
@@ -219,7 +219,7 @@ span.error {
     height: 32px;
 }
 
-#nav-primary ul li a {
+ul#nav-primary li a {
     display: block;
     padding: 7px 18px;
     background-color: #afda79;
@@ -229,14 +229,48 @@ span.error {
     text-decoration: none;
 }
 
-#nav-primary ul li a:hover {
+ul#nav-primary li a:hover {
     background-color: #eee;
     text-decoration: none;
 }
 
-body#dashboard #nav-primary ul li.dashboard a,
-body#clients #nav-primary ul li.clients a,
-body#browse #nav-primary ul li.browse a {
+body#dashboard ul#nav-primary li.dashboard a,
+body#clients ul#nav-primary li.clients a,
+body#browse ul#nav-primary li.browse a {
+    background-color: #eee;
+}
+
+ul#nav-secondary {
+    float: right;
+    list-display: none;
+    margin: 0 auto;
+    padding: 0;
+}
+
+ul#nav-secondary li {
+    list-style: none;
+    float: left;
+    margin: 0;
+    padding: 15px 0 0 0;
+    height: 32px;
+}
+
+ul#nav-secondary li a {
+    display: block;
+    padding: 7px 18px;
+    background-color: #afda79;
+    margin: 0;
+    margin-left: 5px;
+    color: #333;
+    text-decoration: none;
+}
+
+ul#nav-secondary li a:hover {
+    background-color: #eee;
+    text-decoration: none;
+}
+
+body#events ul#nav-secondary li.events a {
     background-color: #eee;
 }
 

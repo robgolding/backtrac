@@ -25,7 +25,7 @@ urlpatterns = patterns('',
 
     (r'^clients/', include('backtrac.apps.clients.urls')),
 
-    (r'^browse/', include('backtrac.apps.catalog.urls')),
+    (r'^catalog/', include('backtrac.apps.catalog.urls')),
 
 )
 

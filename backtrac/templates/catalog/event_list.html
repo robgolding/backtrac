@@ -1,0 +1,36 @@
+{% extends 'catalog/event_base.html' %}
+
+{% block content %}
+    <div class="container">
+        <section class="span-24">
+        <h1>Events</h1>
+            <div class="content">
+                <a class="button" href=""><img src="{{ STATIC_URL }}img/icons/famfamfam/arrow_refresh.png" /> Refresh</a>
+                <table class="object_list">
+                    <thead>
+                        <tr>
+                            <th class="icon"></th><th>Event</th><th>Date/Time</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if object_list %}
+                            {% for event in object_list %}
+                            <tr>
+                                <td class="icon">{% include 'catalog/event_icon.html' %}</td>
+                                    <td class="event">{{ event.get_type_display }} <a href="{{ event.item.get_absolute_url }}">{{ event.item.name }}</a> on <a href="{{ event.item.client.get_absolute_url }}">{{ event.item.client.hostname }}</a></td>
+                                    <td class="datetime">{{ event.occurred_at|date:"d/m/Y H:i" }}</td>
+                                </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr class="info">
+                                <td colspan="3">
+                                    There are no events to display.
+                                </td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+{% endblock %}

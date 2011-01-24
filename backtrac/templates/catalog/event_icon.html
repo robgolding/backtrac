@@ -1,0 +1,11 @@
+{% if event.type == 'created' %}
+    <img src="{{ STATIC_URL }}img/icons/famfamfam/add.png" />
+{% else %}
+    {% if event.type == 'updated' %}
+        <img src="{{ STATIC_URL }}img/icons/famfamfam/pencil.png" />
+    {% else %}
+        {% if event.type == 'deleted' %}
+            <img src="{{ STATIC_URL }}img/icons/famfamfam/delete.png" />
+        {% endif %}
+    {% endif %}
+{% endif %}

@@ -4,11 +4,16 @@ from django.views.generic.list_detail import object_list, object_detail
 
 from backtrac.apps.clients.models import Client
 
+from models import Event
 import views
 
 urlpatterns = patterns('',
 
-    url(r'^$', views.browse_catalog, name='catalog_browse'),
+    url(r'^browse/$', views.browse_catalog, name='catalog_browse'),
+
+    url(r'^events/$', login_required(object_list), {
+                        'queryset': Event.objects.select_related(),},
+                    name='catalog_event_list'),
 
     url(r'^(?P<client_id>\d+)/$', views.browse_route, {'path': '/'},
                     name='catalog_browse_route'),
