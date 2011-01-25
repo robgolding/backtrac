@@ -394,6 +394,35 @@ form.standard-form ul.formset-list a.delete-row.select {
     top: 5px;
 }
 
+/* Progress Bar */
+
+div.progress-container {
+    border: 1px solid #ccc;
+    width: 75%;
+    margin: 10px 5px 10px 0;
+    padding: 1px;
+    clear: both;
+    background: white;
+}
+
+div.progress-container > div {
+    background-color: #ace97c;
+    padding: 3px;
+    height: 20px;
+}
+
+div.progress-container > div.normal {
+    background-color: #ace97c;
+}
+
+div.progress-container > div.warning {
+    background-color: #efef99;
+}
+
+div.progress-container > div.critical {
+    background-color: #fba3a4;
+}
+
 /* Sections */
 
 section {

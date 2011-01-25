@@ -31,8 +31,21 @@
         <section class="span-18">
             <h1>Dashboard</h1>
             <div class="content">
+                <h2>Backup Filesystem</h2>
                 <p>
-                    Prepare for a wealth of information blah blah blah...
+                    Backup filesystem is currently <strong>{{ stats.used_pc }}%</strong> full.
+                </p>
+                <div class="progress-container">
+                    {% with stats.used_pc as pc %}
+                        <div class="{% if pc >= 85 %}critical{% else %}{% if pc >= 70 %}warning{% else %}normal{% endif %}{% endif %}" style="width: {{ stats.used_pc }}%"></div>
+                    {% endwith %}
+                </div>
+                <p>
+                    {{ stats.used|filesizeformat }}/{{ stats.size|filesizeformat }} used.
+                </p>
+                <h2>Catalog</h2>
+                <p>
+                    The catalog currently protects <strong>{{ stats.catalog_size|filesizeformat }}</strong> of data in total.
                 </p>
             </div>
         </section>
