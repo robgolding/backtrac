@@ -1,4 +1,5 @@
-import os, random
+import os
+import random
 import datetime
 
 from zope.interface import implements
@@ -8,6 +9,9 @@ from twisted.internet import reactor
 from twisted.cred import portal, checkers, error, credentials
 from twisted.spread import pb
 from twisted.spread.pb import PBServerFactory 
+
+from twisted.application.service import Application
+from twisted.application.internet import TCPServer
 
 from twisted.spread.util import FilePager
 from twisted.internet import defer
@@ -50,15 +54,15 @@ class BackupServer(object):
         self.port = port
         self.clients = []
 
-    def start(self):
         realm = BackupRealm()
         realm.server = self
         checker = BackupClientAuthChecker()
-        p = portal.Portal(realm, [checker])
+        self.portal = portal.Portal(realm, [checker])
+        self.factory = PBServerFactory(self.portal)
+        self.service = TCPServer(self.port, self.factory)
 
-        reactor.listenTCP(self.port, PBServerFactory(p))
-        print 'Listening on port %d' % self.port
-        reactor.run()
+    def start(self):
+        self.service.startService()
 
 class BackupRealm(object):
     implements(portal.IRealm)

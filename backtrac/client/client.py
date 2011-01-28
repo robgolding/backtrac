@@ -1,6 +1,9 @@
-import os, sys, socket
+import os
+import sys
+import socket
 
 from twisted.python import util
+from twisted import cred
 from twisted.spread import pb
 from twisted.spread.flavors import Referenceable
 from twisted.internet import defer
@@ -8,9 +11,12 @@ from twisted.internet.defer import Deferred, DeferredQueue, DeferredList
 from twisted.internet.error import ConnectionRefusedError
 from twisted.internet import reactor, inotify
 from twisted.internet.task import deferLater, cooperate
+
+from twisted.application.service import Application
+from twisted.application.internet import TCPClient
+
 from twisted.python import log
 from twisted.python.filepath import FilePath
-from twisted import cred
 
 from utils import ConsumerQueue, TransferPager
 
@@ -91,6 +97,9 @@ class BackupClient(pb.Referenceable):
         self.connected = False
         self.notifier = inotify.INotify()
 
+        self.factory = pb.PBClientFactory()
+        self.service = TCPClient(self.hostname, self.port, self.factory)
+
     @defer.inlineCallbacks
     def start(self):
         self.backup_queue.start()
@@ -139,19 +148,20 @@ class BackupClient(pb.Referenceable):
                 path = os.path.join(root, f)
                 self.backup_queue.add(BackupJob(path))
 
-    def connect(self, start_on_connect=False):
-        factory = pb.PBClientFactory()
-        reactor.connectTCP(self.server, self.port, factory)
-        d = factory.login(
+    def login(self):
+        return self.factory.login(
             cred.credentials.UsernamePassword(
                 self.hostname,
                 self.secret_key
             ),
             client=self
         )
+
+    def connect(self, start_on_connect=False):
+        self.service.startService()
+        d = self.login()
         d.addCallback(self._connected, start_on_connect)
         d.addErrback(self._error)
-        reactor.run()
 
     def _connected(self, perspective, start_client=False):
         self.connected = True
