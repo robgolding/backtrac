@@ -128,6 +128,7 @@ INSTALLED_APPS = (
     'backtrac.apps.core',
     'backtrac.apps.catalog',
     'backtrac.apps.clients',
+    'backtrac.apps.timeseries',
 )
 
 # A sample logging configuration. The only tangible logging
