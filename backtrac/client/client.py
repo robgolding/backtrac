@@ -44,19 +44,18 @@ class BackupQueue(ConsumerQueue):
         path = job.filepath.path
         if job.type == BackupJob.CREATE and job.filepath.isdir():
             if job.filepath.exists():
-                self.client.perspective.callRemote('create_item', path, 'd')
+                self.client.broker.create_item(path, 'd')
         elif job.type == BackupJob.MODIFY:
             try:
                 mtime = job.filepath.getModificationTime()
                 size = job.filepath.getsize()
-                d = self.client.perspective.callRemote('check_file', path,
-                                                       mtime, size)
+                d = self.client.broker.check_file(path, mtime, size)
                 d.addCallback(self._check_result, path)
             except (OSError, IOError):
                 pass
         elif job.type == BackupJob.DELETE:
             print '%s deleted' % path
-            self.client.perspective.callRemote('delete_item', path)
+            self.client.broker.delete_item(path)
 
     def error(self, fail):
         print fail
@@ -72,8 +71,7 @@ class TransferQueue(BackupQueue):
             size = filepath.getsize()
         except (OSError, IOError):
             return
-        d = self.client.perspective.callRemote('put_file', filepath.path, mtime,
-                                               size)
+        d = self.client.broker.put_file(filepath.path, mtime, size)
         d.addCallback(self._transfer, filepath)
 
     def error(self, fail):
@@ -87,7 +85,7 @@ class TransferQueue(BackupQueue):
         except (OSError, IOError):
             pass
 
-class BackupClient(pb.Referenceable):
+class BackupBroker(pb.Referenceable):
     def __init__(self, server='localhost', port=8123,
                  hostname=socket.gethostname(), secret_key=''):
         self.server = server
@@ -95,23 +93,72 @@ class BackupClient(pb.Referenceable):
         self.hostname = hostname
         self.secret_key = secret_key
         self.connected = False
-        self.notifier = inotify.INotify()
-
         self.factory = pb.PBClientFactory()
         self.service = TCPClient(self.hostname, self.port, self.factory)
 
+    def get_paths(self):
+        return self.perspective.callRemote('get_paths')
+
+    def get_present_state(self, path):
+        return self.perspective.callRemote('get_present_state', path)
+
+    def check_file(self, path, mtime, size):
+        return self.perspective.callRemote('check_file', path, mtime, size)
+
+    def delete_item(self, path):
+        return self.perspective.callRemote('delete_item', path)
+
+    def create_item(self, path, type='f'):
+        return self.perspective.callRemote('create_item', path, type)
+
+    def put_file(self, path, mtime, size):
+        return self.perspective.callRemote('put_file', path, mtime, size)
+
+    def login(self):
+        return self.factory.login(
+            cred.credentials.UsernamePassword(
+                self.hostname,
+                self.secret_key
+            ),
+            client=self
+        )
+
+    def connect(self):
+        self.service.startService()
+        d = Deferred()
+        r = self.login()
+        r.addCallbacks(self._logged_in, self._error)
+        r.addCallback(lambda _: d.callback(self))
+        return d
+
+    def _logged_in(self, perspective):
+        self.perspective = perspective
+        self.connected = True
+
+    def _error(self, error):
+        raise error
+        if error.type == 'twisted.cred.error.UnauthorizedLogin':
+            print >>sys.stderr, 'Failed to authenticate with server: %s' % self.server
+        elif error.type == ConnectionRefusedError:
+            print >>sys.stderr, 'Connection refused when connecting to server: %s' % self.server
+        else:
+            print >>sys.stderr, error.getTraceback()
+        reactor.stop()
+
+class BackupClient(object):
+    def __init__(self, broker):
+        self.broker = broker
+        self.notifier = inotify.INotify()
+        self.backup_queue = BackupQueue(self)
+        self.transfer_queue = TransferQueue(self)
+
     @defer.inlineCallbacks
-    def start(self):
-        self.backup_queue.start()
-        self.transfer_queue.start()
-        d = self.perspective.callRemote('get_paths')
-        paths = yield d
-        for path in paths:
-            path = normpath(path)
-            self.check_present_state(path)
-            self.walk_path(path)
-            self.add_watch(path)
-        self.notifier.startReading()
+    def check_present_state(self, path):
+        state = yield self.broker.get_present_state(path)
+        for path in state:
+            if not os.path.exists(path):
+                job = BackupJob(path, type=BackupJob.DELETE)
+                self.backup_queue.add(job)
 
     def handle_fs_event(self, watch, filepath, mask):
         def add_to_queue(job):
@@ -127,15 +174,6 @@ class BackupClient(pb.Referenceable):
         job = BackupJob(filepath, type=type)
         reactor.callLater(1, add_to_queue, job)
 
-    @defer.inlineCallbacks
-    def check_present_state(self, path):
-        d = self.perspective.callRemote('get_present_state', path)
-        paths = yield d
-        for path in paths:
-            if not os.path.exists(path):
-                job = BackupJob(path, type=BackupJob.DELETE)
-                self.backup_queue.add(job)
-
     def add_watch(self, path):
         self.notifier.watch(FilePath(path), autoAdd=True,
                             recursive=True,
@@ -148,39 +186,21 @@ class BackupClient(pb.Referenceable):
                 path = os.path.join(root, f)
                 self.backup_queue.add(BackupJob(path))
 
-    def login(self):
-        return self.factory.login(
-            cred.credentials.UsernamePassword(
-                self.hostname,
-                self.secret_key
-            ),
-            client=self
-        )
-
-    def connect(self, start_on_connect=False):
-        self.service.startService()
-        d = self.login()
-        d.addCallback(self._connected, start_on_connect)
-        d.addErrback(self._error)
-
-    def _connected(self, perspective, start_client=False):
-        self.connected = True
-        self.perspective = perspective
-        self.backup_queue = BackupQueue(self)
-        self.transfer_queue = TransferQueue(self)
-        print 'Connected to %s' % self.server
-        if start_client:
-            self.start()
-
-    def _error(self, error):
-        if error.type == 'twisted.cred.error.UnauthorizedLogin':
-            print >>sys.stderr, 'Failed to authenticate with server: %s' % self.server
-        elif error.type == ConnectionRefusedError:
-            print >>sys.stderr, 'Connection refused when connecting to server: %s' % self.server
-        else:
-            print >>sys.stderr, error.getTraceback()
-        reactor.stop()
+    @defer.inlineCallbacks
+    def start(self):
+        self.backup_queue.start()
+        self.transfer_queue.start()
+        paths = yield self.broker.get_paths()
+        for path in paths:
+            path = normpath(path)
+            state = yield self.broker.get_present_state(path)
+            self.check_present_state(state)
+            self.walk_path(path)
+            self.add_watch(path)
+        self.notifier.startReading()
 
 if __name__ == '__main__':
-    client = BackupClient(server='localhost', secret_key='password')
-    client.connect(True)
+    def makeClient(broker):
+        BackupClient(broker).start()
+    broker = BackupBroker(server='localhost', secret_key='password')
+    broker.connect().addCallback(makeClient)

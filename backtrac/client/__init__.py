@@ -1,1 +1,1 @@
-from client import BackupClient
+from client import BackupBroker, BackupClient

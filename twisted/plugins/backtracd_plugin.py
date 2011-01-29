@@ -4,7 +4,7 @@ from twisted.python import usage
 from twisted.plugin import IPlugin
 from twisted.application.service import IServiceMaker
 
-from backtrac.client import BackupClient
+from backtrac.client import BackupBroker, BackupClient
 
 class Options(usage.Options):
     optParameters = (
@@ -24,9 +24,11 @@ class ClientServiceMaker(object):
     options = Options
 
     def makeService(self, options):
-        client = BackupClient(server=options['server'], port=options['port'],
+        def makeClient(broker):
+            BackupClient(broker).start()
+        broker = BackupBroker(server=options['server'], port=options['port'],
                               secret_key=options['secret-key'])
-        client.connect(True)
-        return client.service
+        broker.connect().addCallback(makeClient)
+        return broker.service
 
 serviceMaker = ClientServiceMaker()
