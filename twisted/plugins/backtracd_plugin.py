@@ -4,7 +4,8 @@ from twisted.python import usage
 from twisted.plugin import IPlugin
 from twisted.application.service import IServiceMaker
 
-from backtrac.client import BackupBroker, BackupClient
+from backtrac.client.broker import BackupBroker
+from backtrac.client import BackupClient
 
 class Options(usage.Options):
     optParameters = (

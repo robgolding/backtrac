@@ -24,7 +24,7 @@ def get_server_status(q):
     from twisted.spread import pb
     from twisted.internet import reactor
 
-    from backtrac.client import BackupBroker
+    from backtrac.client.broker import BackupBroker
 
     def _error(error):
         q.put(False)
