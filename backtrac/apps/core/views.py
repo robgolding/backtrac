@@ -41,5 +41,6 @@ def dashboard(request, *args, **kwargs):
 @login_required
 def status(request):
     status = server_status()
-    r, s = ('running', 200) if status else ('not running', 412)
+    running = not isinstance(status, Exception) and bool(status)
+    r, s = ('running', 200) if running else ('not running', 412)
     return HttpResponse(r, status=s)

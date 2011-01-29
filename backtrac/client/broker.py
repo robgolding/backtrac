@@ -1,3 +1,4 @@
+import sys
 import socket
 
 from twisted.spread import pb
@@ -50,18 +51,10 @@ class BackupBroker(pb.Referenceable):
         self.service.startService()
         d = Deferred()
         r = self.login()
-        r.addCallbacks(self._logged_in, self._error)
-        r.addCallback(lambda _: d.callback(self))
+        r.addCallback(self._logged_in)
+        r.addCallbacks(lambda _: d.callback(self), lambda x: d.errback(x))
         return d
 
     def _logged_in(self, perspective):
         self.perspective = perspective
         self.connected = True
-
-    def _error(self, error):
-        if error.type == 'twisted.cred.error.UnauthorizedLogin':
-            print >>sys.stderr, 'Failed to authenticate with server: %s' % self.server
-        elif error.type == ConnectionRefusedError:
-            print >>sys.stderr, 'Connection refused when connecting to server: %s' % self.server
-        else:
-            print >>sys.stderr, error.getTraceback()
