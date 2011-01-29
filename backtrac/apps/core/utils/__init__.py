@@ -24,7 +24,7 @@ def get_server_status(q):
     from twisted.spread import pb
     from twisted.internet import reactor
 
-    from backtrac.client import BackupClient
+    from backtrac.client import BackupBroker
 
     def _error(error):
         q.put(False)
@@ -34,17 +34,10 @@ def get_server_status(q):
         q.put(True)
         reactor.stop()
 
-    client = BackupClient(server='localhost', secret_key=settings.SECRET_KEY)
+    broker = BackupBroker(server='localhost', secret_key=settings.SECRET_KEY,
+                          hostname='localhost')
 
-    factory = pb.PBClientFactory()
-    reactor.connectTCP('localhost', 8123, factory)
-    d = factory.login(
-        cred.credentials.UsernamePassword(
-            'localhost',
-            settings.SECRET_KEY
-        ),
-        client=client
-    )
+    d = broker.connect()
     d.addCallback(_connected)
     d.addErrback(_error)
 
@@ -55,7 +48,7 @@ def call_remote_method(q, method):
     from twisted.spread import pb
     from twisted.internet import reactor
 
-    from backtrac.client import BackupClient
+    from backtrac.client import BackupBroker
 
     def _error(error):
         q.put(error)
@@ -68,17 +61,10 @@ def call_remote_method(q, method):
         q.put(result)
         reactor.stop()
 
-    client = BackupClient(server='localhost', secret_key=settings.SECRET_KEY)
+    broker = BackupBroker(server='localhost', secret_key=settings.SECRET_KEY,
+                          hostname='localhost')
 
-    factory = pb.PBClientFactory()
-    reactor.connectTCP('localhost', 8123, factory)
-    d = factory.login(
-        cred.credentials.UsernamePassword(
-            'localhost',
-            settings.SECRET_KEY
-        ),
-        client=client
-    )
+    d = broker.connect()
     d.addCallback(_connected)
     d.addErrback(_error)
 
