@@ -3,3 +3,4 @@ backtrac/settings/local.py
 backtrac/dev.db
 backtrac/static/admin
 *.swp
+twisted/plugins/dropin.cache
