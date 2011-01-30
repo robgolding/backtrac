@@ -478,24 +478,18 @@ div#system-status.checking {
 /* Object Lists */
 
 table.object_list thead th {
-    background: none;
-    border-bottom: 2px #3f7a09 solid;
-    color: #3f7a09;
-    font-weight: bold;
-    font-size: 17px;
     padding: 7px 15px;
-    font-family: Helvetica, sans-serif;
+    font-size: 16px;
+    border-bottom: 1px solid #666;
+    font-weight: normal;
+    background: none;
 }
 
 table.object_list tbody td {
-    padding: 10px 20px;
+    padding: 10px 15px;
     font-size: 15px;
     border-bottom: 1px solid #bbb;
     color: #444444;
-}
-
-table.object_list tbody tr.even td {
-    background: none;
 }
 
 table.object_list tbody tr.deleted td {
