@@ -1,5 +1,7 @@
 from twisted.internet.defer import Deferred, DeferredQueue, DeferredList
+from twisted.python.filepath import FilePath
 
+from utils import TransferPager
 from job import BackupJob
 
 class ConsumerQueue(object):

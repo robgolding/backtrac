@@ -9,7 +9,6 @@ from twisted.python.filepath import FilePath
 from broker import BackupBroker
 from job import BackupJob
 from queue import BackupQueue, TransferQueue
-from utils import TransferPager
 
 from backtrac.apps.catalog.utils import normpath
 
