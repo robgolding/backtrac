@@ -49,12 +49,16 @@
                 </p>
             </div>
         </section>
-        
-        <section class="span-6 last">
-            <h1>System Status</h1>
-            <div class="content">
-                    <div id="system-status" class="notice">Javascript required.</div>
-            </div>
-        </section>
+        <div class="span-6 last">
+            <section>
+                <h1>System Status</h1>
+                <div class="content">
+                        <div id="system-status" class="notice">Javascript required.</div>
+                </div>
+            </section>
+            <section>
+                {% include 'catalog/event_list_small.html' %}
+            </section>
+        </div>
     </div>
 {% endblock %}

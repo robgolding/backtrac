@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.views.generic.simple import direct_to_template
 from django.db.models import Sum
 
-from backtrac.apps.catalog.models import Item, Version
+from backtrac.apps.catalog.models import Item, Version, Event
 
 from utils import server_status
 
@@ -22,6 +22,8 @@ def dashboard(request, *args, **kwargs):
     used_pc = int(float(used) / float(size) * 100)
     catalog_size = Version.objects.aggregate(size=Sum('size'))['size']
 
+    events = Event.objects.select_related()[:10]
+
     stats = {
         'size': size,
         'used': used,
@@ -33,6 +35,7 @@ def dashboard(request, *args, **kwargs):
         'template': 'dashboard.html',
         'extra_context': {
             'stats': stats,
+            'events': events,
         },
     })
 

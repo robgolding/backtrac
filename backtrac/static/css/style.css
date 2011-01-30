@@ -430,6 +430,7 @@ section {
     -webkit-box-shadow: 3px 3px 2px #999;
     -moz-box-shadow: 3px 3px 2px #999;
     box-shadow: 3px 3px 2px #999;
+    margin-bottom: 10px;
 }
 
 section h1 {
