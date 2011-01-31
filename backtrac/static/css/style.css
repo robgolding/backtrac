@@ -473,7 +473,7 @@ div#system-status.error {
 }
 
 div#system-status.checking {
-    background-image: url("../img/ajax-loader-big.gif");
+    background-image: url("../img/ajax-loader.gif");
 }
 
 /* Object Lists */

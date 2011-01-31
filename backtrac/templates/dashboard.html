@@ -16,7 +16,7 @@
 
         $(function() {
             $("#system-status").addClass("checking");
-            $("#system-status").html("Checking system status...");
+            $("#system-status").html("Checking status...");
 
             $.ajax({ url:     '/status/',
                      success: function(data, textStatus) { setStatus(true); },
