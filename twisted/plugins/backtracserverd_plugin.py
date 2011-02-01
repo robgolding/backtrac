@@ -1,4 +1,6 @@
 import os
+import sys
+import ConfigParser
 
 from zope.interface import implements
 
@@ -12,12 +14,9 @@ from backtrac.server import BackupServer
 
 class Options(usage.Options):
     optParameters = (
-        ('port', 'p', None, 'The port to listen on', int),
+        ('config', '', '/etc/backtrac/backtracserverd.conf',
+         'Config file', str),
     )
-    
-    def postOptions(self):
-        if not self['port']:
-            raise usage.UsageError
 
 class ServerServiceMaker(object):
     implements(IServiceMaker, IPlugin)
@@ -25,8 +24,24 @@ class ServerServiceMaker(object):
     description = 'Backtrac Server Daemon'
     options = Options
 
+    def getConfig(self, config_file):
+        try:
+            cp = ConfigParser.SafeConfigParser()
+            cp.read(config_file)
+        except:
+            print >> sys.stderr, 'Error reading config file:', config_file
+            sys.exit(1)
+        return cp
+
     def makeService(self, options):
-        server = BackupServer(port=options['port'])
-        return server.service
+        config = options['config']
+        cp = self.getConfig(config)
+        try:
+            port = cp.getint('backtracserverd', 'listen_port')
+            server = BackupServer(port=port)
+            return server.service
+        except ConfigParser.Error:
+            print >> sys.stderr, 'Error parsing config file:', config
+            sys.exit(1)
 
 serviceMaker = ServerServiceMaker()

@@ -1,5 +1,6 @@
-import sys
 import os
+import sys
+import ConfigParser
 
 from zope.interface import implements
 
@@ -16,18 +17,25 @@ from django.core.handlers.wsgi import WSGIHandler
 
 class Options(usage.Options):
     optParameters = (
-        ('port', 'p', None, 'The port to listen on', int),
+        ('config', '', '/etc/backtrac/backtracserverd.conf',
+         'Config file', str),
     )
-    
-    def postOptions(self):
-        if not self['port']:
-            raise usage.UsageError
 
 class ServerServiceMaker(object):
     implements(IServiceMaker, IPlugin)
     tapname = 'backtracweb'
     description = 'Backtrac Web Interface'
     options = Options
+
+    def getConfig(self, config_file):
+        try:
+            cp = ConfigParser.SafeConfigParser()
+            cp.read(config_file)
+        except:
+            print >> sys.stderr, 'Error reading config file:', config_file
+            sys.exit(1)
+        return cp
+
 
     def wsgi_resource(self):
         pool = threadpool.ThreadPool()
@@ -37,10 +45,17 @@ class ServerServiceMaker(object):
         return wsgi_resource
 
     def makeService(self, options):
-        application = service.Application('backtracweb')
-        site = server.Site(self.wsgi_resource())
-        svc = internet.TCPServer(options['port'], site)
-        svc.setServiceParent(application)
-        return svc
+        config = options['config']
+        cp = self.getConfig(config)
+        try:
+            port = cp.getint('backtracweb', 'listen_port')
+            application = service.Application('backtracweb')
+            site = server.Site(self.wsgi_resource())
+            svc = internet.TCPServer(port, site)
+            svc.setServiceParent(application)
+            return svc
+        except ConfigParser.Error:
+            print >> sys.stderr, 'Error parsing config file:', config
+            sys.exit(1)
 
 serviceMaker = ServerServiceMaker()

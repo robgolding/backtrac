@@ -1,3 +1,6 @@
+import sys
+import ConfigParser
+
 from zope.interface import implements
 
 from twisted.python import usage
@@ -9,14 +12,9 @@ from backtrac.client import BackupClient
 
 class Options(usage.Options):
     optParameters = (
-        ('server', 's', None, 'The server to connect to', str),
-        ('port', 'p', None, 'The port to connect to the server on', int),
-        ('secret-key', 'k', None, 'The secret key to authenticate with', str),
+        ('config', '', '/etc/backtrac/backtracd.conf',
+         'Config file', str),
     )
-    
-    def postOptions(self):
-        if not self['server'] or not self['port'] or not self['secret-key']:
-            raise usage.UsageError
 
 class ClientServiceMaker(object):
     implements(IServiceMaker, IPlugin)
@@ -24,12 +22,32 @@ class ClientServiceMaker(object):
     description = 'Backtrac Client Daemon'
     options = Options
 
+    def getConfig(self, config_file):
+        try:
+            cp = ConfigParser.SafeConfigParser()
+            cp.read(config_file)
+        except:
+            print >> sys.stderr, 'Error reading config file:', config_file
+            sys.exit(1)
+        return cp
+
     def makeService(self, options):
         def makeClient(broker):
             BackupClient(broker).start()
-        broker = BackupBroker(server=options['server'], port=options['port'],
-                              secret_key=options['secret-key'])
-        broker.connect().addCallback(makeClient)
-        return broker.service
+
+        config = options['config']
+        cp = self.getConfig(config)
+        try:
+            server = cp.get('backtracd', 'server')
+            port = cp.getint('backtracd', 'port')
+            secrey_key = cp.get('backtracd', 'secret_key')
+            broker = BackupBroker(server=server, port=port,
+                                  secret_key=secrey_key)
+            broker.connect().addCallback(makeClient)
+            return broker.service
+        except ConfigParser.Error:
+            raise
+            print >> sys.stderr, 'Error parsing config file:', config
+            sys.exit(1)
 
 serviceMaker = ClientServiceMaker()
