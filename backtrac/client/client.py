@@ -1,14 +1,18 @@
 import os
 import sys
 
-from twisted.internet import defer
-from twisted.internet import reactor, inotify
-
+from twisted import cred
+from twisted.spread import pb
+from twisted.python import failure
+from twisted.internet import defer, reactor, inotify
 from twisted.python.filepath import FilePath
 
+import utils
 from broker import BackupBroker
 from job import BackupJob
 from queue import BackupQueue, TransferQueue
+
+from django.conf import settings
 
 from backtrac.apps.catalog.utils import normpath
 
@@ -67,6 +71,20 @@ class BackupClient(object):
             self.walk_path(path)
             self.add_watch(path)
         self.notifier.startReading()
+
+def get_server_status():
+    broker = BackupBroker(server='localhost', secret_key=settings.SECRET_KEY,
+                          hostname='localhost')
+    d = broker.connect()
+
+    try:
+        result = utils.get_result_blocking(d)
+    except utils.TimoutExpiredException:
+        result = False
+
+    if isinstance(result, failure.Failure):
+        return False
+    return bool(d.result)
 
 if __name__ == '__main__':
     def makeClient(broker):

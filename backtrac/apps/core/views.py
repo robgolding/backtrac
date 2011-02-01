@@ -6,7 +6,7 @@ from django.db.models import Sum
 
 from backtrac.apps.catalog.models import Item, Version, Event
 
-from utils import server_status
+from backtrac.client import client
 
 @login_required
 def index(request):
@@ -43,7 +43,6 @@ def dashboard(request, *args, **kwargs):
 
 @login_required
 def status(request):
-    status = server_status()
-    running = not isinstance(status, Exception) and bool(status)
+    running = client.get_server_status()
     r, s = ('running', 200) if running else ('not running', 412)
     return HttpResponse(r, status=s)
