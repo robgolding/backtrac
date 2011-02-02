@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.conf.urls.defaults import *
+from django.views.generic.simple import direct_to_template
 
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.contrib import admin
@@ -30,5 +31,13 @@ urlpatterns = patterns('',
 
 )
 
+handler500 = lambda x: direct_to_template(x, '500.html')
+
 if settings.DEBUG:
     urlpatterns += staticfiles_urlpatterns()
+    urlpatterns += patterns('',
+        (r'^500/$', handler500),
+        (r'^404/$', 'django.views.generic.simple.direct_to_template', {
+            'template': '404.html'
+        }),
+    )
