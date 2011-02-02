@@ -2,7 +2,7 @@ import os
 
 from default import *
 
-SERVE_STATIC = True
+DEBUG = True
 PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 
 DATABASES = {
