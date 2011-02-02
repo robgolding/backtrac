@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="container">
+        <section class="span-18">
+            <h1>Page Not Found</h1>
+            <div class="content">
+                <p>
+                    Sorry, but the page you are looking for cannot be found.
+                </p>
+                <p>
+                    Perhaps if you return to the <a href="{% url dashboard %}">dashboard</a>,
+                    you may be able to find what you are looking for.
+                </p>
+            </div>
+        </section>
+    </div>
+{% endblock content %}
