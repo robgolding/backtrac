@@ -21,7 +21,7 @@ class Options(usage.Options):
 class ServerServiceMaker(object):
     implements(IServiceMaker, IPlugin)
     tapname = 'backtracserverd'
-    description = 'Backtrac Server Daemon'
+    description = 'Backtrac server'
     options = Options
 
     def getConfig(self, config_file):

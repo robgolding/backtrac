@@ -13,6 +13,7 @@ from twisted.python import threadpool
 from twisted.internet import reactor, defer
 
 os.environ['DJANGO_SETTINGS_MODULE'] = 'backtrac.settings'
+from django.conf import settings
 from django.core.handlers.wsgi import WSGIHandler
 
 class Options(usage.Options):
@@ -21,10 +22,32 @@ class Options(usage.Options):
          'Config file', str),
     )
 
+class Root(resource.Resource):
+    def __init__(self, wsgi_resource):
+        resource.Resource.__init__(self)
+        self.wsgi_resource = wsgi_resource
+
+    def getChild(self, path, request):
+        path0 = request.prepath.pop(0)
+        request.postpath.insert(0, path0)
+        return self.wsgi_resource
+
+class ThreadPoolService(service.Service):
+    def __init__(self, pool):
+        self.pool = pool
+
+    def startService(self):
+        service.Service.startService(self)
+        self.pool.start()
+
+    def stopService(self):
+        service.Service.stopService(self)
+        self.pool.stop()
+
 class ServerServiceMaker(object):
     implements(IServiceMaker, IPlugin)
     tapname = 'backtracweb'
-    description = 'Backtrac Web Interface'
+    description = 'Backtrac web server'
     options = Options
 
     def getConfig(self, config_file):
@@ -36,24 +59,40 @@ class ServerServiceMaker(object):
             sys.exit(1)
         return cp
 
-
-    def wsgi_resource(self):
-        pool = threadpool.ThreadPool()
-        pool.start()
-        reactor.addSystemEventTrigger('after', 'shutdown', pool.stop)
-        wsgi_resource = wsgi.WSGIResource(reactor, pool, WSGIHandler())
-        return wsgi_resource
-
     def makeService(self, options):
         config = options['config']
         cp = self.getConfig(config)
         try:
             port = cp.getint('backtracweb', 'listen_port')
-            application = service.Application('backtracweb')
-            site = server.Site(self.wsgi_resource())
-            svc = internet.TCPServer(port, site)
-            svc.setServiceParent(application)
-            return svc
+            #application = service.Application('backtracweb')
+
+            # make a new MultiService to hold the thread/web services
+            multi = service.MultiService()
+
+            # make a new ThreadPoolService and add it to the multi service
+            tps = ThreadPoolService(threadpool.ThreadPool())
+            tps.setServiceParent(multi)
+
+            # create the WSGI resource using the thread pool and Django handler
+            resource = wsgi.WSGIResource(reactor, tps.pool, WSGIHandler())
+            # create a custom 'root' resource, that we can add other things to
+            root = Root(resource)
+
+            # if the Django code is not serving the static media, then
+            # we had better do it instead
+            if not settings.DEBUG:
+                static_resource = static.File(os.path.join(os.path.abspath('.'),
+                                                           'backtrac/static'))
+                root.putChild(settings.STATIC_URL.strip('/'), static_resource)
+
+            # create the site and a TCPServer service to serve it with
+            site = server.Site(root)
+            ws = internet.TCPServer(port, site)
+
+            # add the web server service to the multi service
+            ws.setServiceParent(multi)
+
+            return multi
         except ConfigParser.Error:
             print >> sys.stderr, 'Error parsing config file:', config
             sys.exit(1)

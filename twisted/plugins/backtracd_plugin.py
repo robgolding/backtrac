@@ -19,7 +19,7 @@ class Options(usage.Options):
 class ClientServiceMaker(object):
     implements(IServiceMaker, IPlugin)
     tapname = 'backtracd'
-    description = 'Backtrac Client Daemon'
+    description = 'Backtrac client'
     options = Options
 
     def getConfig(self, config_file):
