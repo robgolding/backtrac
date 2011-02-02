@@ -65,6 +65,12 @@ class Item(models.Model):
     def __unicode__(self):
         return self.path
 
+    class Meta:
+        unique_together = (
+            ('client', 'path'),
+            ('parent', 'name'),
+        )
+
 class Version(models.Model):
     id = models.CharField('ID', max_length=36, primary_key=True)
     item = models.ForeignKey(Item, related_name='versions', db_index=True)
