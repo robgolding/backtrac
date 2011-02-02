@@ -56,7 +56,7 @@ MEDIA_URL = '/media/'
 
 # Absolute path to the directory that holds static files.
 # Example: "/home/media/media.lawrence.com/static/"
-STATIC_ROOT = os.path.join(PATH, 'static/')
+STATIC_ROOT = ''
 
 # URL that handles the static files served from STATIC_ROOT.
 # Example: "http://media.lawrence.com/static/"
@@ -105,11 +105,11 @@ TEMPLATE_DIRS = (
 
 TEMPLATE_CONTEXT_PROCESSORS = (
     # default Django template context processors
-    'django.core.context_processors.auth',
     'django.core.context_processors.debug',
     'django.core.context_processors.i18n',
     'django.core.context_processors.media',
     'django.core.context_processors.static',
+    'django.contrib.auth.context_processors.auth',
     'django.contrib.messages.context_processors.messages',
 )
 
