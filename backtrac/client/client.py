@@ -11,6 +11,7 @@ import utils
 from broker import BackupBroker
 from job import BackupJob
 from queue import BackupQueue, TransferQueue
+from platform.linux.filesystem_notifications import FileSystemMonitor
 
 from django.conf import settings
 
@@ -21,9 +22,9 @@ class ClientError(Exception): pass
 class BackupClient(object):
     def __init__(self, broker):
         self.broker = broker
-        self.notifier = inotify.INotify()
         self.backup_queue = BackupQueue(self)
         self.transfer_queue = TransferQueue(self)
+        self.monitor = FileSystemMonitor(self.backup_queue)
 
     @defer.inlineCallbacks
     def check_present_state(self, path):
@@ -32,25 +33,6 @@ class BackupClient(object):
             if not os.path.exists(path):
                 job = BackupJob(path, type=BackupJob.DELETE)
                 self.backup_queue.add(job)
-
-    def handle_fs_event(self, watch, filepath, mask):
-        def add_to_queue(job):
-            self.backup_queue.add(job)
-        if mask & inotify.IN_CREATE:
-            type = BackupJob.CREATE
-        elif mask & inotify.IN_CHANGED or mask & inotify.IN_MOVED_TO:
-            type = BackupJob.MODIFY
-        elif mask & inotify.IN_DELETE or mask & inotify.IN_MOVED_FROM:
-            type = BackupJob.DELETE
-        else:
-            return
-        job = BackupJob(filepath, type=type)
-        reactor.callLater(1, add_to_queue, job)
-
-    def add_watch(self, path):
-        self.notifier.watch(FilePath(path), autoAdd=True,
-                            recursive=True,
-                            callbacks=[self.handle_fs_event])
 
     def walk_path(self, path):
         for root, dirs, files in os.walk(path):
@@ -66,11 +48,9 @@ class BackupClient(object):
         paths = yield self.broker.get_paths()
         for path in paths:
             path = normpath(path)
-            state = yield self.broker.get_present_state(path)
-            self.check_present_state(state)
+            self.check_present_state(path)
             self.walk_path(path)
-            self.add_watch(path)
-        self.notifier.startReading()
+            self.monitor.add_watch(path)
 
 def get_server_status():
     broker = BackupBroker(server='localhost', secret_key=settings.SECRET_KEY,
@@ -85,9 +65,3 @@ def get_server_status():
     if isinstance(result, failure.Failure):
         return False
     return bool(d.result)
-
-if __name__ == '__main__':
-    def makeClient(broker):
-        BackupClient(broker).start()
-    broker = BackupBroker(server='localhost', secret_key='password')
-    broker.connect().addCallback(makeClient)

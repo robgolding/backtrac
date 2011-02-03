@@ -43,7 +43,7 @@ class BackupQueue(ConsumerQueue):
         if job.type == BackupJob.CREATE and job.filepath.isdir():
             if job.filepath.exists():
                 self.client.broker.create_item(path, 'd')
-        elif job.type == BackupJob.MODIFY:
+        elif job.type == BackupJob.UPDATE:
             try:
                 mtime = job.filepath.getModificationTime()
                 size = job.filepath.getsize()
