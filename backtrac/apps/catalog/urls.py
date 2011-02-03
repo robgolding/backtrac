@@ -12,8 +12,14 @@ urlpatterns = patterns('',
     url(r'^browse/$', views.browse_catalog, name='catalog_browse'),
 
     url(r'^events/$', login_required(object_list), {
-                        'queryset': Event.objects.select_related(),},
+                        'queryset': Event.objects.select_related(),
+                        'paginate_by': 20},
                     name='catalog_event_list'),
+
+    url(r'^events/(?P<page>\d+)/$', login_required(object_list), {
+                        'queryset': Event.objects.select_related(),
+                        'paginate_by': 20},
+                    name='catalog_event_list_page'),
 
     url(r'^(?P<client_id>\d+)/$', views.browse_route, {'path': '/'},
                     name='catalog_browse_route'),

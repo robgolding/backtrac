@@ -4,14 +4,14 @@ import sys
 from twisted import cred
 from twisted.spread import pb
 from twisted.python import failure
-from twisted.internet import defer, reactor, inotify
+from twisted.internet import defer, reactor
 from twisted.python.filepath import FilePath
 
 import utils
 from broker import BackupBroker
 from job import BackupJob
 from queue import BackupQueue, TransferQueue
-from platform.linux.filesystem_notifications import FileSystemMonitor
+from platform import FileSystemMonitor
 
 from django.conf import settings
 

@@ -6,6 +6,31 @@
         <h1>Events</h1>
             <div class="content">
                 <a class="button" href=""><img src="{{ STATIC_URL }}img/icons/famfamfam/arrow_refresh.png" /> Refresh</a>
+                {% if is_paginated %}
+                <ul class="pagination">
+                    <li{% if not page_obj.has_previous %} class="disabled"{% endif %}>
+                        {% if page_obj.has_previous %}
+                        <a href="{% url catalog_event_list_page page_obj.previous_page_number %}">&laquo; Previous</a>
+                        {% else %}
+                        &laquo; Previous
+                        {% endif %}
+                    </li>
+                    {% for i in page_obj.paginator.page_range %}
+                        {% if page_obj.number != i %}
+                            <li><a href="{% url catalog_event_list_page i %}">{{ i }}</a></li>
+                        {% else %}
+                            <li class="selected">{{ i }}</li>
+                        {% endif %}
+                    {% endfor %}
+                    <li{% if not page_obj.has_next %} class="disabled"{% endif %}>
+                        {% if page_obj.has_next %}
+                        <a href="{% url catalog_event_list_page page_obj.next_page_number %}">Next &raquo;</a>
+                        {% else %}
+                        Next &raquo;
+                        {% endif %}
+                    </li>
+                </ul>
+                {% endif %}
                 <table class="object_list">
                     <thead>
                         <tr>
