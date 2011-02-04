@@ -58,6 +58,10 @@ def browse_directory(request, client, item,
                   template_name='catalog/browse_client.html'):
     show_deleted = request.GET.get('deleted', False) == '1'
 
+    if item is not None and item.deleted:
+        if not show_deleted and not hasattr(request.GET, 'deleted'):
+            show_deleted = True
+
     items = Item.objects.all()
     if show_deleted:
         items = Item.objects.all()

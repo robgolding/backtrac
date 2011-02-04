@@ -6,7 +6,15 @@
         <h1>{{ client.hostname }}: {{ item.path|default:"/" }}</h1>
             <div class="content">
                 <a class="button" href=""><img src="{{ STATIC_URL }}img/icons/famfamfam/arrow_refresh.png" /> Refresh</a>
-                <a class="button" href="{{ item.parent.get_absolute_url }}"><img src="{{ STATIC_URL }}img/icons/famfamfam/arrow_up.png" /> Parent folder</code></a>
+                {% if item %}
+                    {% if item.parent %}
+                        <a class="button" href="{{ item.parent.get_absolute_url }}{% if show_deleted %}?deleted=1{% endif %}"><img src="{{ STATIC_URL }}img/icons/famfamfam/arrow_up.png" /> Parent folder</a>
+                    {% else %}
+                        <a class="button" href="{% url catalog_browse_route client.id %}"><img src="{{ STATIC_URL }}img/icons/famfamfam/arrow_up.png" /> Parent folder</a>
+                    {% endif %}
+                {% else %}
+                        <a class="button" href="{% url catalog_browse %}"><img src="{{ STATIC_URL }}img/icons/famfamfam/arrow_up.png" /> Browse catalog</a>
+                {% endif %}
                 {% if show_deleted %}
                     <a class="button" href="?deleted=0"><img src="{{ STATIC_URL }}img/icons/famfamfam/bin_empty.png" /> Hide deleted items</a>
                 {% else %}
@@ -24,7 +32,7 @@
                             {% with item.latest_version.backed_up_at|timesince as age %}
                             <tr{% if item.deleted %} class="deleted"{% endif %}>
                                     <td class="icon">{% include 'catalog/item_icon.html' %}</td>
-                                    <td class="name"><a href="{{ item.get_absolute_url }}">{{ item.name }}{% ifequal item.type 'd' %}/{% endifequal %}</a></td>
+                                    <td class="name"><a href="{{ item.get_absolute_url }}{% if show_deleted %}?deleted=1{% endif %}">{{ item.name }}{% ifequal item.type 'd' %}/{% endifequal %}</a></td>
                                     <td class="size">{% if item.deleted %}deleted{% else %}{{ item.latest_version.size|filesizeformat }}{% endif %}</td>
                                     <td class="age">{{ age|default:"N/A" }}</td>
                                 </tr>
