@@ -7,31 +7,34 @@
             <div class="content">
                 <a class="button" href=""><img src="{{ STATIC_URL }}img/icons/famfamfam/arrow_refresh.png" /> Refresh</a>
                 {% if is_paginated %}
-                <ul class="pagination">
-                    <li{% if not page_obj.has_previous %} class="disabled"{% endif %}>
-                        {% if page_obj.has_previous %}
-                        <a href="{% url catalog_event_list_page page_obj.previous_page_number %}">&laquo; Previous</a>
+                <div class="pagination">
+                <p>Page {{ page_obj.number }} of {{ paginator.num_pages }} - </p>
+                <ul>
+                    {% if has_previous %}
+                    {% if page_obj.number > 3 %}
+                        <li class="first"><a href="{% url catalog_event_list_page 1 %}" title="First page">&laquo; First</a></li>
+                    {% endif %}
+                    <li class="previous"><a href="{% url catalog_event_list_page previous %}" title="Previous page">&lt;</a></li>
+                    {% endif %}
+                    {% for number in paginator.page_range %}
+                        {% if number == page_obj.number %}
+                            <li class="active">{{ number }}</li>
                         {% else %}
-                        &laquo; Previous
-                        {% endif %}
-                    </li>
-                    {% for i in page_obj.paginator.page_range %}
-                        {% if page_obj.number != i %}
-                            <li><a href="{% url catalog_event_list_page i %}">{{ i }}</a></li>
-                        {% else %}
-                            <li class="selected">{{ i }}</li>
+                            {% if number <= page_obj.number|add:'2' and number >= page_obj.number|add:'-2' or number|divisibleby:"10" %}
+                                <li><a href="{% url catalog_event_list_page number %}" title="Page {{ number }}">{{ number }}</a></li>
+                            {% endif %}
                         {% endif %}
                     {% endfor %}
-                    <li{% if not page_obj.has_next %} class="disabled"{% endif %}>
-                        {% if page_obj.has_next %}
-                        <a href="{% url catalog_event_list_page page_obj.next_page_number %}">Next &raquo;</a>
-                        {% else %}
-                        Next &raquo;
+                    {% if has_next %}
+                        <li class="next"><a href="{% url catalog_event_list_page next %}" title="Next page">&gt;</a></li>
+                        {% if page_obj.number < paginator.num_pages|add:'-2' %}
+                            <li><a href="{% url catalog_event_list_page paginator.num_pages %}" title="Last page">Last &raquo;</a>
                         {% endif %}
-                    </li>
+                    {% endif %}
                 </ul>
+                </div>
                 {% endif %}
-                <table class="object_list">
+                <table class="object_list events">
                     <thead>
                         <tr>
                             <th class="icon"></th><th>Event</th><th>Date/Time</th>

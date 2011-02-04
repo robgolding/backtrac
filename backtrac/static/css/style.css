@@ -529,9 +529,71 @@ table.object_list tbody tr.info td {
     padding: 15px inherit;
 }
 
+table.object_list tbody td.datetime {
+    width: 120px;
+}
+
 table.backedup_file_list tbody td.path, table.backedup_file_list tbody td.size {
     font-size: 12px;
     padding-right: 3px;
+}
+
+/* Pagination */
+
+div.pagination {
+    float: right;
+    margin: 17px 10px 0 0;
+}
+
+div.pagination p {
+    display: block;
+    float: left;
+    margin: 0 10px 0 0;
+}
+
+div.pagination ul {
+    float: right;
+    margin: 0;
+    padding: 0;
+}
+
+div.pagination ul li {
+    border: 0; margin:0; padding:0;
+    list-style: none;
+    margin-right: 2px;
+    float: left;
+}
+
+div.pagination ul li a {
+    border: solid 1px #9aafe5;
+    margin-right: 2px;
+}
+
+div.pagination ul li.next a,
+div.pagination ul li.previous a {
+    font-weight: bold;
+}
+
+div.pagination ul li.active {
+    background: #2e6ab1;
+    color: #fff;
+    font-weight: bold;
+    display: block;
+    float: left;
+    padding: 4px 6px;
+}
+
+div.pagination ul li a:link,
+div.pagination ul li a:visited {
+    color: #0e509e
+    display: block;
+    float: left;
+    padding: 3px 6px;
+    text-decoration: none;
+}
+
+div.pagination ul li a:hover {
+    border: solid 1px #0e509e;
 }
 
 /* Events */
