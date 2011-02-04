@@ -16,6 +16,17 @@ class Storage(object):
         self.root = root
         makedirs(self.root)
 
+    def get_total_bytes(self):
+        stat = os.statvfs(self.root)
+        return stat.f_blocks * stat.f_frsize
+
+    def get_avail_bytes(self):
+        stat = os.statvfs(self.root)
+        return stat.f_bavail * stat.f_frsize
+
+    def get_used_bytes(self):
+        return self.get_total_bytes() - self.get_avail_bytes()
+
 class ClientStorage(object):
     def __init__(self, storage, client):
         self.storage = storage
