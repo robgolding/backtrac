@@ -609,6 +609,7 @@ ul.events-list li {
     background-repeat: no-repeat;
     padding-left: 25px;
     margin-bottom: 5px;
+    word-break: break-all;
 }
 
 ul.events-list li.created {
