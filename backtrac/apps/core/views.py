@@ -7,7 +7,7 @@ from django.conf import settings
 
 from backtrac.apps.catalog.models import Item, Version, Event
 
-from backtrac.apps.core.storage import Storage, ClientStorage
+from backtrac.server.storage import Storage
 from backtrac.client import client
 
 @login_required
