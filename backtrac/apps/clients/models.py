@@ -4,6 +4,8 @@ from django.db import models
 from django.db.models.signals import post_save
 from django import dispatch
 
+from backtrac.apps.catalog.models import Version
+
 client_connected = dispatch.Signal(providing_args=['client'])
 client_disconnected = dispatch.Signal(providing_args=['client'])
 
@@ -11,6 +13,12 @@ class Client(models.Model):
     hostname = models.CharField(max_length=255, unique=True, db_index=True)
     secret_key = models.CharField(max_length=255)
     active = models.BooleanField(default=True, editable=False)
+
+    def get_latest_version(self):
+        try:
+            return Version.objects.filter(item__client=self).latest()
+        except Version.DoesNotExist:
+            return None
 
     @models.permalink
     def get_absolute_url(self):

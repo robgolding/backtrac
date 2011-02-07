@@ -15,7 +15,7 @@
                     <tbody>
                         {% if object_list %}
                             {% for client in object_list %}
-                            {% with client.get_last_modified_version.backed_up_at|timesince as lastmod %}
+                            {% with client.get_latest_version.backed_up_at|timesince as lastmod %}
                                 <tr>
                                     <td class="icon">{% include 'clients/client_icon.html' %}</td>
                                     <td class="name"><a href="{% url catalog_browse_route client.id %}">{{ client.hostname }}</a></td>

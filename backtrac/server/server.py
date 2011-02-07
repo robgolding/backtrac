@@ -18,7 +18,8 @@ from twisted.internet import defer
 
 from django.conf import settings
 
-from utils import PageCollector, get_storage_for
+from storage import Storage, ClientStorage
+from utils import PageCollector
 
 from backtrac.apps.clients import models as clients
 from backtrac.apps.catalog import models as catalog
@@ -94,7 +95,8 @@ class BackupClient(pb.Avatar):
     def __init__(self, client, server):
         self.client = client
         self.server = server
-        self.storage = get_storage_for(client)
+        storage = Storage(settings.BACKTRAC_BACKUP_ROOT)
+        self.storage = ClientStorage(storage, client)
 
     def attached(self, mind):
         self.remote = mind
