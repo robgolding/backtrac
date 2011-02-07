@@ -9,7 +9,7 @@ from django.db import transaction
 from django.template.context import RequestContext
 from django.contrib import messages
 
-from backtrac.server.utils import get_storage_for
+from backtrac.server.storage import Storage, ClientStorage
 from backtrac.apps.clients.models import Client
 
 from models import Item, Version, Event
@@ -91,7 +91,7 @@ def browse_directory(request, client, item,
 def download_version(request, version_id, view_file=True):
     version = get_object_or_404(Version, pk=version_id)
     item = version.item
-    storage = get_storage_for(item.client)
+    storage = ClientStorage(Storage(settings.BACKTRAC_BACKUP_ROOT), item.client)
 
     f = storage.get(item.path, version.pk)
     contents = f.read()
