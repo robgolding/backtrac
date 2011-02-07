@@ -57,6 +57,10 @@ def get_server_status():
                           hostname='localhost')
     d = broker.connect()
 
+    # Add an errback to redirect the failure into oblivion, so we don't get an
+    # exception if the server isn't running
+    d.addErrback(lambda x: None)
+
     try:
         result = utils.get_result_blocking(d)
     except utils.TimoutExpiredException:
