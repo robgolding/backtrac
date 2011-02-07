@@ -8,6 +8,7 @@ from django.views.generic.list_detail import object_list, object_detail
 from django.db import transaction
 from django.template.context import RequestContext
 from django.contrib import messages
+from django.conf import settings
 
 from backtrac.server.storage import Storage, ClientStorage
 from backtrac.apps.clients.models import Client
