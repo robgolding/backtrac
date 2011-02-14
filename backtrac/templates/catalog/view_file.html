@@ -2,7 +2,7 @@
 
 {% block content %}
     <div class="container">
-        <section class="span-18">
+        <section class="span-16">
             <h1>{{ item.name }}</h1>
             <div class="content clearfix">
                 <a class="button" href="{{ item.parent.get_absolute_url }}"><img src="{{ STATIC_URL }}img/icons/famfamfam/arrow_left.png" /> Back to {{ item.parent.name }}</a>
@@ -35,11 +35,10 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% with item.versions.all as versions %}
                         {% if versions %}
                             {% for version in versions %}
                                 <tr>
-                                    <td class="datetime"><a href="{% url catalog_view_version version.id %}">{{ version.backed_up_at|date:"SHORT_DATETIME_FORMAT" }}</a></td>
+                                    <td class="datetime"><a href="{% url catalog_view_version version.id %}">{{ version.backed_up_at|date:"d/m/Y H:i" }}</a></td>
                                     <td class="size">{{ version.size|filesizeformat }}</td>
                                     <td class="actions">
                                         <a href="{% url catalog_download_version version.id %}" title="Download version">
@@ -58,15 +57,29 @@
                                 </td>
                             </tr>
                         {% endif %}
-                        {% endwith %}
                     </tbody>
                 </table>
             </div>
         </section>
-        <section class="span-6 last">
-            <h1>Help</h1>
+        <section class="span-8 last">
+            <h1>History</h1>
             <div class="content menu clearfix">
-                <p>Possibly help or something else here...</p>
+                <div id="history-graph" style="height: 200px;">
+                    <script type="text/javascript">
+                        {% spaceless %}
+                        var data = [
+                            {% for v in versions %}
+                                [{{ v.backed_up_at|date:"U" }} * 1000, {{ v.size }}]{% if not forloop.last %},{% endif %}
+                            {% endfor %}
+                        ];
+                        $.plot($("#history-graph"), [data], {
+                            xaxis: {
+                                mode: "time",
+                            }
+                        });
+                        {% endspaceless %}
+                    </script>
+                </div>
             </div>
         </section>
     </div>

@@ -49,6 +49,7 @@ def view_file(request, client, item,
     data = {
         'client': client,
         'item': item,
+        'versions': item.versions.all(),
     }
 
     return render_to_response(template_name, data,
