@@ -47,6 +47,25 @@
                 <p>
                     The catalog currently protects <strong>{{ stats.catalog_size|filesizeformat }}</strong> of data in total.
                 </p>
+                <div id="size-history" style="height: 300px;">
+                     <script type="text/javascript">
+                        {% spaceless %}
+                        var data = [
+                            {% for s in stats.size_history %}
+                                [{{ s.0|date:"U" }} * 1000, {{ s.1 }}]{% if not forloop.last %},{% endif %}
+                            {% endfor %}
+                        ];
+                        $.plot($("#size-history"), [data], {
+                            xaxis: {
+                                mode: "time",
+                            },
+                            yaxis: {
+                                tickFormatter: bytesToSize,
+                            }
+                        });
+                        {% endspaceless %}
+                    </script>
+                </div>
             </div>
         </section>
         <div class="span-6 last">

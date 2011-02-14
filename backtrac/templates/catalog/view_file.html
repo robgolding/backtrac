@@ -75,6 +75,9 @@
                         $.plot($("#history-graph"), [data], {
                             xaxis: {
                                 mode: "time",
+                            },
+                            yaxis: {
+                                tickFormatter: bytesToSize,
                             }
                         });
                         {% endspaceless %}

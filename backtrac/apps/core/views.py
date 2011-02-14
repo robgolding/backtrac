@@ -1,3 +1,5 @@
+import datetime
+
 from django.http import HttpResponse, HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
@@ -22,6 +24,15 @@ def dashboard(request, *args, **kwargs):
     used_pc = int(float(used) / float(size) * 100)
     catalog_size = Version.objects.aggregate(size=Sum('size'))['size']
 
+    version_qs = Version.objects.all()
+    max_date = datetime.datetime.now()
+    size_history = []
+    while len(version_qs) > 0:
+        size = version_qs.aggregate(size=Sum('size'))['size']
+        size_history.append([max_date, size])
+        max_date -= datetime.timedelta(days=1)
+        version_qs = version_qs.filter(backed_up_at__lt=max_date)
+
     events = Event.objects.select_related()[:10]
 
     stats = {
@@ -29,6 +40,7 @@ def dashboard(request, *args, **kwargs):
         'used': used,
         'used_pc': used_pc,
         'catalog_size': catalog_size,
+        'size_history': size_history,
     }
 
     kwargs.update({
