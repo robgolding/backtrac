@@ -70,3 +70,26 @@ class GetOrCreateItemTest(TestCase):
         self.assertEqual(item.type, self.type)
         self.assertEqual(item.client.pk, self.client.pk)
         self.assertEqual(item.client.hostname, self.client.hostname)
+
+class ItemCreatedTest(TestCase):
+    def setUp(self):
+        """
+        Create a test client to use within the test.
+        """
+        self.client = Client.objects.create(hostname='test', secret_key='')
+        self.path = '/testing/item/created/signal'
+        self.sender = None # we don't need a specific sender in this case
+
+    def test_item_created_signal(self):
+        """
+        Test that the catalog.models.item_created signal does not raise an
+        IntegrityError if a directory and a file are created with the same
+        path.
+        """
+        from backtrac.apps.catalog.models import item_created
+
+        item_created.send(sender=None, path=self.path, type='f',
+                          client=self.client)
+
+        item_created.send(sender=None, path=self.path, type='d',
+                          client=self.client)
