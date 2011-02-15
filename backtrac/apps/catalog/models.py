@@ -1,6 +1,7 @@
+import os
 import datetime
 
-from django.db import models
+from django.db import models, IntegrityError
 from django.db.models.signals import pre_save, post_save
 from django import dispatch
 
@@ -23,15 +24,13 @@ EVENT_TYPE_CHOICES = (
 )
 
 def get_or_create_item(client, path, type):
-    names = path.strip('/').split('/')
-    item, created = None, False
-    types = [type if i == (len(names) - 1) else 'd' for i in range(len(names))]
-    for name, type in zip(names, types):
-        item, created = Item.objects.get_or_create(client=client,
-                                                   parent=item,
-                                                   name=name,
-                                                   type=type)
-    return item, created
+    if path == '/':
+        return None, False
+    path = path.rstrip('/')
+    head, tail = os.path.split(path)
+    parent, created = get_or_create_item(client, head, 'd')
+    return Item.objects.get_or_create(client=client, name=tail, type=type,
+                                      parent=parent)
 
 class Item(models.Model):
     """
@@ -113,24 +112,30 @@ def update_latest_version(sender, instance=None, **kwargs):
 
 @dispatch.receiver(item_created)
 def item_created_callback(sender, path, type, client, **kwargs):
-    item, created = get_or_create_item(client, path, type)
-    if created or item.deleted:
-        if item.deleted:
-            item.deleted = False
-            item.save()
-        Event.objects.create(item=item, type='created')
+    try:
+        item, created = get_or_create_item(client, path, type)
+        if created or item.deleted:
+            if item.deleted:
+                item.deleted = False
+                item.save()
+            Event.objects.create(item=item, type='created')
+    except IntegrityError:
+        pass
 
 @dispatch.receiver(item_updated)
 def item_updated_callback(sender, path, mtime, size, client, version_id,
                           **kwargs):
-    item, created = get_or_create_item(client, path, 'f')
-    version, _ = Version.objects.get_or_create(id=version_id, item=item,
-                                               mtime=mtime, size=size)
-    if created:
-        type = 'created'
-    else:
-        type = 'updated'
-    Event.objects.create(item=item, type=type)
+    try:
+        item, created = get_or_create_item(client, path, 'f')
+        version, _ = Version.objects.get_or_create(id=version_id, item=item,
+                                                   mtime=mtime, size=size)
+        if created:
+            type = 'created'
+        else:
+            type = 'updated'
+        Event.objects.create(item=item, type=type)
+    except IntegrityError:
+        pass
 
 @dispatch.receiver(item_deleted)
 def item_deleted_callback(sender, path, client, **kwargs):
