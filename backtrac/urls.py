@@ -34,7 +34,6 @@ urlpatterns = patterns('',
 handler500 = lambda x: direct_to_template(x, '500.html')
 
 if settings.DEBUG:
-    urlpatterns += staticfiles_urlpatterns()
     urlpatterns += patterns('',
         (r'^500/$', handler500),
         (r'^404/$', 'django.views.generic.simple.direct_to_template', {

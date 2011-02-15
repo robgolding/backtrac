@@ -78,12 +78,9 @@ class ServerServiceMaker(object):
             # create a custom 'root' resource, that we can add other things to
             root = Root(resource)
 
-            # if the Django code is not serving the static media, then
-            # we had better do it instead
-            if not settings.DEBUG:
-                static_resource = static.File(os.path.join(os.path.abspath('.'),
-                                                           'backtrac/static'))
-                root.putChild(settings.STATIC_URL.strip('/'), static_resource)
+            # serve the static media
+            static_resource = static.File(os.path.join(settings.STATIC_ROOT))
+            root.putChild(settings.STATIC_URL.strip('/'), static_resource)
 
             # create the site and a TCPServer service to serve it with
             site = server.Site(root)
