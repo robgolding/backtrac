@@ -28,8 +28,8 @@ def dashboard(request, *args, **kwargs):
     max_date = datetime.datetime.now()
     size_history = []
     while len(version_qs) > 0:
-        size = version_qs.aggregate(size=Sum('size'))['size']
-        size_history.append([max_date, size])
+        s = version_qs.aggregate(size=Sum('size'))['size']
+        size_history.append([max_date, s])
         max_date -= datetime.timedelta(days=1)
         version_qs = version_qs.filter(backed_up_at__lt=max_date)
 
