@@ -81,6 +81,7 @@ class Version(models.Model):
 
     class Meta:
         get_latest_by = 'backed_up_at'
+        ordering = ('-backed_up_at', '-mtime')
 
     def __unicode__(self):
         return '%s [%s]' % (self.item.path, self.backed_up_at)
