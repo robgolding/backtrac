@@ -19,7 +19,7 @@ from backtrac.apps.catalog.utils import normpath
 
 class ClientError(Exception): pass
 
-class BackupClient(object):
+class BackupClient(pb.Referenceable):
     def __init__(self, broker):
         self.broker = broker
         self.backup_queue = BackupQueue(self)
@@ -43,6 +43,7 @@ class BackupClient(object):
 
     @defer.inlineCallbacks
     def start(self):
+        broker = yield self.broker.connect(client=self)
         self.backup_queue.start()
         self.transfer_queue.start()
         paths = yield self.broker.get_paths()

@@ -32,9 +32,6 @@ class ClientServiceMaker(object):
         return cp
 
     def makeService(self, options):
-        def makeClient(broker):
-            BackupClient(broker).start()
-
         config = options['config']
         cp = self.getConfig(config)
         try:
@@ -43,7 +40,8 @@ class ClientServiceMaker(object):
             secrey_key = cp.get('backtracd', 'secret_key')
             broker = BackupBroker(server=server, port=port,
                                   secret_key=secrey_key)
-            broker.connect().addCallback(makeClient)
+            client = BackupClient(broker)
+            client.start()
             return broker.service
         except ConfigParser.Error:
             raise

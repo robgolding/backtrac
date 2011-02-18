@@ -38,19 +38,19 @@ class BackupBroker(pb.Referenceable):
     def put_file(self, path, mtime, size):
         return self.perspective.callRemote('put_file', path, mtime, size)
 
-    def login(self):
+    def login(self, client):
         return self.factory.login(
             cred.credentials.UsernamePassword(
                 self.hostname,
                 self.secret_key
             ),
-            client=self
+            client=client
         )
 
-    def connect(self):
+    def connect(self, client=None):
         self.service.startService()
         d = Deferred()
-        r = self.login()
+        r = self.login(client or self)
         r.addCallback(self._logged_in)
         r.addCallbacks(lambda _: d.callback(self), lambda x: d.errback(x))
         return d
