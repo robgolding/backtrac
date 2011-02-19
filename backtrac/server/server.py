@@ -9,20 +9,17 @@ from twisted.internet import reactor
 from twisted.cred import portal, checkers, error, credentials
 from twisted.spread import pb
 from twisted.spread.pb import PBServerFactory 
-
 from twisted.application.service import Application
 from twisted.application.internet import TCPServer
-
 from twisted.spread.util import FilePager
 from twisted.internet import defer
 
 from django.conf import settings
 
-from storage import Storage, ClientStorage
-from utils import PageCollector
-
+from backtrac.server.storage import Storage, ClientStorage
 from backtrac.apps.clients import models as clients
 from backtrac.apps.catalog import models as catalog
+from backtrac.utils.transfer import PageCollector
 
 class BackupClientAuthChecker:
     implements(checkers.ICredentialsChecker)

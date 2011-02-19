@@ -4,10 +4,7 @@ from django.conf import settings
 from django.utils.datastructures import SortedDict
 from django.db.models import get_model
 
-from utils import makedirs
-
-File = get_model('catalog', 'File')
-FileVersion = get_model('catalog', 'FileVersion')
+from backtrac.utils import makedirs
 
 class StorageError(Exception): pass
 

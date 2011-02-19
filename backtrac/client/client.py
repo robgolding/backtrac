@@ -7,13 +7,14 @@ from twisted.python import failure
 from twisted.internet import defer, reactor
 from twisted.python.filepath import FilePath
 
-import utils
-from broker import BackupBroker
-from job import BackupJob
-from queue import BackupQueue, TransferQueue
-from platform import FileSystemMonitor
-
 from django.conf import settings
+
+from backtrac.client import utils
+from backtrac.client.broker import BackupBroker
+from backtrac.client.job import BackupJob
+from backtrac.client.queue import BackupQueue, TransferQueue
+from backtrac.client.platform import FileSystemMonitor
+from backtrac.utils.transfer import PageCollector
 
 from backtrac.apps.catalog.utils import normpath
 

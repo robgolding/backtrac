@@ -1,8 +1,8 @@
-from twisted.internet.defer import Deferred, DeferredQueue, DeferredList
+from twisted.internet.defer import Deferred, DeferredQueue
 from twisted.python.filepath import FilePath
 
-from utils import TransferPager
-from job import BackupJob
+from backtrac.utils.transfer import TransferPager
+from backtrac.client.job import BackupJob
 
 class ConsumerQueue(object):
     def __init__(self, stop_on_error=False):
@@ -77,7 +77,8 @@ class TransferQueue(BackupQueue):
 
     def _transfer(self, collector, filepath):
         try:
-            pager = TransferPager(collector, filepath)
+            fd = open(filepath.path, 'rb')
+            pager = TransferPager(collector, fd)
             pager.wait()
             print '%s, %d bytes' % (filepath.path, filepath.getsize())
         except (OSError, IOError):
