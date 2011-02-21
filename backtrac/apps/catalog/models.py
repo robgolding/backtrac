@@ -135,6 +135,9 @@ def item_updated_callback(sender, path, mtime, size, client, version_id,
         if created:
             type = 'created'
         else:
+            if item.deleted:
+                item.deleted = False
+                item.save()
             type = 'updated'
         Event.objects.create(item=item, type=type)
     except IntegrityError:

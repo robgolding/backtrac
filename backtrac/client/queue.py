@@ -38,22 +38,32 @@ class BackupQueue(ConsumerQueue):
         super(BackupQueue, self).__init__(*args, **kwargs)
         self.client = client
 
+    def consume_create(self, filepath):
+        if filepath.isdir():
+            self.client.broker.create_item(filepath.path, 'd')
+        else:
+            self.consume_update(filepath)
+
+    def consume_update(self, filepath):
+        try:
+            mtime = filepath.getModificationTime()
+            size = filepath.getsize()
+            d = self.client.broker.check_file(filepath.path, mtime, size)
+            d.addCallback(self._check_result, filepath.path)
+        except (OSError, IOError):
+            pass
+
+    def consume_delete(self, filepath):
+        print '%s deleted' % filepath.path
+        self.client.broker.delete_item(filepath.path)
+
     def consume(self, job):
-        path = job.filepath.path
-        if job.type == BackupJob.CREATE and job.filepath.isdir():
-            if job.filepath.exists():
-                self.client.broker.create_item(path, 'd')
+        if job.type == BackupJob.CREATE:
+            self.consume_create(job.filepath)
         elif job.type == BackupJob.UPDATE:
-            try:
-                mtime = job.filepath.getModificationTime()
-                size = job.filepath.getsize()
-                d = self.client.broker.check_file(path, mtime, size)
-                d.addCallback(self._check_result, path)
-            except (OSError, IOError):
-                pass
+            self.consume_update(job.filepath)
         elif job.type == BackupJob.DELETE:
-            print '%s deleted' % path
-            self.client.broker.delete_item(path)
+            self.consume_delete(job.filepath)
 
     def error(self, fail):
         print fail
