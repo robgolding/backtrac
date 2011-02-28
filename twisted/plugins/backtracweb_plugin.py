@@ -79,7 +79,7 @@ class ServerServiceMaker(object):
             root = Root(resource)
 
             # serve the static media
-            static_resource = static.File(os.path.join(settings.STATIC_ROOT))
+            static_resource = static.File(settings.STATIC_ROOT)
             root.putChild(settings.STATIC_URL.strip('/'), static_resource)
 
             # create the site and a TCPServer service to serve it with
