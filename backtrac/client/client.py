@@ -68,6 +68,8 @@ def get_server_status():
     except utils.TimoutExpiredException:
         result = False
 
+    broker.factory.disconnect()
+
     if isinstance(result, failure.Failure):
         return False
     return bool(d.result)
