@@ -8,7 +8,7 @@ from twisted.python import failure, log
 from twisted.internet import reactor
 from twisted.cred import portal, checkers, error, credentials
 from twisted.spread import pb
-from twisted.spread.pb import PBServerFactory 
+from twisted.spread.pb import PBServerFactory
 from twisted.application.service import Application
 from twisted.application.internet import TCPServer
 from twisted.spread.util import FilePager
@@ -16,9 +16,7 @@ from twisted.internet import defer
 
 from django.conf import settings
 
-from backtrac.server.storage import Storage, ClientStorage
-from backtrac.apps.clients import models as clients
-from backtrac.apps.catalog import models as catalog
+from backtrac.api.client import Client, get_client
 from backtrac.utils.transfer import PageCollector
 
 class BackupClientAuthChecker:
@@ -37,15 +35,14 @@ class BackupClientAuthChecker:
             return defer.maybeDeferred(
                 credentials.checkPassword,
                 settings.SECRET_KEY).addCallback(self._passwordMatch,
-                                                 'localhost')
-        try:
-            client = clients.Client.objects.get(hostname=credentials.username)
-            return defer.maybeDeferred(
-                credentials.checkPassword,
-                client.secret_key).addCallback(self._passwordMatch,
-                                               client.hostname)
-        except clients.Client.DoesNotExist:
+                                                 None)
+        client = get_client(credentials.username)
+        if client is None:
             return defer.fail(error.UnauthorizedLogin())
+        return defer.maybeDeferred(
+            credentials.checkPassword,
+            client.get_key()).addCallback(self._passwordMatch,
+                                           client)
 
 class BackupServer(object):
     def __init__(self, port=8123):
@@ -65,13 +62,12 @@ class BackupServer(object):
 class BackupRealm(object):
     implements(portal.IRealm)
 
-    def requestAvatar(self, client_id, mind, *interfaces):
+    def requestAvatar(self, client_api, mind, *interfaces):
         assert pb.IPerspective in interfaces
-        if client_id == 'localhost':
-            avatar = ManagementClient(self.server)
+        if client_api is not None:
+            avatar = BackupClient(client_api, self.server)
         else:
-            client_obj = clients.Client.objects.get(hostname=client_id)
-            avatar = BackupClient(client_obj, self.server)
+            avatar = ManagementClient(self.server)
         avatar.attached(mind)
         return pb.IPerspective, avatar, lambda a=avatar:a.detached(mind)
 
@@ -88,66 +84,46 @@ class ManagementClient(pb.Avatar):
     def perspective_num_clients(self):
         return len(self.server.clients)
 
+    def perspective_restore_file(self, client, version_id):
+        pass
+
 class BackupClient(pb.Avatar):
-    def __init__(self, client, server):
-        self.client = client
+    def __init__(self, client_api, server):
+        self.api = client_api
         self.server = server
-        storage = Storage(settings.BACKTRAC_BACKUP_ROOT)
-        self.storage = ClientStorage(storage, client)
+        self.storage = client_api.get_storage()
 
     def attached(self, mind):
         self.remote = mind
         self.server.clients.append(self)
-        clients.client_connected.send(sender=self, client=self.client)
-        print 'Client \'%s\' connected' % self.client.hostname
+        self.api.connected()
+        print 'Client \'%s\' connected' % self.api.get_hostname()
 
     def detached(self, mind):
         self.remote = None
         self.server.clients.remove(self)
-        clients.client_disconnected.send(sender=self, client=self.client)
-        print 'Client \'%s\' disconnected' % self.client.hostname
+        self.api.disconnected()
+        print 'Client \'%s\' disconnected' % self.api.get_hostname()
 
     def perspective_get_paths(self):
-        return [p.path for p in self.client.filepaths.all()]
+        return self.api.get_paths()
 
     def perspective_get_present_state(self, path):
-        def get_children(item, items):
-            items.append(item.path)
-            for i in item.children.present():
-                get_children(i, items)
-        items = []
-        try:
-            item = catalog.Item.objects.get(client=self.client, path=path)
-            get_children(item, items)
-        except catalog.Item.DoesNotExist:
-            pass
-        return items
+        return self.api.get_present_state(path)
 
     def perspective_check_file(self, path, mtime, size):
-        try:
-            item = catalog.Item.objects.get(client=self.client, path=path)
-            if not item.latest_version or item.deleted:
-                return True
-            if abs(mtime - item.latest_version.mtime) < 1:
-                if abs(size - item.latest_version.size) < 1:
-                    return False
-        except catalog.Item.DoesNotExist:
-            pass
-        return True
+        return self.api.backup_required(path, mtime, size)
 
     def perspective_create_item(self, path, type):
-        catalog.item_created.send(sender=self, path=path, type=type,
-                                  client=self.client)
+        return self.api.create_item(path, type)
 
     def perspective_delete_item(self, path):
-        catalog.item_deleted.send(sender=self, path=path, client=self.client)
+        return self.api.delete_item(path)
 
     def perspective_put_file(self, path, mtime, size):
         version_id, fdst = self.storage.add(path)
         collector = PageCollector(fdst)
-        catalog.item_updated.send(sender=self, path=path, mtime=mtime,
-                                  size=size, client=self.client,
-                                  version_id=version_id)
+        self.api.update_item(path, mtime, size, version_id)
         return collector
 
 if __name__ == '__main__':

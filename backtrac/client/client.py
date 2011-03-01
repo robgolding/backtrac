@@ -14,6 +14,7 @@ from backtrac.client.broker import BackupBroker
 from backtrac.client.job import BackupJob
 from backtrac.client.queue import BackupQueue, TransferQueue
 from backtrac.client.platform import FileSystemMonitor
+from backtrac.utils import makedirs
 from backtrac.utils.transfer import PageCollector
 
 from backtrac.apps.catalog.utils import normpath
@@ -41,6 +42,12 @@ class BackupClient(pb.Referenceable):
             for f in files:
                 path = os.path.join(root, f)
                 self.backup_queue.add(BackupJob(path))
+
+    def remote_put_file(self, path):
+        makedirs(os.path.split(path)[0])
+        fdst = open(path, 'wb')
+        collector = PageCollector(fdst)
+        return collector
 
     @defer.inlineCallbacks
     def start(self):
