@@ -85,7 +85,7 @@ class Version(models.Model):
         return self.restored_from is not None
 
     def resolve_original(self):
-        if self.is_restore():
+        if self.is_restored():
             return self.restored_from.resolve_original()
         return self
 
