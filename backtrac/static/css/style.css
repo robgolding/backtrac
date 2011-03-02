@@ -624,6 +624,10 @@ ul.events-list li.deleted {
     background-image: url('../img/icons/famfamfam/delete.png');
 }
 
+ul.events-list li.restored {
+    background-image: url('../img/icons/famfamfam/page_go.png');
+}
+
 /* Object Summary */
 
 .object-summary {

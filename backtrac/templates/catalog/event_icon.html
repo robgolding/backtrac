@@ -6,6 +6,10 @@
     {% else %}
         {% if event.type == 'deleted' %}
             <img src="{{ STATIC_URL }}img/icons/famfamfam/delete.png" />
+        {% else %}
+            {% if event.type == 'restored' %}
+                <img src="{{ STATIC_URL }}img/icons/famfamfam/page_go.png" />
+            {% endif %}
         {% endif %}
     {% endif %}
 {% endif %}

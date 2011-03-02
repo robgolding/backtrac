@@ -22,6 +22,7 @@ EVENT_TYPE_CHOICES = (
     ('created', 'Created'),
     ('updated', 'Updated'),
     ('deleted', 'Deleted'),
+    ('restored', 'Restored'),
 )
 
 def get_or_create_item(client, path, type):
@@ -78,6 +79,15 @@ class Version(models.Model):
     backed_up_at = models.DateTimeField(auto_now_add=True, db_index=True)
     mtime = models.IntegerField('Modified time')
     size = models.BigIntegerField()
+    restored_from = models.ForeignKey('self', null=True, blank=True, db_index=True)
+
+    def is_restored(self):
+        return self.restored_from is not None
+
+    def resolve_original(self):
+        if self.is_restore():
+            return self.restored_from.resolve_original()
+        return self
 
     class Meta:
         get_latest_by = 'backed_up_at'

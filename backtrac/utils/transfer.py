@@ -19,9 +19,14 @@ class TransferPager(FilePager):
 class PageCollector(Referenceable):
     def __init__(self, fdst):
         self.fdst = fdst
+        self._deferred = Deferred()
 
     def remote_gotPage(self, page):
         self.fdst.write(page)
 
     def remote_endedPaging(self):
         self.fdst.close()
+        self._deferred.callback(self.fdst.name)
+
+    def wait(self):
+        return self._deferred

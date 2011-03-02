@@ -44,9 +44,13 @@ class BackupClient(pb.Referenceable):
                 self.backup_queue.add(BackupJob(path))
 
     def remote_put_file(self, path):
+        self.monitor.add_exclusion(path)
         makedirs(os.path.split(path)[0])
         fdst = open(path, 'wb')
         collector = PageCollector(fdst)
+        collector.wait().addCallback(
+            lambda p: reactor.callLater(1, self.monitor.rm_exclusion, p)
+        )
         return collector
 
     @defer.inlineCallbacks

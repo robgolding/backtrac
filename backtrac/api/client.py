@@ -5,7 +5,7 @@ from django.conf import settings
 from backtrac.server.storage import Storage, ClientStorage
 from backtrac.apps.clients import models as client_models
 from backtrac.apps.clients.models import client_connected, client_disconnected
-from backtrac.apps.catalog.models import Item, Version, RestoreJob, \
+from backtrac.apps.catalog.models import Item, Version, Event, RestoreJob, \
         item_created, item_updated, item_deleted
 from backtrac.utils import generate_version_id
 
@@ -48,7 +48,7 @@ class Client(object):
         try:
             item = Item.objects.get(client=self.client_obj, path=path)
             get_children(item, items)
-        except catalog.Item.DoesNotExist:
+        except Item.DoesNotExist:
             pass
         return items
 
@@ -65,13 +65,14 @@ class Client(object):
         item_deleted.send(sender=self.client_obj, path=path,
                           client=self.client_obj)
 
-    def backup_required(self, path, size, mtime):
+    def backup_required(self, path, mtime, size):
         try:
             item = Item.objects.get(client=self.client_obj, path=path)
             if not item.latest_version or item.deleted:
                 return True
-            if abs(mtime - item.latest_version.mtime) < 1:
-                if abs(size - item.latest_version.size) < 1:
+            if abs(size - item.latest_version.size) < 1:
+                if item.latest_version.is_restored() or \
+                   abs(mtime - item.latest_version.mtime) < 1:
                     return False
         except Item.DoesNotExist:
             pass
@@ -85,23 +86,32 @@ class Client(object):
 
     def restore_begin(self, restore_id):
         try:
+            # set the start time of the restore job so we know it's in progress
             job = RestoreJob.objects.get(id=restore_id)
             job.started_at = datetime.datetime.now()
             job.save()
-            # copy the version to the latest slot so the restored file is not
-            # backed up again
-            version = job.version
-            version.id = generate_version_id()
-            version.backed_up_at = datetime.datetime.now()
-            # TODO: re-enable this when the muter has been implemented
-            #version.save()
         except RestoreJob.DoesNotExist:
             pass
 
     def restore_complete(self, restore_id):
         try:
+            # set the completion time of the restore job so we know it's done
             job = RestoreJob.objects.get(id=restore_id)
             job.completed_at = datetime.datetime.now()
             job.save()
+            # copy the version to the latest slot so the restored file is not
+            # backed up again, generating a brand new ID and setting the
+            # restored_from value to the original version for later use
+            version = job.version
+            restored = Version.objects.create(id=generate_version_id(),
+                                              item=version.item,
+                                              mtime=version.mtime,
+                                              size=version.size,
+                                              restored_from=version)
+            # make sure the item isn't marked as deleted any more
+            version.item.deleted = False
+            version.item.save()
+            # create an event for the restore
+            Event.objects.create(type='restored', item=version.item)
         except RestoreJob.DoesNotExist:
             pass

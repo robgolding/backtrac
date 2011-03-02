@@ -28,7 +28,7 @@ def browse_catalog(request, template_name='catalog/browse.html'):
 
 @login_required
 def browse_route(request, client_id, path='/'):
-    client = get_object_or_404(Client, pk=client_id)
+    client = get_object_or_404(Client, id=client_id)
     path = normpath(path)
 
     if path == '/':
@@ -90,11 +90,11 @@ def browse_directory(request, client, item,
 
 @login_required
 def download_version(request, version_id, view_file=True):
-    version = get_object_or_404(Version, pk=version_id)
+    version = get_object_or_404(Version, id=version_id).resolve_original()
     item = version.item
     storage = ClientStorage(Storage(settings.BACKTRAC_BACKUP_ROOT), item.client)
 
-    f = storage.get(item.path, version.pk)
+    f = storage.get(item.path, version.id)
     contents = f.read()
     mimetype, encoding = mimetypes.guess_type(item.name)
     mimetype = mimetype or 'application/octet-stream'
@@ -112,7 +112,7 @@ def download_version(request, version_id, view_file=True):
 
 @login_required
 def restore_version(request, version_id):
-    version = get_object_or_404(Version, pk=version_id)
+    version = get_object_or_404(Version, id=version_id).resolve_original()
     RestoreJob.objects.create(client=version.item.client, version=version)
     messages.success(request, 'File \'%s\' queued for restoration to %s' % \
                      (version.item.name, version.item.client.hostname))

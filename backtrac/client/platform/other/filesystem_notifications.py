@@ -10,5 +10,11 @@ class FileSystemMonitor(object):
     def rm_watch(self, path):
         pass
 
+    def add_exclusion(self, pattern):
+        pass
+
+    def rm_exclusion(self, pattern):
+        pass
+
     def stop(self):
         pass
