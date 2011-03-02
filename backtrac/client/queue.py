@@ -26,7 +26,7 @@ class ConsumerQueue(object):
 
     def consume(self, obj):
         raise NotImplementedError
-    
+
     def fail(self, fail):
         raise NotImplementedError
 
@@ -93,5 +93,3 @@ class TransferQueue(BackupQueue):
             print '%s, %d bytes' % (filepath.path, filepath.getsize())
         except (OSError, IOError):
             pass
-
-

@@ -1,10 +1,8 @@
-import os, shutil, hashlib, uuid
+import os
+import shutil
+import hashlib
 
-from django.conf import settings
-from django.utils.datastructures import SortedDict
-from django.db.models import get_model
-
-from backtrac.utils import makedirs
+from backtrac.utils import makedirs, generate_version_id
 
 class StorageError(Exception): pass
 
@@ -39,7 +37,7 @@ class ClientStorage(object):
 
     def add(self, path, version_id=None):
         if version_id is None:
-            version_id = str(uuid.uuid4())
+            version_id = generate_version_id()
         container = self._get_container(path)
         makedirs(container)
         dst = os.path.join(container, version_id)

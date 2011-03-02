@@ -1,10 +1,13 @@
+import datetime
+
 from django.conf import settings
 
 from backtrac.server.storage import Storage, ClientStorage
 from backtrac.apps.clients import models as client_models
 from backtrac.apps.clients.models import client_connected, client_disconnected
-from backtrac.apps.catalog.models import Item, Version, item_created, \
-        item_updated, item_deleted
+from backtrac.apps.catalog.models import Item, Version, RestoreJob, \
+        item_created, item_updated, item_deleted
+from backtrac.utils import generate_version_id
 
 def get_client(hostname):
     try:
@@ -59,7 +62,8 @@ class Client(object):
                           version_id=version_id)
 
     def delete_item(self, path):
-        item_deleted.send(sender=self.client_obj, path=path, client=client)
+        item_deleted.send(sender=self.client_obj, path=path,
+                          client=self.client_obj)
 
     def backup_required(self, path, size, mtime):
         try:
@@ -72,3 +76,32 @@ class Client(object):
         except Item.DoesNotExist:
             pass
         return True
+
+    def get_pending_restore_jobs(self):
+        jobs = self.client_obj.restores.filter(started_at=None, completed_at=None)
+        return [
+            (job.id, job.version.item.path, job.version.id) for job in jobs
+        ]
+
+    def restore_begin(self, restore_id):
+        try:
+            job = RestoreJob.objects.get(id=restore_id)
+            job.started_at = datetime.datetime.now()
+            job.save()
+            # copy the version to the latest slot so the restored file is not
+            # backed up again
+            version = job.version
+            version.id = generate_version_id()
+            version.backed_up_at = datetime.datetime.now()
+            # TODO: re-enable this when the muter has been implemented
+            #version.save()
+        except RestoreJob.DoesNotExist:
+            pass
+
+    def restore_complete(self, restore_id):
+        try:
+            job = RestoreJob.objects.get(id=restore_id)
+            job.completed_at = datetime.datetime.now()
+            job.save()
+        except RestoreJob.DoesNotExist:
+            pass

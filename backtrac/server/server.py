@@ -12,12 +12,13 @@ from twisted.spread.pb import PBServerFactory
 from twisted.application.service import Application
 from twisted.application.internet import TCPServer
 from twisted.spread.util import FilePager
+from twisted.internet.task import LoopingCall
 from twisted.internet import defer
 
 from django.conf import settings
 
 from backtrac.api.client import Client, get_client
-from backtrac.utils.transfer import PageCollector
+from backtrac.utils.transfer import PageCollector, TransferPager
 
 class BackupClientAuthChecker:
     implements(checkers.ICredentialsChecker)
@@ -47,7 +48,7 @@ class BackupClientAuthChecker:
 class BackupServer(object):
     def __init__(self, port=8123):
         self.port = port
-        self.clients = []
+        self.clients = {}
 
         realm = BackupRealm()
         realm.server = self
@@ -55,6 +56,12 @@ class BackupServer(object):
         self.portal = portal.Portal(realm, [checker])
         self.factory = PBServerFactory(self.portal)
         self.service = TCPServer(self.port, self.factory)
+        self.restore_loop = LoopingCall(self.execute_pending_restores)
+        self.restore_loop.start(5)
+
+    def execute_pending_restores(self):
+        for hostname, client in self.clients.items():
+            client.execute_pending_restores()
 
     def start(self):
         self.service.startService()
@@ -84,9 +91,6 @@ class ManagementClient(pb.Avatar):
     def perspective_num_clients(self):
         return len(self.server.clients)
 
-    def perspective_restore_file(self, client, version_id):
-        pass
-
 class BackupClient(pb.Avatar):
     def __init__(self, client_api, server):
         self.api = client_api
@@ -95,13 +99,13 @@ class BackupClient(pb.Avatar):
 
     def attached(self, mind):
         self.remote = mind
-        self.server.clients.append(self)
+        self.server.clients[self.api.get_hostname()] = self
         self.api.connected()
         print 'Client \'%s\' connected' % self.api.get_hostname()
 
     def detached(self, mind):
         self.remote = None
-        self.server.clients.remove(self)
+        del self.server.clients[self.api.get_hostname()]
         self.api.disconnected()
         print 'Client \'%s\' disconnected' % self.api.get_hostname()
 
@@ -126,6 +130,21 @@ class BackupClient(pb.Avatar):
         self.api.update_item(path, mtime, size, version_id)
         return collector
 
-if __name__ == '__main__':
-    server = BackupServer()
-    server.start()
+    def restore_file(self, restore_id, path, version_id):
+        def _restore(collector, path, version_id):
+            fd = self.storage.get(path, version_id)
+            pager = TransferPager(collector, fd)
+            pager.wait()
+            print 'Restore %d complete' % restore_id
+            self.api.restore_complete(restore_id)
+
+        print 'Restoring %s to %s (job %d)' % (path, self.api.get_hostname(),
+                                               restore_id)
+        self.api.restore_begin(restore_id)
+        d = self.remote.callRemote('put_file', path)
+        d.addCallback(_restore, path, version_id)
+
+    def execute_pending_restores(self):
+        jobs = self.api.get_pending_restore_jobs()
+        for id, path, version_id in jobs:
+            self.restore_file(id, path, version_id)

@@ -40,15 +40,15 @@ class Item(models.Model):
     client = models.ForeignKey('clients.Client', related_name='items',
                                db_index=True)
     parent = models.ForeignKey('self', null=True, blank=True, db_index=True,
-                                            related_name='children')
+                               related_name='children')
     name = models.CharField(max_length=255)
     type = models.CharField(max_length=2, choices=ITEM_TYPE_CHOICES,
-                                            db_index=True)
+                            db_index=True)
     path = models.CharField(max_length=255, null=True, blank=True,
-                                            db_index=True)
+                            db_index=True)
     latest_version = models.ForeignKey('catalog.Version', null=True,
-                                            blank=True, db_index=True,
-                                            related_name='item_latest_set')
+                                       blank=True, db_index=True,
+                                       related_name='item_latest_set')
     deleted = models.BooleanField(default=False, db_index=True)
 
     objects = managers.ItemManager()
@@ -87,9 +87,10 @@ class Version(models.Model):
         return '%s [%s]' % (self.item.path, self.backed_up_at)
 
 class Event(models.Model):
-    item = models.ForeignKey(Item)
-    occurred_at = models.DateTimeField(auto_now_add=True)
-    type = models.CharField(max_length=20, choices=EVENT_TYPE_CHOICES)
+    item = models.ForeignKey(Item, db_index=True)
+    occurred_at = models.DateTimeField(auto_now_add=True, db_index=True)
+    type = models.CharField(max_length=20, choices=EVENT_TYPE_CHOICES,
+                            db_index=True)
 
     def __unicode__(self):
         return '%s %s' % (self.get_type_display(), self.item.name)
@@ -97,6 +98,33 @@ class Event(models.Model):
     class Meta:
         ordering = ['-occurred_at']
         get_latest_by = 'occurred_at'
+
+class RestoreJob(models.Model):
+    client = models.ForeignKey('clients.Client', related_name='restores',
+                               db_index=True)
+    version = models.ForeignKey(Version, db_index=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    started_at = models.DateTimeField(null=True, blank=True, db_index=True)
+    completed_at = models.DateTimeField(null=True, blank=True, db_index=True)
+
+    def is_pending(self):
+        return self.completed_at is None and self.started_at is None
+
+    def is_in_progress(self):
+        return not self.is_pending() and not self.is_complete()
+
+    def is_complete(self):
+        return self.completed_at is not None
+
+    def __unicode__(self):
+        if self.is_pending():
+            status = 'pending'
+        else:
+            if self.is_complete():
+                status = 'complete'
+            else:
+                status = 'in progress'
+        return 'Restore %s to %s (%s)' % (self.version, self.client, status)
 
 @dispatch.receiver(pre_save, sender=Item)
 def update_item(sender, instance=None, **kwargs):
@@ -110,7 +138,9 @@ def update_children(sender, instance=None, **kwargs):
 
 @dispatch.receiver(post_save, sender=Version)
 def update_latest_version(sender, instance=None, **kwargs):
-    instance.item.latest_version = instance
+    versions = instance.item.versions.all()
+    latest = versions.latest()
+    instance.item.latest_version = latest
     instance.item.save()
 
 @dispatch.receiver(item_created)
