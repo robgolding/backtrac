@@ -39,10 +39,10 @@ class BackupQueue(ConsumerQueue):
         self.client = client
 
     def consume_create(self, filepath):
+        # don't do anything if a file is created, as the server handles this as
+        # an 'update'
         if filepath.isdir():
             self.client.broker.create_item(filepath.path, 'd')
-        else:
-            self.consume_update(filepath)
 
     def consume_update(self, filepath):
         try:
