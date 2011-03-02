@@ -12,9 +12,8 @@ from django.conf import settings
 
 from backtrac.server.storage import Storage, ClientStorage
 from backtrac.apps.clients.models import Client
-
-from models import Item, Version, Event
-from utils import normpath
+from backtrac.apps.catalog.models import Item, Version, Event, RestoreJob
+from backtrac.apps.catalog.utils import normpath
 
 @login_required
 def browse_catalog(request, template_name='catalog/browse.html'):
@@ -110,3 +109,11 @@ def download_version(request, version_id, view_file=True):
     if encoding:
         response['Content-Encoding'] = encoding
     return response
+
+@login_required
+def restore_version(request, version_id):
+    version = get_object_or_404(Version, pk=version_id)
+    RestoreJob.objects.create(client=version.item.client, version=version)
+    messages.success(request, 'File \'%s\' queued for restoration to %s' % \
+                     (version.item.name, version.item.client.hostname))
+    return HttpResponseRedirect(version.item.get_absolute_url())

@@ -6,7 +6,7 @@
             <h1>{{ item.name }}</h1>
             <div class="content clearfix">
                 <a class="button" href="{{ item.parent.get_absolute_url }}"><img src="{{ STATIC_URL }}img/icons/famfamfam/arrow_left.png" /> Back to {{ item.parent.name }}</a>
-                <a class="button" href=""><img src="{{ STATIC_URL }}img/icons/famfamfam/computer_go.png" /> Restore latest version</a>
+                <a class="button" href="{% url catalog_restore_version item.latest_version.id %}"><img src="{{ STATIC_URL }}img/icons/famfamfam/computer_go.png" /> Restore latest version</a>
                 <div class="object-summary file-summary">
                     {% with item.latest_version as latest %}
                     {% with latest.backed_up_at|timesince as age %}
@@ -44,7 +44,7 @@
                                         <a href="{% url catalog_download_version version.id %}" title="Download version">
                                             <img src="{{ STATIC_URL}}img/icons/download_16.png" />
                                         </a>
-                                        <a href="" title="Restore version">
+                                        <a href="{% url catalog_restore_version version.id %}" title="Restore version">
                                             <img src="{{ STATIC_URL}}img/icons/copy_16.png" />
                                         </a>
                                     </td>

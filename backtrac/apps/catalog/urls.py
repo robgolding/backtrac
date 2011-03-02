@@ -35,4 +35,7 @@ urlpatterns = patterns('',
                         'view_file': True,},
                     name='catalog_view_version'),
 
+    url(r'^restore/(?P<version_id>[\w-]+)/$', views.restore_version,
+                    name='catalog_restore_version'),
+
 )
