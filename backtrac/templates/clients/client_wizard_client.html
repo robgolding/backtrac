@@ -1,0 +1,64 @@
+{% extends 'clients/base.html' %}
+
+{% block content %}
+    <script language="javascript">
+        $(function() {
+            $("#filepaths ul.formset-list li").formset({
+                prefix: '{{ step0 }}',
+                formCssClass: 'filepaths-dynamic-form',
+                addCssClass: 'add-row button small',
+                addText: '<img src="{{ STATIC_URL }}img/icons/famfamfam/add.png" /\> add another</a>',
+                deleteCssClass: 'delete-row',
+                deleteText: '<img src="{{ STATIC_URL }}img/icons/famfamfam/delete.png" /\>',
+            });
+            $('a.delete-row').attr('title', 'Remove');
+        });
+    </script>
+    <div class="container">
+        <section class="span-18">
+            <h1>Add a Client</h1>
+            <div class="content clearfix">
+                <h2>Step {{ step }} of {{ step_count }}</h2>
+                <form action="" method="post" class="standard-form">{% csrf_token %}
+                    <h2>Client Details</h2>
+                    <input type="hidden" name="{{ step_field }}" value="{{ step0 }}" />
+                    {% for error in form.non_field_errors %}
+                        <p class="error">{{ error }}</p>
+                    {% endfor %}
+                    {% for field in form %}
+                        {% if field.is_hidden %}
+                            {{ field }}
+                        {% else %}
+                            <div class="field-wrapper clearfix">
+                                {{ field.label_tag }}<br />
+                                <div class="field">{{ field }}</div>
+                                <div class="field-errors">  
+                                    {% if field.errors %}
+                                        <span class="error">{{ field.errors.0 }}</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                    {{ previous_fields|safe }}
+                    <a href="" class="button">
+                        <img src="{{ STATIC_URL }}img/icons/famfamfam/arrow_left.png" />
+                        Back
+                    </a>
+                    <button type="submit" class="button">
+                        <img src="{{ STATIC_URL }}img/icons/famfamfam/arrow_right.png" />
+                        Next
+                    </button>
+                </form>
+            </div>
+        </section>
+        <section class="span-6 last">
+            <h1>Help</h1>
+            <div class="content">
+                <p>
+                    Some tips here...
+                </p>
+            </div>
+        </section>
+    </div>
+{% endblock %}

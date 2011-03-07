@@ -4,6 +4,7 @@ from django.views.generic.list_detail import object_list, object_detail
 from django.views.generic import DetailView, ListView
 
 from models import Client
+import forms
 import views
 
 urlpatterns = patterns('',
@@ -32,5 +33,11 @@ urlpatterns = patterns('',
 
     url(r'^create/$', views.create_client,
         name='clients_create_client'),
+
+    url(r'^wizard/$', forms.ClientWizard([forms.ClientFieldsForm,
+                                          forms.PathFormSet,
+                                          forms.PathFormSet
+                                         ]),
+        name='clients_test'),
 
 )
