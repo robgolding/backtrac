@@ -116,13 +116,17 @@ class BackupClient(pb.Avatar):
         return self.api.get_present_state(path)
 
     def perspective_check_file(self, path, mtime, size):
-        return self.api.backup_required(path, mtime, size)
+        if not self.api.is_excluded(path):
+            return self.api.backup_required(path, mtime, size)
+        return False
 
     def perspective_create_item(self, path, type):
-        return self.api.create_item(path, type)
+        if not self.api.is_excluded(path):
+            self.api.create_item(path, type)
 
     def perspective_delete_item(self, path):
-        return self.api.delete_item(path)
+        if not self.api.is_excluded(self):
+            self.api.delete_item(path)
 
     def perspective_put_file(self, path, mtime, size):
         version_id, fdst = self.storage.add(path)

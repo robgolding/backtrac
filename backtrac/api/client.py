@@ -37,7 +37,10 @@ class Client(object):
         return ClientStorage(storage, self.client_obj)
 
     def get_paths(self):
-        return [p.path for p in self.client_obj.filepaths.all()]
+        return [ p.path for p in self.client_obj.filepaths.all() ]
+
+    def get_exclusions(self):
+        return [ excl.glob for excl in self.client_obj.exclusions.all() ]
 
     def get_present_state(self, path):
         def get_children(item, items):
@@ -51,6 +54,11 @@ class Client(object):
         except Item.DoesNotExist:
             pass
         return items
+
+    def is_excluded(self, path):
+        return any([
+            e.get_regex().match(path) for e in self.client_obj.exclusions.all()
+        ])
 
     def create_item(self, path, type):
         item_created.send(sender=self.client_obj, path=path, type=type,

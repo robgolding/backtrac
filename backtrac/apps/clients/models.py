@@ -1,3 +1,5 @@
+import re
+import fnmatch
 import datetime
 
 from django.db import models
@@ -36,6 +38,17 @@ class FilePath(models.Model):
 
     def __unicode__(self):
         return self.path
+
+class Exclusion(models.Model):
+    client = models.ForeignKey(Client, related_name='exclusions')
+    glob = models.CharField(max_length=255)
+
+    def get_regex(self):
+        regex = fnmatch.translate(self.glob)
+        return re.compile(regex)
+
+    def __unicode__(self):
+        return 'Exclude %s (%s)' % (self.glob, self.client.hostname)
 
 class Status(models.Model):
     client = models.OneToOneField(Client, primary_key=True)
