@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+
+{% block page_id %}config{% endblock page_id %}
+
+{% block content %}
+    <script language="javascript">
+        $(function() {
+            $("#exclusions ul.formset-list li").formset({
+                formCssClass: 'filepaths-dynamic-form',
+                addCssClass: 'add-row button small',
+                addText: '<img src="{{ STATIC_URL }}img/icons/famfamfam/add.png" /\> add another</a>',
+                deleteCssClass: 'delete-row',
+                deleteText: '<img src="{{ STATIC_URL }}img/icons/famfamfam/delete.png" /\>',
+            });
+            $('a.delete-row').attr('title', 'Remove');
+        });
+    </script>
+    <div class="container">
+        <section class="span-18">
+            <h1>Configuration</h1>
+            <div class="content">
+                <h2>Global Exclusions</h2>
+                <p>Exclude files matching the following patterns:</p>
+                <form action="" method="post" class="standard-form">{% csrf_token %}
+                    {{ exclusion_formset.management_form }}
+                    <div class="field-wrapper clearfix" id="exclusions">
+                        <ul class="formset-list">
+                            {% for form in exclusion_formset.forms %}
+                                {% for field in form %}
+                                    {% if field.is_hidden %}
+                                        {{ field }}
+                                    {% endif %}
+                                {% endfor %}
+                                <li>
+                                    {{ form.glob }}&nbsp;
+                                    {% if form.path.errors %}
+                                        <span class="error">
+                                        ({{ form.path.errors.0 }})
+                                        </span>
+                                    {% endif %} 
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    <button type="submit" class="button">
+                        <img src="{{ STATIC_URL }}css/blueprint/plugins/buttons/icons/tick.png" />
+                        Save Configuration
+                    </button>
+                    <a class="button" href="{% url dashboard %}">
+                        <img src="{{ STATIC_URL }}css/blueprint/plugins/buttons/icons/cross.png" />
+                        Cancel
+                    </a>
+                </form>
+            </div>
+        </section>
+        <div class="span-6 last">
+            <section>
+                <h1>Help</h1>
+                <div class="content">
+                    <p>Or something...</p>
+                </div>
+            </section>
+        </div>
+    </div>
+{% endblock %}
