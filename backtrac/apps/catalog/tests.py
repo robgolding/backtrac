@@ -10,7 +10,33 @@ from backtrac.apps.catalog.models import Item, Version, get_or_create_item
 
 #TODO: Write a test for the download_version view
 
-class LatestVersionTest(TestCase):
+class ItemPathTest(TestCase):
+    def setUp(self):
+        """
+        """
+        self.client = Client.objects.create(hostname='test', secret_key='')
+        self.item1 = Item.objects.create(client=self.client,
+                                         name='home',
+                                         type='d')
+        self.item2 = Item.objects.create(client=self.client,
+                                         name='test',
+                                         parent=self.item1,
+                                         type='d')
+        self.item3 = Item.objects.create(client=self.client,
+                                         name='file',
+                                         parent=self.item2,
+                                         type='f')
+
+    def test_item_path(self):
+        """
+        Test that the created items are given the correct path attribute
+        automatically, via the update_item pre-save signal.
+        """
+        self.assertEqual(self.item1.path, '/home')
+        self.assertEqual(self.item2.path, '/home/test')
+        self.assertEqual(self.item3.path, '/home/test/file')
+
+class ItemLatestVersionTest(TestCase):
     def _add_version_to_item(self, item):
         """
         Stick another version onto the given item with a new UUID, and a
