@@ -107,10 +107,11 @@ class ResolveOriginalVersionTest(TestCase):
         self.original = Version.objects.create(id=str(uuid.uuid4()),
                                                item=self.item, mtime=123,
                                                size=456)
+        v = self.original
         for i in range(5):
             v = Version.objects.create(id=str(uuid.uuid4()), item=self.item,
                                        mtime=123, size=456,
-                                       restored_from=self.original)
+                                       restored_from=v)
             self.versions.append(v)
 
     def test_resolve_original(self):
