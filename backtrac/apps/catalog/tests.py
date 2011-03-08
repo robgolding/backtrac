@@ -13,7 +13,8 @@ from django.contrib.auth.models import User
 
 from backtrac.server.storage import Storage, ClientStorage
 from backtrac.apps.clients.models import Client
-from backtrac.apps.catalog.models import Item, Version, get_or_create_item
+from backtrac.apps.catalog.models import Item, Version, RestoreJob, \
+        get_or_create_item
 
 class ItemPathTest(TestCase):
     def setUp(self):
@@ -175,6 +176,7 @@ class BrowseRouteTest(TestCase):
 
         response = self.client.get(self.item.get_absolute_url())
 
+        self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context['item'], self.item)
         self.assertEqual(list(response.context['versions']), [self.version])
 
@@ -187,6 +189,7 @@ class BrowseRouteTest(TestCase):
 
         response = self.client.get(self.item.parent.get_absolute_url())
 
+        self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context['item'], self.item.parent)
         self.assertEqual(list(response.context['item'].children.all()),
                          list(self.item.parent.children.all()))
@@ -207,7 +210,6 @@ class DownloadVersionTest(TestCase):
                                               item=self.item, mtime=123,
                                               size=456)
 
-
         self.storage = ClientStorage(Storage(settings.BACKTRAC_BACKUP_ROOT),
                                      self.client_obj)
 
@@ -225,7 +227,59 @@ class DownloadVersionTest(TestCase):
         response = self.client.get(reverse('catalog_download_version',
                                            args=[self.version.id]))
 
+        self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content, self.FILE_CONTENTS)
+
+    def tearDown(self):
+        """
+        Remove the test storage directory we created earlier.
+        """
+        shutil.rmtree(settings.BACKTRAC_BACKUP_ROOT)
+
+class RestoreVersionTest(TestCase):
+    FILE_CONTENTS = "This is a test file, ready to be restored"
+    RESTORE_PATH = os.path.join(settings.BACKTRAC_TMP_DIR, 'restore-%s'
+                                % str(uuid.uuid4()))
+
+    def setUp(self):
+        """
+        Create a test user, item and version, then put a file into the storage
+        system for that version.
+        """
+        User.objects.create_user('test', 'test@test.com', 'test')
+
+        self.client_obj = Client.objects.create(hostname='test', secret_key='')
+        self.item, _ = get_or_create_item(self.client_obj, self.RESTORE_PATH, 'f')
+        self.version1 = Version.objects.create(id=str(uuid.uuid4()),
+                                               item=self.item, mtime=123,
+                                               size=456)
+        self.version2 = Version.objects.create(id=str(uuid.uuid4()),
+                                               item=self.item, mtime=123,
+                                               size=456,
+                                               restored_from=self.version1)
+
+        self.storage = ClientStorage(Storage(settings.BACKTRAC_BACKUP_ROOT),
+                                     self.client_obj)
+
+        _, fd = self.storage.add(self.item.path, self.version1.id)
+        fd.write(self.FILE_CONTENTS)
+        fd.close()
+
+    def test_restore_version(self):
+        """
+        Test that the restore_version view creates a RestoreJob object with the
+        correctly resolved version ID, and returns a 302 redirect status code.
+        """
+        self.client.login(username='test', password='test')
+
+        response = self.client.get(reverse('catalog_restore_version',
+                                           args=[self.version2.id]))
+
+        self.assertEqual(response.status_code, 302)
+
+        restore_job = RestoreJob.objects.get(client=self.client_obj)
+
+        self.assertEqual(restore_job.version.id, self.version1.id)
 
     def tearDown(self):
         """
