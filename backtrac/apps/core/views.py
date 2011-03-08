@@ -62,7 +62,7 @@ def dashboard(request, *args, **kwargs):
 @transaction.commit_on_success
 def config(request, template_name='config.html'):
     if request.method == 'POST':
-        exclusion_formset = ExclusionFormSet(request.POST)
+        exclusion_formset = ExclusionFormSet(request.POST, prefix='exclusions')
         if exclusion_formset.is_valid():
             [e.delete() for e in GlobalExclusion.objects.all()]
             for form in exclusion_formset:
@@ -74,7 +74,8 @@ def config(request, template_name='config.html'):
     else:
         exclusions = GlobalExclusion.objects.all()
         exclusions_data = [{'glob': e.glob} for e in exclusions]
-        exclusion_formset = ExclusionFormSet(initial=exclusions_data)
+        exclusion_formset = ExclusionFormSet(initial=exclusions_data,
+                                             prefix='exclusions')
 
     data = {
         'exclusion_formset': exclusion_formset,
