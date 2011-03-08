@@ -6,7 +6,7 @@ from django.db.models.signals import pre_save, post_save
 from django.utils.encoding import filepath_to_uri
 from django import dispatch
 
-import managers
+from backtrac.apps.catalog import managers
 
 item_created = dispatch.Signal(providing_args=['path', 'type'])
 item_updated = dispatch.Signal(

@@ -14,8 +14,6 @@ class ClientForm(forms.ModelForm):
         model = Client
 
 class FilePathForm(forms.ModelForm):
-    def __init__(self, *args, **kwargs):
-        super(FilePathForm, self).__init__(*args, **kwargs)
 
     class Meta:
         model = FilePath

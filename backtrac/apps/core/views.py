@@ -3,14 +3,19 @@ import datetime
 from django.http import HttpResponse, HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
+from django.shortcuts import render_to_response
 from django.views.generic.simple import direct_to_template
+from django.template.context import RequestContext
+from django.contrib import messages
+from django.db import transaction
 from django.db.models import Sum
 from django.conf import settings
 
-from backtrac.apps.catalog.models import Item, Version, Event
-
-from backtrac.server.storage import Storage
 from backtrac.client import client
+from backtrac.server.storage import Storage
+from backtrac.apps.core.models import GlobalExclusion
+from backtrac.apps.core.forms import ExclusionFormSet
+from backtrac.apps.catalog.models import Item, Version, Event
 
 @login_required
 def index(request):
@@ -52,6 +57,30 @@ def dashboard(request, *args, **kwargs):
     })
 
     return direct_to_template(request, *args, **kwargs)
+
+@login_required
+@transaction.commit_on_success
+def config(request, template_name='config.html'):
+    if request.method == 'POST':
+        exclusion_formset = ExclusionFormSet(request.POST)
+        if exclusion_formset.is_valid():
+            [e.delete() for e in GlobalExclusion.objects.all()]
+            for form in exclusion_formset:
+                glob = form.cleaned_data.get('glob', None)
+                if glob:
+                    GlobalExclusion.objects.create(glob=glob)
+            messages.success(request, 'Configuration updated successfully')
+            return HttpResponseRedirect(reverse('core_config'))
+    else:
+        exclusions = GlobalExclusion.objects.all()
+        exclusions_data = [{'glob': e.glob} for e in exclusions]
+        exclusion_formset = ExclusionFormSet(initial=exclusions_data)
+
+    data = {
+        'exclusion_formset': exclusion_formset,
+    }
+    return render_to_response(template_name, data,
+                              context_instance=RequestContext(request))
 
 @login_required
 def status(request):

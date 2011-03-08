@@ -4,8 +4,8 @@ from django.views.generic.list_detail import object_list, object_detail
 
 from backtrac.apps.clients.models import Client
 
-from models import Event
-import views
+from backtrac.apps.catalog.models import Event
+from backtrac.apps.catalog import views
 
 urlpatterns = patterns('',
 

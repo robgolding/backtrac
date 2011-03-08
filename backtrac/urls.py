@@ -6,6 +6,7 @@ from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.contrib import admin
 admin.autodiscover()
 
+from backtrac.apps.core.urls import config_patterns
 from backtrac.apps.core import views
 
 urlpatterns = patterns('',
@@ -28,6 +29,8 @@ urlpatterns = patterns('',
     (r'^clients/', include('backtrac.apps.clients.urls')),
 
     (r'^catalog/', include('backtrac.apps.catalog.urls')),
+
+    (r'^config/', include(config_patterns)),
 
 )
 

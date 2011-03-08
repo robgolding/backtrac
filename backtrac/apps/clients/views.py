@@ -33,16 +33,19 @@ def create_client(request, template_name='clients/client_form.html'):
         'filepath_formset': filepath_formset,
         'back_link': reverse('clients_client_list'),
     }
-    return render_to_response(template_name, data, context_instance=RequestContext(request))
+    return render_to_response(template_name, data,
+                              context_instance=RequestContext(request))
 
 @login_required
 @transaction.commit_on_success
-def update_client(request, client_id, template_name='clients/client_form.html'):
+def update_client(request, client_id,
+                  template_name='clients/client_form.html'):
     client = get_object_or_404(Client, pk=client_id)
     referrer = request.META.get('HTTP_REFERER', '').strip(' ?')
     if request.method == 'POST':
         client_form = ClientForm(request.POST, instance=client)
-        filepath_formset = UpdateFilePathFormSet(request.POST, prefix='filepaths')
+        filepath_formset = UpdateFilePathFormSet(request.POST,
+                                                 prefix='filepaths')
         if all([client_form.is_valid(), filepath_formset.is_valid()]):
             [j.delete() for j in client.filepaths.all()]
             client = client_form.save()
@@ -57,7 +60,8 @@ def update_client(request, client_id, template_name='clients/client_form.html'):
         client_form = ClientForm(instance=client)
         filepaths = client.filepaths.all()
         filepaths_data = [{'path': j.path} for j in filepaths]
-        filepath_formset = UpdateFilePathFormSet(initial=filepaths_data, prefix='filepaths')
+        filepath_formset = UpdateFilePathFormSet(initial=filepaths_data,
+                                                 prefix='filepaths')
 
     if referrer.endswith(client.get_absolute_url()):
         back_link = client.get_absolute_url()
@@ -70,7 +74,8 @@ def update_client(request, client_id, template_name='clients/client_form.html'):
         'filepath_formset': filepath_formset,
         'back_link': back_link,
     }
-    return render_to_response(template_name, data, context_instance=RequestContext(request))
+    return render_to_response(template_name, data,
+                              context_instance=RequestContext(request))
 
 @login_required
 def pause_client(request, client_id, next=None):
@@ -101,7 +106,8 @@ def resume_client(request, client_id, next=None):
     return HttpResponseRedirect(next)
 
 @login_required
-def delete_client(request, client_id, template_name='clients/delete_client.html'):
+def delete_client(request, client_id,
+                  template_name='clients/delete_client.html'):
     client = get_object_or_404(Client, pk=client_id)
     referrer = request.META.get('HTTP_REFERER', '').strip(' ?')
     if request.method == 'POST':
@@ -116,4 +122,5 @@ def delete_client(request, client_id, template_name='clients/delete_client.html'
         back_link = reverse('clients_client_list')
 
     data = { 'client': client, 'back_link': back_link }
-    return render_to_response(template_name, data, context_instance=RequestContext(request))
+    return render_to_response(template_name, data,
+                              context_instance=RequestContext(request))
