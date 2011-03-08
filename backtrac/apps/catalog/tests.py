@@ -6,7 +6,7 @@ import uuid, random
 from django.test import TestCase
 
 from backtrac.apps.clients.models import Client
-from models import Item, Version
+from backtrac.apps.catalog.models import Item, Version, get_or_create_item
 
 #TODO: Write a test for the download_version view
 
@@ -61,8 +61,6 @@ class GetOrCreateItemTest(TestCase):
         """
         Test that catalog.models.get_or_create_item works as expected.
         """
-        from backtrac.apps.catalog.models import get_or_create_item
-
         item, created = get_or_create_item(self.client, self.path, self.type)
 
         self.assertEqual(created, True)
@@ -93,3 +91,32 @@ class ItemCreatedTest(TestCase):
 
         item_created.send(sender=None, path=self.path, type='d',
                           client=self.client)
+
+class ResolveOriginalVersionTest(TestCase):
+    def setUp(self):
+        """
+        Create an Item and a chain of versions to test the resolve_original()
+        method on.
+        """
+        import uuid
+
+        self.client = Client.objects.create(hostname='test', secret_key='')
+        self.item, _ = get_or_create_item(self.client, '/test/item', 'f')
+
+        self.versions = []
+        self.original = Version.objects.create(id=str(uuid.uuid4()),
+                                               item=self.item, mtime=123,
+                                               size=456)
+        for i in range(5):
+            v = Version.objects.create(id=str(uuid.uuid4()), item=self.item,
+                                       mtime=123, size=456,
+                                       restored_from=self.original)
+            self.versions.append(v)
+
+    def test_resolve_original(self):
+        """
+        Test that the resolve_original() method on the Version class works as
+        expected.
+        """
+        for v in self.versions:
+            self.assertEqual(v.resolve_original(), self.original)
