@@ -129,14 +129,14 @@ class BackupClient(pb.Avatar):
             self.api.delete_item(path)
 
     def perspective_put_file(self, path, mtime, size):
-        version_id, fdst = self.storage.add(path)
+        version_id, fdst = self.storage.put(self.api.get_hostname(), path)
         collector = PageCollector(fdst)
         self.api.update_item(path, mtime, size, version_id)
         return collector
 
     def restore_file(self, restore_id, path, version_id):
         def _restore(collector, path, version_id):
-            fd = self.storage.get(path, version_id)
+            fd = self.storage.get(self.api.get_hostname(), path, version_id)
             pager = TransferPager(collector, fd)
             pager.wait()
             print 'Restore %d complete' % restore_id

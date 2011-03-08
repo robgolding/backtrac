@@ -11,6 +11,12 @@ class Storage(object):
         self.root = root
         makedirs(self.root)
 
+    def _hash(self, data):
+        return hashlib.sha1(data).hexdigest()
+
+    def _get_container(self, bucket, path):
+        return os.path.join(self.root, bucket, self._hash(bucket))
+
     def get_total_bytes(self):
         stat = os.statvfs(self.root)
         return stat.f_blocks * stat.f_frsize
@@ -22,33 +28,20 @@ class Storage(object):
     def get_used_bytes(self):
         return self.get_total_bytes() - self.get_avail_bytes()
 
-class ClientStorage(object):
-    def __init__(self, storage, client):
-        self.storage = storage
-        self.client = client
-        self.root = os.path.join(self.storage.root, self.client.hostname)
-        makedirs(self.root)
-
-    def _hash(self, data):
-        return hashlib.sha1(data).hexdigest()
-
-    def _get_container(self, path):
-        return os.path.join(self.root, self._hash(path))
-
-    def add(self, path, version_id=None):
+    def put(self, bucket, path, version_id=None):
         if version_id is None:
             version_id = generate_version_id()
-        container = self._get_container(path)
+        container = self._get_container(bucket, path)
         makedirs(container)
         dst = os.path.join(container, version_id)
         if os.path.exists(dst):
             raise StorageError('Version ID \'%s\' already exists for file: %s'
                                % (version_id, path))
-        destination = open(dst, 'wb')
-        return version_id, destination
+        fd = open(dst, 'wb')
+        return version_id, fd
 
-    def get(self, path, version_id):
-        container = self._get_container(path)
+    def get(self, bucket, path, version_id):
+        container = self._get_container(bucket, path)
         if not os.path.exists(container):
             raise StorageError('Cannot find container for file: %s' % path)
         src = os.path.join(container, version_id)
@@ -57,4 +50,3 @@ class ClientStorage(object):
         else:
             raise StorageError('Cannot find version ID \'%s\' for file: %s'
                                % (version_id, path))
-

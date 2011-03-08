@@ -10,7 +10,7 @@ from django.template.context import RequestContext
 from django.contrib import messages
 from django.conf import settings
 
-from backtrac.server.storage import Storage, ClientStorage
+from backtrac.server.storage import Storage
 from backtrac.apps.clients.models import Client
 from backtrac.apps.catalog.models import Item, Version, Event, RestoreJob
 from backtrac.apps.catalog.utils import normpath
@@ -92,9 +92,9 @@ def browse_directory(request, client, item,
 def download_version(request, version_id, view_file=True):
     version = get_object_or_404(Version, id=version_id).resolve_original()
     item = version.item
-    storage = ClientStorage(Storage(settings.BACKTRAC_BACKUP_ROOT), item.client)
+    storage = Storage(settings.BACKTRAC_BACKUP_ROOT)
 
-    f = storage.get(item.path, version.id)
+    f = storage.get(item.client.hostname, item.path, version.id)
     contents = f.read()
     mimetype, encoding = mimetypes.guess_type(item.name)
     mimetype = mimetype or 'application/octet-stream'

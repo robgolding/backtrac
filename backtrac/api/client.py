@@ -2,7 +2,7 @@ import datetime
 
 from django.conf import settings
 
-from backtrac.server.storage import Storage, ClientStorage
+from backtrac.server.storage import Storage
 from backtrac.apps.clients import models as client_models
 from backtrac.apps.clients.models import client_connected, client_disconnected
 from backtrac.apps.catalog.models import Item, Version, Event, RestoreJob, \
@@ -33,8 +33,7 @@ class Client(object):
         return self.client_obj.secret_key
 
     def get_storage(self):
-        storage = Storage(settings.BACKTRAC_BACKUP_ROOT)
-        return ClientStorage(storage, self.client_obj)
+        return Storage(settings.BACKTRAC_BACKUP_ROOT)
 
     def get_paths(self):
         return [ p.path for p in self.client_obj.filepaths.all() ]

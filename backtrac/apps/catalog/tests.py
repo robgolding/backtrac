@@ -11,7 +11,7 @@ from django.core.urlresolvers import reverse
 from django.test import TestCase
 from django.contrib.auth.models import User
 
-from backtrac.server.storage import Storage, ClientStorage
+from backtrac.server.storage import Storage
 from backtrac.apps.clients.models import Client
 from backtrac.apps.catalog.models import Item, Version, RestoreJob, \
         get_or_create_item
@@ -210,10 +210,10 @@ class DownloadVersionTest(TestCase):
                                               item=self.item, mtime=123,
                                               size=456)
 
-        self.storage = ClientStorage(Storage(settings.BACKTRAC_BACKUP_ROOT),
-                                     self.client_obj)
+        self.storage = Storage(settings.BACKTRAC_BACKUP_ROOT)
 
-        _, fd = self.storage.add(self.item.path, self.version.id)
+        _, fd = self.storage.put(self.client_obj.hostname, self.item.path,
+                                 self.version.id)
         fd.write(self.FILE_CONTENTS)
         fd.close()
 
@@ -258,10 +258,10 @@ class RestoreVersionTest(TestCase):
                                                size=456,
                                                restored_from=self.version1)
 
-        self.storage = ClientStorage(Storage(settings.BACKTRAC_BACKUP_ROOT),
-                                     self.client_obj)
+        self.storage = Storage(settings.BACKTRAC_BACKUP_ROOT)
 
-        _, fd = self.storage.add(self.item.path, self.version1.id)
+        _, fd = self.storage.put(self.client_obj.hostname, self.item.path,
+                                 self.version1.id)
         fd.write(self.FILE_CONTENTS)
         fd.close()
 
