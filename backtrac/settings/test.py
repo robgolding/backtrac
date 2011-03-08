@@ -8,3 +8,5 @@ DATABASES = {
         'PORT': '',
     }
 }
+
+BACKTRAC_BACKUP_ROOT = '/tmp/backtrac/test/backups/'

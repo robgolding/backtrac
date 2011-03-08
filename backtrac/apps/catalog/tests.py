@@ -1,14 +1,19 @@
 """
 Tests for the `catalog' application.
 """
-import uuid, random
+import os
+import uuid
+import shutil
+import random
 
+from django.conf import settings
+from django.core.urlresolvers import reverse
 from django.test import TestCase
+from django.contrib.auth.models import User
 
+from backtrac.server.storage import Storage, ClientStorage
 from backtrac.apps.clients.models import Client
 from backtrac.apps.catalog.models import Item, Version, get_or_create_item
-
-#TODO: Write a test for the download_version view
 
 class ItemPathTest(TestCase):
     def setUp(self):
@@ -147,3 +152,83 @@ class ResolveOriginalVersionTest(TestCase):
         """
         for v in self.versions:
             self.assertEqual(v.resolve_original(), self.original)
+
+class BrowseRouteTest(TestCase):
+    def setUp(self):
+        """
+        Create a test user, and an Item to retrieve with the browse_route view.
+        """
+        User.objects.create_user('test', 'test@test.com', 'test')
+
+        self.client_obj = Client.objects.create(hostname='test', secret_key='')
+        self.item, _ = get_or_create_item(self.client_obj, '/test/item', 'f')
+        self.version = Version.objects.create(id=str(uuid.uuid4()),
+                                              item=self.item, mtime=123,
+                                              size=456)
+
+    def test_browse_route_view_file(self):
+        """
+        Test that the browse_route view returns a response with the correct
+        context when viewing a file.
+        """
+        self.client.login(username='test', password='test')
+
+        response = self.client.get(self.item.get_absolute_url())
+
+        self.assertEqual(response.context['item'], self.item)
+        self.assertEqual(list(response.context['versions']), [self.version])
+
+    def test_browse_route_browse_directory(self):
+        """
+        Test that the browse_route view returns a response with the correct
+        context when browsing a directory.
+        """
+        self.client.login(username='test', password='test')
+
+        response = self.client.get(self.item.parent.get_absolute_url())
+
+        self.assertEqual(response.context['item'], self.item.parent)
+        self.assertEqual(list(response.context['item'].children.all()),
+                         list(self.item.parent.children.all()))
+
+class DownloadVersionTest(TestCase):
+    FILE_CONTENTS = "This is a test file"
+
+    def setUp(self):
+        """
+        Create a test user, item and version, then put a file into the storage
+        system for that version.
+        """
+        User.objects.create_user('test', 'test@test.com', 'test')
+
+        self.client_obj = Client.objects.create(hostname='test', secret_key='')
+        self.item, _ = get_or_create_item(self.client_obj, '/test/item', 'f')
+        self.version = Version.objects.create(id=str(uuid.uuid4()),
+                                              item=self.item, mtime=123,
+                                              size=456)
+
+
+        self.storage = ClientStorage(Storage(settings.BACKTRAC_BACKUP_ROOT),
+                                     self.client_obj)
+
+        _, fd = self.storage.add(self.item.path, self.version.id)
+        fd.write(self.FILE_CONTENTS)
+        fd.close()
+
+    def test_download_version(self):
+        """
+        Test that the download_version view returns the correct file from the
+        storage subsystem.
+        """
+        self.client.login(username='test', password='test')
+
+        response = self.client.get(reverse('catalog_download_version',
+                                           args=[self.version.id]))
+
+        self.assertEqual(response.content, self.FILE_CONTENTS)
+
+    def tearDown(self):
+        """
+        Remove the test storage directory we created earlier.
+        """
+        shutil.rmtree(settings.BACKTRAC_BACKUP_ROOT)
