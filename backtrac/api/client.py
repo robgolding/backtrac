@@ -2,7 +2,7 @@ import datetime
 
 from django.conf import settings
 
-from backtrac.server.storage import Storage
+from backtrac.apps.core.models import GlobalExclusion
 from backtrac.apps.clients import models as client_models
 from backtrac.apps.clients.models import client_connected, client_disconnected
 from backtrac.apps.catalog.models import Item, Version, Event, RestoreJob, \
@@ -32,9 +32,6 @@ class Client(object):
     def get_key(self):
         return self.client_obj.secret_key
 
-    def get_storage(self):
-        return Storage(settings.BACKTRAC_BACKUP_ROOT)
-
     def get_paths(self):
         return [ p.path for p in self.client_obj.filepaths.all() ]
 
@@ -55,9 +52,10 @@ class Client(object):
         return items
 
     def is_excluded(self, path):
-        return any([
-            e.get_regex().match(path) for e in self.client_obj.exclusions.all()
-        ])
+        exclusions = list(self.client_obj.exclusions.all()) + \
+                list(GlobalExclusion.objects.all())
+
+        return any([ e.get_regex().match(path) for e in exclusions ])
 
     def create_item(self, path, type):
         item_created.send(sender=self.client_obj, path=path, type=type,

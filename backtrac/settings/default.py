@@ -121,11 +121,12 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     'django.contrib.admindocs',
     'django.contrib.contenttypes',
-    
+
     # backtrac apps
     'backtrac.apps.core',
     'backtrac.apps.catalog',
     'backtrac.apps.clients',
+    'backtrac.api',
     'backtrac.apps.timeseries',
 )
 

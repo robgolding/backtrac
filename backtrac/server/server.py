@@ -17,6 +17,7 @@ from twisted.internet import defer
 
 from django.conf import settings
 
+from backtrac.server.storage import Storage
 from backtrac.api.client import Client, get_client
 from backtrac.utils.transfer import PageCollector, TransferPager
 
@@ -49,6 +50,7 @@ class BackupServer(object):
     def __init__(self, port=8123):
         self.port = port
         self.clients = {}
+        self.storage = Storage(settings.BACKTRAC_BACKUP_ROOT)
 
         realm = BackupRealm()
         realm.server = self
@@ -95,7 +97,6 @@ class BackupClient(pb.Avatar):
     def __init__(self, client_api, server):
         self.api = client_api
         self.server = server
-        self.storage = client_api.get_storage()
 
     def attached(self, mind):
         self.remote = mind
@@ -129,14 +130,16 @@ class BackupClient(pb.Avatar):
             self.api.delete_item(path)
 
     def perspective_put_file(self, path, mtime, size):
-        version_id, fdst = self.storage.put(self.api.get_hostname(), path)
+        version_id, fdst = self.server.storage.put(self.api.get_hostname(),
+                                                   path)
         collector = PageCollector(fdst)
         self.api.update_item(path, mtime, size, version_id)
         return collector
 
     def restore_file(self, restore_id, path, version_id):
         def _restore(collector, path, version_id):
-            fd = self.storage.get(self.api.get_hostname(), path, version_id)
+            fd = self.server.storage.get(self.api.get_hostname(), path,
+                                         version_id)
             pager = TransferPager(collector, fd)
             pager.wait()
             print 'Restore %d complete' % restore_id
