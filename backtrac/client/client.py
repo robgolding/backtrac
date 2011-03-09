@@ -5,6 +5,7 @@ from twisted import cred
 from twisted.spread import pb
 from twisted.python import failure
 from twisted.internet import defer, reactor
+from twisted.internet.task import LoopingCall
 from twisted.python.filepath import FilePath
 
 from django.conf import settings
@@ -12,20 +13,27 @@ from django.conf import settings
 from backtrac.client import utils
 from backtrac.client.broker import BackupBroker
 from backtrac.client.job import BackupJob
-from backtrac.client.queue import BackupQueue, TransferQueue
+from backtrac.client.queue import BackupQueue, TransferQueue, QueueManager
 from backtrac.client.platform import FileSystemMonitor
 from backtrac.utils import makedirs
 from backtrac.utils.transfer import PageCollector
 
 from backtrac.apps.catalog.utils import normpath
 
+BACKUP_QUEUE_SLOTS = 5
+TRANSFER_QUEUE_SLOTS = 5
+
 class ClientError(Exception): pass
 
 class BackupClient(pb.Referenceable):
     def __init__(self, broker):
         self.broker = broker
-        self.backup_queue = BackupQueue(self)
-        self.transfer_queue = TransferQueue(self)
+        self.backup_queue = QueueManager(
+            [ BackupQueue(self) for i in range(BACKUP_QUEUE_SLOTS) ]
+        )
+        self.transfer_queue = QueueManager(
+            [ TransferQueue(self) for i in range(TRANSFER_QUEUE_SLOTS) ]
+        )
         self.monitor = FileSystemMonitor(self.backup_queue)
 
     @defer.inlineCallbacks

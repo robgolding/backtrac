@@ -10,12 +10,14 @@ class ConsumerQueue(object):
     def __init__(self, stop_on_error=False):
         self.stop_on_error = stop_on_error
         self.queue = DeferredQueue()
+        self.size = 0
 
     def _consume_next(self, *args):
+        self.size -= 1
         self.queue.get().addCallbacks(self._consumer, self._error)
 
-    def _consumer(self, obj):
-        r = self.consume(obj)
+    def _consumer(self, item):
+        r = self.consume(item)
         if isinstance(r, Deferred):
             r.addCallbacks(self._consume_next, self._consume_next)
         else:
@@ -26,10 +28,11 @@ class ConsumerQueue(object):
         if not self.stop_on_error:
             self._consume_next()
 
-    def add(self, filepath):
-        self.queue.put(filepath)
+    def add(self, item):
+        self.size += 1
+        self.queue.put(item)
 
-    def consume(self, obj):
+    def consume(self, item):
         raise NotImplementedError
 
     def fail(self, fail):
@@ -103,3 +106,18 @@ class TransferQueue(BackupQueue):
             print '%s, %d bytes' % (filepath.path, filepath.getsize())
         except (OSError, IOError):
             pass
+
+class QueueManager(object):
+    def __init__(self, queues):
+        self.queues = queues
+
+    def add(self, item):
+        queue = min(self.queues, key=lambda q:q.size)
+        queue.add(item)
+
+    def start(self):
+        for queue in self.queues:
+            queue.start()
+
+    def get_size(self):
+        return sum([ queue.size for queue in self.queues ])
