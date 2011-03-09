@@ -4,6 +4,8 @@ from twisted.python.filepath import FilePath
 from backtrac.utils.transfer import TransferPager
 from backtrac.client.job import BackupJob
 
+QUEUE_TIMEOUT_SECONDS = 120
+
 class ConsumerQueue(object):
     def __init__(self, stop_on_error=False):
         self.stop_on_error = stop_on_error
@@ -13,8 +15,11 @@ class ConsumerQueue(object):
         self.queue.get().addCallbacks(self._consumer, self._error)
 
     def _consumer(self, obj):
-        self.consume(obj)
-        self._consume_next()
+        r = self.consume(obj)
+        if isinstance(r, Deferred):
+            r.addCallbacks(self._consume_next, self._consume_next)
+        else:
+            self._consume_next()
 
     def _error(self, fail):
         self.error(fail)
@@ -42,7 +47,7 @@ class BackupQueue(ConsumerQueue):
         # don't do anything if a file is created, as the server handles this as
         # an 'update'
         if filepath.isdir():
-            self.client.broker.create_item(filepath.path, 'd')
+            return self.client.broker.create_item(filepath.path, 'd')
 
     def consume_update(self, filepath):
         try:
@@ -50,20 +55,21 @@ class BackupQueue(ConsumerQueue):
             size = filepath.getsize()
             d = self.client.broker.check_file(filepath.path, mtime, size)
             d.addCallback(self._check_result, filepath.path)
+            return d
         except (OSError, IOError):
             pass
 
     def consume_delete(self, filepath):
         print '%s deleted' % filepath.path
-        self.client.broker.delete_item(filepath.path)
+        return self.client.broker.delete_item(filepath.path)
 
     def consume(self, job):
         if job.type == BackupJob.CREATE:
-            self.consume_create(job.filepath)
+            return self.consume_create(job.filepath)
         elif job.type == BackupJob.UPDATE:
-            self.consume_update(job.filepath)
+            return self.consume_update(job.filepath)
         elif job.type == BackupJob.DELETE:
-            self.consume_delete(job.filepath)
+            return self.consume_delete(job.filepath)
 
     def error(self, fail):
         print fail
@@ -79,17 +85,21 @@ class TransferQueue(BackupQueue):
             size = filepath.getsize()
         except (OSError, IOError):
             return
-        d = self.client.broker.put_file(filepath.path, mtime, size)
-        d.addCallback(self._transfer, filepath)
+        d = Deferred()
+        self.client.broker.put_file(filepath.path, mtime, size).addCallback(
+            self._transfer, filepath, d
+        )
+        return d
 
     def error(self, fail):
         print fail
 
-    def _transfer(self, collector, filepath):
+    def _transfer(self, collector, filepath, d=None):
         try:
             fd = open(filepath.path, 'rb')
             pager = TransferPager(collector, fd)
-            pager.wait()
+            if d is not None:
+                pager.wait().chainDeferred(d)
             print '%s, %d bytes' % (filepath.path, filepath.getsize())
         except (OSError, IOError):
             pass
