@@ -126,7 +126,7 @@ class BackupClient(pb.Avatar):
             self.api.create_item(path, type)
 
     def perspective_delete_item(self, path):
-        if not self.api.is_excluded(self):
+        if not self.api.is_excluded(path):
             self.api.delete_item(path)
 
     def perspective_put_file(self, path, mtime, size):

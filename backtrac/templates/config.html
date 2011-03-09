@@ -6,7 +6,7 @@
     <script language="javascript">
         $(function() {
             $("#exclusions ul.formset-list li").formset({
-                formCssClass: 'filepaths-dynamic-form',
+                prefix: '{{ exclusion_formset.prefix }}',
                 addCssClass: 'add-row button small',
                 addText: '<img src="{{ STATIC_URL }}img/icons/famfamfam/add.png" /\> add another</a>',
                 deleteCssClass: 'delete-row',
@@ -33,9 +33,9 @@
                                 {% endfor %}
                                 <li>
                                     {{ form.glob }}&nbsp;
-                                    {% if form.path.errors %}
+                                    {% if form.glob.errors %}
                                         <span class="error">
-                                        ({{ form.path.errors.0 }})
+                                        ({{ form.glob.errors.0 }})
                                         </span>
                                     {% endif %} 
                                 </li>
@@ -44,7 +44,7 @@
                     </div>
                     <button type="submit" class="button">
                         <img src="{{ STATIC_URL }}css/blueprint/plugins/buttons/icons/tick.png" />
-                        Save Configuration
+                        Save
                     </button>
                     <a class="button" href="{% url dashboard %}">
                         <img src="{{ STATIC_URL }}css/blueprint/plugins/buttons/icons/cross.png" />

@@ -2,6 +2,6 @@ from django import forms
 from django.forms.formsets import BaseFormSet, formset_factory
 
 class ExclusionForm(forms.Form):
-    glob = forms.CharField(max_length=255)
+    glob = forms.CharField(max_length=255, required=False)
 
-ExclusionFormSet = formset_factory(ExclusionForm, formset=BaseFormSet, extra=1)
+ExclusionFormSet = formset_factory(ExclusionForm, formset=BaseFormSet, extra=0)

@@ -1,3 +1,4 @@
+import os
 import datetime
 
 from django.conf import settings
@@ -52,10 +53,11 @@ class Client(object):
         return items
 
     def is_excluded(self, path):
+        _, basename = os.path.split(path)
         exclusions = list(self.client_obj.exclusions.all()) + \
                 list(GlobalExclusion.objects.all())
 
-        return any([ e.get_regex().match(path) for e in exclusions ])
+        return any([ e.get_regex().match(basename) for e in exclusions ])
 
     def create_item(self, path, type):
         item_created.send(sender=self.client_obj, path=path, type=type,
@@ -84,7 +86,8 @@ class Client(object):
         return True
 
     def get_pending_restore_jobs(self):
-        jobs = self.client_obj.restores.filter(started_at=None, completed_at=None)
+        jobs = self.client_obj.restores.filter(started_at=None,
+                                               completed_at=None)
         return [
             (job.id, job.version.item.path, job.version.id) for job in jobs
         ]
