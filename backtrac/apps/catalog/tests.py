@@ -250,18 +250,14 @@ class RestoreVersionTest(TestCase):
 
         self.client_obj = Client.objects.create(hostname='test', secret_key='')
         self.item, _ = get_or_create_item(self.client_obj, self.RESTORE_PATH, 'f')
-        self.version1 = Version.objects.create(id=str(uuid.uuid4()),
-                                               item=self.item, mtime=123,
-                                               size=456)
-        self.version2 = Version.objects.create(id=str(uuid.uuid4()),
-                                               item=self.item, mtime=123,
-                                               size=456,
-                                               restored_from=self.version1)
+        self.version = Version.objects.create(id=str(uuid.uuid4()),
+                                              item=self.item, mtime=123,
+                                              size=456)
 
         self.storage = Storage(settings.BACKTRAC_BACKUP_ROOT)
 
         _, fd = self.storage.put(self.client_obj.hostname, self.item.path,
-                                 self.version1.id)
+                                 self.version.id)
         fd.write(self.FILE_CONTENTS)
         fd.close()
 
@@ -273,13 +269,14 @@ class RestoreVersionTest(TestCase):
         self.client.login(username='test', password='test')
 
         response = self.client.get(reverse('catalog_restore_version',
-                                           args=[self.version2.id]))
+                                           args=[self.version.id]))
 
         self.assertEqual(response.status_code, 302)
 
-        restore_job = RestoreJob.objects.get(client=self.client_obj)
+        jobs = RestoreJob.objects.filter(client=self.client_obj,
+                                         version=self.version)
 
-        self.assertEqual(restore_job.version.id, self.version1.id)
+        self.assertEqual(len(jobs), 1)
 
     def tearDown(self):
         """

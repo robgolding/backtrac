@@ -88,9 +88,13 @@ class Client(object):
     def get_pending_restore_jobs(self):
         jobs = self.client_obj.restores.filter(started_at=None,
                                                completed_at=None)
-        return [
-            (job.id, job.version.item.path, job.version.id) for job in jobs
-        ]
+        result = []
+        for job in jobs:
+            # resolve the original version, to get the correct version ID for
+            # pulling out of the storage subsystem
+            version = job.version.resolve_original()
+            result.append((job.id, version.item.path, version.id))
+        return result
 
     def restore_begin(self, restore_id):
         try:
