@@ -1,3 +1,4 @@
 -e svn+http://code.djangoproject.com/svn/django/trunk#egg=Django
 twisted==10.2.0
 pyinotify
+-e git+http://github.com/robgolding63/python-magic#egg=magic

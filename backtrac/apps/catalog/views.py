@@ -14,6 +14,7 @@ from backtrac.server.storage import Storage
 from backtrac.apps.clients.models import Client
 from backtrac.apps.catalog.models import Item, Version, Event, RestoreJob
 from backtrac.apps.catalog.utils import normpath
+from backtrac.utils import get_mimetype
 
 @login_required
 def browse_catalog(request, template_name='catalog/browse.html'):
@@ -95,24 +96,28 @@ def download_version(request, version_id, view_file=True):
     storage = Storage(settings.BACKTRAC_BACKUP_ROOT)
 
     f = storage.get(item.client.hostname, item.path, version.id)
-    contents = f.read()
-    mimetype, encoding = mimetypes.guess_type(item.name)
-    mimetype = mimetype or 'application/octet-stream'
-    content_disposition = 'filename=%s' % item.name
-    if not view_file:
-        content_disposition = 'attachment; ' + content_disposition
 
-    response = HttpResponse(FileWrapper(f), content_type=mimetype)
-    response = HttpResponse(contents, mimetype=mimetype)
-    response['Content-Length'] = len(contents)
-    response['Content-Disposition'] = content_disposition
-    if encoding:
-        response['Content-Encoding'] = encoding
+    mimetype = get_mimetype(f)
+    contents = f.read()
+
+    #TODO: Fix this so we don't have to load the file into memory first
+    #response = HttpResponse(FileWrapper(f))
+    response = HttpResponse(contents)
+
+    if view_file and mimetype.startswith('text/'):
+        response['Content-Disposition'] = 'inline'
+        response['Content-Transfer-Encoding'] = 'binary'
+        response['Content-Type'] = 'text/plain'
+    else:
+        response['Content-Disposition'] = 'attachment; filename=%s' % item.name
+        response['Content-Length'] = len(contents)
+        response['Content-Type'] = 'application/octet-stream'
+
     return response
 
 @login_required
 def restore_version(request, version_id):
-    version = get_object_or_404(Version, id=version_id).resolve_original()
+    version = get_object_or_404(Version, id=version_id)
     RestoreJob.objects.create(client=version.item.client, version=version)
     messages.success(request, 'File \'%s\' queued for restoration to %s' % \
                      (version.item.name, version.item.client.hostname))
