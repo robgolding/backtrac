@@ -68,6 +68,7 @@ class Item(models.Model):
         return self.path
 
     class Meta:
+        ordering = ['name']
         unique_together = (
             ('client', 'path'),
             ('parent', 'name'),

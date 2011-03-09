@@ -75,7 +75,7 @@ def browse_directory(request, client, item,
     else:
         items = items.filter(parent=item)
 
-    items = items.select_related('client', 'latest_version')
+    items = items.select_related('client', 'latest_version').order_by('name')
     events = Event.objects.filter(item__client=client).select_related()[:10]
 
     data = {
@@ -109,9 +109,10 @@ def download_version(request, version_id, view_file=True):
         response['Content-Transfer-Encoding'] = 'binary'
         response['Content-Type'] = 'text/plain'
     else:
-        response['Content-Disposition'] = 'attachment; filename=%s' % item.name
+        response['Content-Disposition'] = '%sfilename=%s' % \
+                ('attachment; ' if not view_file else '', item.name)
         response['Content-Length'] = len(contents)
-        response['Content-Type'] = 'application/octet-stream'
+        response['Content-Type'] = mimetype
 
     return response
 
