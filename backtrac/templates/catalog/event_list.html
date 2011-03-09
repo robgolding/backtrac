@@ -8,7 +8,7 @@
                 <a class="button" href=""><img src="{{ STATIC_URL }}img/icons/famfamfam/arrow_refresh.png" /> Refresh</a>
                 {% if is_paginated %}
                 <div class="pagination">
-                <p>Page {{ page_obj.number }} of {{ paginator.num_pages }} - </p>
+                    <p>{{ paginator.count }} events, page {{ page_obj.number }} of {{ paginator.num_pages }} - </p>
                 <ul>
                     {% if has_previous %}
                     {% if page_obj.number > 3 %}
@@ -20,7 +20,7 @@
                         {% if number == page_obj.number %}
                             <li class="active">{{ number }}</li>
                         {% else %}
-                            {% if number <= page_obj.number|add:'2' and number >= page_obj.number|add:'-2' or number|divisibleby:"10" %}
+                            {% if number <= page_obj.number|add:'2' and number >= page_obj.number|add:'-2' %}
                                 <li><a href="{% url catalog_event_list_page number %}" title="Page {{ number }}">{{ number }}</a></li>
                             {% endif %}
                         {% endif %}
