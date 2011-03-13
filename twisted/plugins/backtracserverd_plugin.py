@@ -37,8 +37,9 @@ class ServerServiceMaker(object):
         config = options['config']
         cp = self.getConfig(config)
         try:
+            ip = cp.get('backtracserverd', 'listen_ip')
             port = cp.getint('backtracserverd', 'listen_port')
-            server = BackupServer(port=port)
+            server = BackupServer(ip=ip, port=port)
             return server.service
         except ConfigParser.Error:
             print >> sys.stderr, 'Error parsing config file:', config

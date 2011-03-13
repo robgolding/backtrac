@@ -63,6 +63,7 @@ class ServerServiceMaker(object):
         config = options['config']
         cp = self.getConfig(config)
         try:
+            ip = cp.get('backtracweb', 'listen_ip')
             port = cp.getint('backtracweb', 'listen_port')
             #application = service.Application('backtracweb')
 
@@ -84,7 +85,7 @@ class ServerServiceMaker(object):
 
             # create the site and a TCPServer service to serve it with
             site = server.Site(root)
-            ws = internet.TCPServer(port, site)
+            ws = internet.TCPServer(port, site, interface=ip)
 
             # add the web server service to the multi service
             ws.setServiceParent(multi)

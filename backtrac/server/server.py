@@ -47,7 +47,7 @@ class BackupClientAuthChecker:
                                            client)
 
 class BackupServer(object):
-    def __init__(self, port=8123):
+    def __init__(self, ip='0.0.0.0', port=8123):
         self.port = port
         self.clients = {}
         self.storage = Storage(settings.BACKTRAC_BACKUP_ROOT)
@@ -57,7 +57,7 @@ class BackupServer(object):
         checker = BackupClientAuthChecker()
         self.portal = portal.Portal(realm, [checker])
         self.factory = PBServerFactory(self.portal)
-        self.service = TCPServer(self.port, self.factory)
+        self.service = TCPServer(self.port, self.factory, interface=ip)
         self.restore_loop = LoopingCall(self.execute_pending_restores)
         self.restore_loop.start(5)
 
