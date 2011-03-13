@@ -18,7 +18,7 @@ from django.core.handlers.wsgi import WSGIHandler
 
 class Options(usage.Options):
     optParameters = (
-        ('config', '', '/etc/backtrac/backtracserverd.conf',
+        ('config', '', '/etc/backtrac/server.conf',
          'Config file', str),
     )
 

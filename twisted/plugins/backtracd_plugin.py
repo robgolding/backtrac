@@ -12,7 +12,7 @@ from backtrac.client import BackupClient
 
 class Options(usage.Options):
     optParameters = (
-        ('config', '', '/etc/backtrac/backtracd.conf',
+        ('config', '', '/etc/backtrac/client.conf',
          'Config file', str),
     )
 
