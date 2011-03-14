@@ -18,7 +18,7 @@ class BackupBroker(pb.Referenceable):
         self.secret_key = secret_key
         self.connected = False
         self.factory = pb.PBClientFactory()
-        self.service = TCPClient(self.hostname, self.port, self.factory)
+        self.service = TCPClient(self.server, self.port, self.factory)
 
     def get_paths(self):
         return self.perspective.callRemote('get_paths')
