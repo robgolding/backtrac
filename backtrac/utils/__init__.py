@@ -1,6 +1,7 @@
 import os
 import uuid
 import magic
+import hashlib
 
 def generate_version_id():
     return str(uuid.uuid4())
@@ -20,3 +21,17 @@ def get_mimetype(fd):
     mime = magic.from_buffer(fd.read(1024), mime=True)
     fd.seek(pos)
     return mime
+
+def get_file_hash(filename):
+    """
+    Get the MD5 digest for the file at `filename'. Reads the file in chunks so
+    the whole thing doesn't have to be loaded into memory first.
+    """
+    f = open(filename, 'rb')
+    md5 = hashlib.md5()
+    while True:
+        data = f.read(128)
+        if not data:
+            break
+        md5.update(data)
+    return md5.digest()

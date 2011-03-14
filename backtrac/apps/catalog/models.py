@@ -80,6 +80,7 @@ class Version(models.Model):
     backed_up_at = models.DateTimeField(auto_now_add=True, db_index=True)
     mtime = models.IntegerField('Modified time')
     size = models.BigIntegerField()
+    hash = models.CharField(max_length=36, null=True, blank=True)
     restored_from = models.ForeignKey('self', null=True, blank=True, db_index=True)
 
     def is_restored(self):
