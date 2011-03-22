@@ -6,6 +6,8 @@ from backtrac.apps.clients.models import Client
 
 from backtrac.apps.catalog.models import Event
 from backtrac.apps.catalog import views
+from backtrac.apps.catalog.forms import RestoreWizard, RestoreForm1, \
+        RestoreForm2
 
 urlpatterns = patterns('',
 
@@ -35,7 +37,8 @@ urlpatterns = patterns('',
                         'view_file': True,},
                     name='catalog_view_version'),
 
-    url(r'^restore/(?P<version_id>[\w-]+)/$', views.restore_version,
+    url(r'^restore/(?P<version_id>[\w-]+)/$', RestoreWizard([RestoreForm1,
+                                                             RestoreForm2]),
                     name='catalog_restore_version'),
 
 )

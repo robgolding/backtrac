@@ -1,0 +1,58 @@
+{% extends 'catalog/browse_base.html' %}
+
+{% block content %}
+    <script language="javascript">
+        $(function() { });
+    </script>
+    <div class="container">
+        <section class="span-18">
+            <h1>Restore {{ item.name }}</h1>
+            <div class="content clearfix">
+                <form action="" method="post" class="standard-form">{% csrf_token %}
+                    <h2>Step {{ step }} of {{ step_count }}</h2>
+                    <input type="hidden" name="{{ step_field }}" value="{{ step0 }}" />
+                    {% for error in form.non_field_errors %}
+                        <p class="error">{{ error }}</p>
+                    {% endfor %}
+                    {% for field in form %}
+                        {% if field.is_hidden %}
+                            {{ field }}
+                        {% else %}
+                            <div class="field-wrapper clearfix">
+                                {{ field.label_tag }}<br />
+                                <div class="field">{{ field }}</div>
+                                <div class="field-errors">  
+                                    {% if field.errors %}
+                                        <span class="error">{{ field.errors.0 }}</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                    {{ previous_fields|safe }}
+                    <a href="{{ item.get_absolute_url }}" class="button">
+                        <img src="{{ STATIC_URL }}css/blueprint/plugins/buttons/icons/cross.png" />
+                        Cancel
+                    </a>
+                    <button type="submit" class="button" style="float: right;">
+                        {% if step == step_count %}
+                            <img src="{{ STATIC_URL }}css/blueprint/plugins/buttons/icons/tick.png" />
+                            Restore
+                        {% else %}
+                            <img src="{{ STATIC_URL }}img/icons/famfamfam/arrow_right.png" />
+                            Next
+                        {% endif %}
+                    </button>
+                </form>
+            </div>
+        </section>
+        <section class="span-6 last">
+            <h1>Help</h1>
+            <div class="content">
+                <p>
+                    Some tips here...
+                </p>
+            </div>
+        </section>
+    </div>
+{% endblock %}
