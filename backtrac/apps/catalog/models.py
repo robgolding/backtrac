@@ -112,9 +112,11 @@ class Event(models.Model):
         get_latest_by = 'occurred_at'
 
 class RestoreJob(models.Model):
-    client = models.ForeignKey('clients.Client', related_name='restores',
-                               db_index=True)
     version = models.ForeignKey(Version, db_index=True)
+    destination_client = models.ForeignKey('clients.Client',
+                                           related_name='restores',
+                                           db_index=True)
+    destination_path = models.CharField(max_length=255, db_index=True)
     created_at = models.DateTimeField(auto_now_add=True)
     started_at = models.DateTimeField(null=True, blank=True, db_index=True)
     completed_at = models.DateTimeField(null=True, blank=True, db_index=True)
@@ -136,7 +138,9 @@ class RestoreJob(models.Model):
                 status = 'complete'
             else:
                 status = 'in progress'
-        return 'Restore %s to %s (%s)' % (self.version, self.client, status)
+        return 'Restore %s to %s (%s)' % (self.version,
+                                          self.destination_client,
+                                          status)
 
 @dispatch.receiver(pre_save, sender=Item)
 def update_item(sender, instance=None, **kwargs):
