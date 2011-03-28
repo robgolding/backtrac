@@ -54,9 +54,11 @@ class BackupQueue(ConsumerQueue):
 
     def consume_update(self, filepath):
         try:
-            mtime = filepath.getModificationTime()
-            size = filepath.getsize()
-            d = self.client.broker.check_file(filepath.path, mtime, size)
+            attrs = {
+                'mtime': filepath.getModificationTime(),
+                'size': filepath.getsize(),
+            }
+            d = self.client.broker.check_file(filepath.path, attrs)
             d.addCallback(self._check_result, filepath.path)
             return d
         except (OSError, IOError):

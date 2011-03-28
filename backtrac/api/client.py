@@ -40,17 +40,22 @@ class Client(object):
         return [ excl.glob for excl in self.client_obj.exclusions.all() ]
 
     def get_present_state(self, path):
-        def get_children(item, items):
-            items.append(item.path)
-            for i in item.children.present():
-                get_children(i, items)
-        items = []
+        def get_children(item, index):
+            attrs = {}
+            if item.latest_version:
+                attrs['mtime'] = item.latest_version.mtime
+                attrs['size'] = item.latest_version.size
+            index[item.path] = attrs
+            for i in item.children.present().select_related('latest_version'):
+                get_children(i, index)
+        index = {}
+        qs = []
         try:
             item = Item.objects.get(client=self.client_obj, path=path)
-            get_children(item, items)
+            get_children(item, index)
         except Item.DoesNotExist:
             pass
-        return items
+        return index
 
     def is_excluded(self, path):
         _, basename = os.path.split(path)
@@ -72,15 +77,33 @@ class Client(object):
         item_deleted.send(sender=self.client_obj, path=path,
                           client=self.client_obj)
 
-    def backup_required(self, path, mtime, size):
+    def compare_attrs(self, old_attrs, new_attrs):
+        #TODO add a configurable tolerance for these values
+        diff = 0
+        if 'mtime' in old_attrs and 'mtime' in new_attrs:
+            if abs(old_attrs['mtime'] - new_attrs['mtime']) > 1:
+                diff += 1
+        if 'size' in old_attrs and 'size' in new_attrs:
+            if abs(old_attrs['size'] - new_attrs['size']) > 1:
+                diff += 2
+        return diff
+
+    def backup_required(self, path, attrs):
         try:
             item = Item.objects.get(client=self.client_obj, path=path)
             if not item.latest_version or item.deleted:
                 return True
-            if abs(size - item.latest_version.size) < 1:
-                if item.latest_version.is_restored() or \
-                   abs(mtime - item.latest_version.mtime) < 1:
-                    return False
+            new_attrs = {
+                'mtime': item.latest_version.mtime,
+                'size': item.latest_version.size
+            }
+            diff = self.compare_attrs(attrs, new_attrs)
+            if diff == 0:
+                return False
+            elif diff < 2 and item.latest_version.is_restored():
+                return False
+            else:
+                return True
         except Item.DoesNotExist:
             pass
         return True

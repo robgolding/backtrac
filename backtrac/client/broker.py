@@ -26,8 +26,11 @@ class BackupBroker(pb.Referenceable):
     def get_present_state(self, path):
         return self.perspective.callRemote('get_present_state', path)
 
-    def check_file(self, path, mtime, size):
-        return self.perspective.callRemote('check_file', path, mtime, size)
+    def check_index(self, path, index):
+        return self.perspective.callRemote('check_index', path, index)
+
+    def check_file(self, path, attrs):
+        return self.perspective.callRemote('check_file', path, attrs)
 
     def delete_item(self, path):
         return self.perspective.callRemote('delete_item', path)

@@ -114,11 +114,23 @@ class BackupClient(pb.Avatar):
         return self.api.get_paths()
 
     def perspective_get_present_state(self, path):
-        return self.api.get_present_state(path)
+        index = self.api.get_present_state(path)
+        return index.keys()
 
-    def perspective_check_file(self, path, mtime, size):
+    def perspective_check_index(self, path, cur_index):
+        old_index = self.api.get_present_state(path)
+        backup = []
+        for path, attrs in cur_index.items():
+            if not path in old_index:
+                backup.append(path)
+            else:
+                if self.api.compare_attrs(old_index[path], attrs) > 0:
+                    backup.append(path)
+        return backup
+
+    def perspective_check_file(self, path, attrs):
         if not self.api.is_excluded(path):
-            return self.api.backup_required(path, mtime, size)
+            return self.api.backup_required(path, attrs)
         return False
 
     def perspective_create_item(self, path, type):

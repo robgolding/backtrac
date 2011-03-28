@@ -51,6 +51,25 @@ class BackupClient(pb.Referenceable):
                 path = os.path.join(root, f)
                 self.backup_queue.add(BackupJob(path))
 
+    def get_index(self, path):
+        index = {}
+        for root, dirs, files in os.walk(path):
+            index[root] = {}
+            for f in files:
+                path = os.path.join(root, f)
+                filepath = FilePath(path)
+                index[path] = {
+                    'mtime': filepath.getModificationTime(),
+                    'size': filepath.getsize(),
+                }
+        return index
+
+    @defer.inlineCallbacks
+    def check_index(self, path, index):
+        backup = yield self.broker.check_index(path, index)
+        for path in backup:
+            self.backup_queue.add(BackupJob(path))
+
     def remote_put_file(self, path):
         self.monitor.add_exclusion(path)
         makedirs(os.path.split(path)[0])
@@ -69,9 +88,11 @@ class BackupClient(pb.Referenceable):
         paths = yield self.broker.get_paths()
         for path in paths:
             path = normpath(path)
-            self.check_present_state(path)
-            self.walk_path(path)
             self.monitor.add_watch(path)
+            index = self.get_index(path)
+            self.check_present_state(path)
+            self.check_index(path, index)
+            #self.walk_path(path)
 
 def get_server_status():
     broker = BackupBroker(server='localhost', secret_key=settings.SECRET_KEY,
