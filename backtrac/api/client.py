@@ -93,7 +93,12 @@ class Client(object):
             # resolve the original version, to get the correct version ID for
             # pulling out of the storage subsystem
             version = job.version.resolve_original()
-            result.append((job.id, version.item.path, version.id))
+            result.append((
+                    job.id,
+                    job.version.item.path,
+                    version.id,
+                    job.destination_path,
+            ))
         return result
 
     def restore_begin(self, restore_id):

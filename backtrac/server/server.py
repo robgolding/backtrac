@@ -136,22 +136,24 @@ class BackupClient(pb.Avatar):
         self.api.update_item(path, mtime, size, version_id)
         return collector
 
-    def restore_file(self, restore_id, path, version_id):
-        def _restore(collector, path, version_id):
-            fd = self.server.storage.get(self.api.get_hostname(), path,
+    def restore_file(self, restore_id, from_path, version_id, to_path):
+        def _restore(collector):
+            fd = self.server.storage.get(self.api.get_hostname(), from_path,
                                          version_id)
             pager = TransferPager(collector, fd)
-            pager.wait()
+            pager.wait().addCallback(_restore_complete)
+
+        def _restore_complete(collector):
             print 'Restore %d complete' % restore_id
             self.api.restore_complete(restore_id)
 
-        print 'Restoring %s to %s (job %d)' % (path, self.api.get_hostname(),
-                                               restore_id)
+        print 'Restoring %s to %s:%s' % (from_path, self.api.get_hostname(),
+                                       to_path)
         self.api.restore_begin(restore_id)
-        d = self.remote.callRemote('put_file', path)
-        d.addCallback(_restore, path, version_id)
+        d = self.remote.callRemote('put_file', to_path)
+        d.addCallback(_restore)
 
     def execute_pending_restores(self):
         jobs = self.api.get_pending_restore_jobs()
-        for id, path, version_id in jobs:
-            self.restore_file(id, path, version_id)
+        for id, from_path, to_path, version_id in jobs:
+            self.restore_file(id, from_path, to_path, version_id)
