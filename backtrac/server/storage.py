@@ -25,7 +25,9 @@ class Storage(object):
         Calculate a hash of the given file name, which contains only characters
         that are valid on the file system.
         """
-        return hashlib.sha1(name).hexdigest()
+        # encode the filename into ascii so hashlib doesn't shit the bed
+        encoded = name.encode("ascii", "replace")
+        return hashlib.sha1(encoded).hexdigest()
 
     def _get_container(self, bucket, name):
         """
