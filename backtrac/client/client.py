@@ -58,17 +58,22 @@ class BackupClient(pb.Referenceable):
             for f in files:
                 path = os.path.join(root, f)
                 filepath = FilePath(path)
-                index[path] = {
-                    'mtime': filepath.getModificationTime(),
-                    'size': filepath.getsize(),
-                }
+                try:
+                    index[path] = {
+                        'mtime': filepath.getModificationTime(),
+                        'size': filepath.getsize(),
+                    }
+                except OSError:
+                    # file could be a broken symlink, or deleted mid-scan
+                    continue
         return index
 
     @defer.inlineCallbacks
     def check_index(self, path, index):
         backup = yield self.broker.check_index(path, index)
         for path in backup:
-            self.backup_queue.add(BackupJob(path))
+            #self.backup_queue.add(BackupJob(path))
+            self.transfer_queue.add(FilePath(path))
 
     def remote_put_file(self, path):
         self.monitor.add_exclusion(path)
@@ -83,8 +88,6 @@ class BackupClient(pb.Referenceable):
     @defer.inlineCallbacks
     def start(self):
         broker = yield self.broker.connect(client=self)
-        self.backup_queue.start()
-        self.transfer_queue.start()
         paths = yield self.broker.get_paths()
         for path in paths:
             path = normpath(path)
@@ -93,6 +96,8 @@ class BackupClient(pb.Referenceable):
             self.check_present_state(path)
             self.check_index(path, index)
             #self.walk_path(path)
+        self.backup_queue.start()
+        self.transfer_queue.start()
 
 def get_server_status():
     broker = BackupBroker(server='localhost', secret_key=settings.SECRET_KEY,

@@ -53,6 +53,9 @@ class BackupQueue(ConsumerQueue):
             return self.client.broker.create_item(filepath.path, 'd')
 
     def consume_update(self, filepath):
+        if filepath.isdir():
+            # we can't backup a directory
+            return
         try:
             attrs = {
                 'mtime': filepath.getModificationTime(),
@@ -85,10 +88,14 @@ class BackupQueue(ConsumerQueue):
 
 class TransferQueue(BackupQueue):
     def consume(self, filepath):
+        if filepath.isdir():
+            # we can't transfer a directory
+            return
         try:
             mtime = filepath.getModificationTime()
             size = filepath.getsize()
         except (OSError, IOError):
+            # returning will allow the queue to move on
             return
         d = Deferred()
         self.client.broker.put_file(filepath.path, mtime, size).addCallback(
@@ -106,8 +113,11 @@ class TransferQueue(BackupQueue):
             if d is not None:
                 pager.wait().chainDeferred(d)
             print '%s, %d bytes' % (filepath.path, filepath.getsize())
-        except (OSError, IOError):
-            pass
+        except (OSError, IOError) as e:
+            print "Error:", e
+            if d is not None:
+                # make sure we callback, otherwise the queue will stick
+                d.errback(e)
 
 class QueueManager(object):
     def __init__(self, queues):
