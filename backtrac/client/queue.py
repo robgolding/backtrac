@@ -101,8 +101,8 @@ class BackupQueue(ConsumerQueue):
 
 class TransferQueue(BackupQueue):
     def consume(self, filepath):
-        if filepath.isdir():
-            # we can't transfer a directory
+        if not filepath.is_file():
+            # we can't transfer something that isn't a file!
             return
         try:
             mtime = filepath.getModificationTime()
