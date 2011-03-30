@@ -34,6 +34,7 @@ class BackupClient(pb.Referenceable):
         self.transfer_queue = QueueManager(
             [ TransferQueue(self) for i in range(TRANSFER_QUEUE_SLOTS) ]
         )
+        self.startup_queue = TransferQueue(self, empty=self._startup_complete)
         self.monitor = FileSystemMonitor(self.backup_queue)
 
     @defer.inlineCallbacks
@@ -71,9 +72,10 @@ class BackupClient(pb.Referenceable):
     @defer.inlineCallbacks
     def check_index(self, path, index):
         backup = yield self.broker.check_index(path, index)
-        for path in backup:
+        for p in backup:
             #self.backup_queue.add(BackupJob(path))
-            self.transfer_queue.add(FilePath(path))
+            self.startup_queue.add(FilePath(p))
+        print "Indexed %s" % path
 
     def remote_put_file(self, path):
         self.monitor.add_exclusion(path)
@@ -96,8 +98,12 @@ class BackupClient(pb.Referenceable):
             self.check_present_state(path)
             self.check_index(path, index)
             #self.walk_path(path)
+        self.startup_queue.start()
         self.backup_queue.start()
         self.transfer_queue.start()
+
+    def _startup_complete(self):
+        self.startup_queue.stop()
 
 def get_server_status():
     broker = BackupBroker(server='localhost', secret_key=settings.SECRET_KEY,

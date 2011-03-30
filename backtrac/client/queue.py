@@ -7,17 +7,25 @@ from backtrac.client.job import BackupJob
 QUEUE_TIMEOUT_SECONDS = 120
 
 class ConsumerQueue(object):
-    def __init__(self, stop_on_error=False):
+    def __init__(self, stop_on_error=False, empty=None):
         self.stop_on_error = stop_on_error
+        self.empty = empty
         self.queue = DeferredQueue()
         self.size = 0
+        self.running = True
+        self._deferred = Deferred()
 
     def _consume_next(self, *args):
-        self.size -= 1
-        self.queue.get().addCallbacks(self._consumer, self._error)
+        if not self.running:
+            return
+        self._deferred = self.queue.get()
+        self._deferred.addCallbacks(self._consumer, self._error)
 
     def _consumer(self, item):
+        self.size -= 1
         r = self.consume(item)
+        if self.size == 0 and self.empty is not None:
+            self.empty()
         if isinstance(r, Deferred):
             r.addCallbacks(self._consume_next, self._consume_next)
         else:
@@ -35,11 +43,16 @@ class ConsumerQueue(object):
     def consume(self, item):
         raise NotImplementedError
 
-    def fail(self, fail):
+    def error(self, fail):
         raise NotImplementedError
 
     def start(self):
+        self.running = True
         self._consume_next()
+
+    def stop(self):
+        self.running = False
+        self._deferred.cancel()
 
 class BackupQueue(ConsumerQueue):
     def __init__(self, client, *args, **kwargs):
