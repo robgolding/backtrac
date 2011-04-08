@@ -56,6 +56,9 @@ class ServerServiceMaker(object):
                                             'manhole_username')
                     shell.password = cp.get('backtracserverd',
                                             'manhole_password')
+                    shell.namespace = {
+                        'server': server
+                    }
                     manhole = internet.TCPServer(2000, shell)
                     manhole.setServiceParent(multi)
 
