@@ -6,6 +6,8 @@ from zope.interface import implements
 
 from twisted.python import usage
 from twisted.plugin import IPlugin
+from twisted.manhole import telnet
+from twisted.application import internet, service
 from twisted.application.service import IServiceMaker
 
 os.environ['DJANGO_SETTINGS_MODULE'] = 'backtrac.settings'
@@ -40,7 +42,24 @@ class ServerServiceMaker(object):
             ip = cp.get('backtracserverd', 'listen_ip')
             port = cp.getint('backtracserverd', 'listen_port')
             server = BackupServer(ip=ip, port=port)
-            return server.service
+            multi = service.MultiService()
+            server.service.setServiceParent(multi)
+
+            if all([
+                cp.has_option('backtracserverd', 'enable_manhole'),
+                cp.has_option('backtracserverd', 'manhole_username'),
+                cp.has_option('backtracserverd', 'manhole_password'),
+            ]):
+                if cp.getboolean('backtracserverd', 'enable_manhole'):
+                    shell = telnet.ShellFactory()
+                    shell.username = cp.get('backtracserverd',
+                                            'manhole_username')
+                    shell.password = cp.get('backtracserverd',
+                                            'manhole_password')
+                    manhole = internet.TCPServer(2000, shell)
+                    manhole.setServiceParent(multi)
+
+            return multi
         except ConfigParser.Error:
             print >> sys.stderr, 'Error parsing config file:', config
             sys.exit(1)
