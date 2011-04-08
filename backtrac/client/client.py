@@ -89,21 +89,25 @@ class BackupClient(pb.Referenceable):
 
     @defer.inlineCallbacks
     def start(self):
-        broker = yield self.broker.connect(client=self)
-        paths = yield self.broker.get_paths()
-        for path in paths:
-            path = normpath(path)
-            self.monitor.add_watch(path)
-            index = self.get_index(path)
-            self.check_present_state(path)
-            self.check_index(path, index)
-            #self.walk_path(path)
-        self.startup_queue.start()
-        self.backup_queue.start()
-        self.transfer_queue.start()
+        try:
+            yield self.broker.connect(client=self)
+            paths = yield self.broker.get_paths()
+            for path in paths:
+                path = normpath(path)
+                self.monitor.add_watch(path)
+                index = self.get_index(path)
+                self.check_present_state(path)
+                self.check_index(path, index)
+                #self.walk_path(path)
+            self.startup_queue.start()
+            self.backup_queue.start()
+            self.transfer_queue.start()
+        except Exception, e:
+            print "Connection error:", e.value.getErrorMessage()
 
     def _startup_complete(self):
-        self.startup_queue.stop()
+        #self.startup_queue.stop()
+        pass
 
 def get_server_status():
     broker = BackupBroker(server='localhost', secret_key=settings.SECRET_KEY,

@@ -3,11 +3,19 @@ import socket
 
 from twisted.spread import pb
 from twisted.spread.flavors import Referenceable
+from twisted.python.failure import Failure
 from twisted.internet.error import ConnectionRefusedError
 from twisted.internet.defer import Deferred
 from twisted import cred
 
 from twisted.application.internet import TCPClient
+
+class ConnectionError(Exception):
+    def __init__(self, value):
+        self.value = value
+
+    def __str__(self):
+        return repr(self.value)
 
 class BackupBroker(pb.Referenceable):
     def __init__(self, server='localhost', port=8123,
@@ -50,13 +58,13 @@ class BackupBroker(pb.Referenceable):
             client=client
         )
 
+    def _error(self, failure):
+        raise ConnectionError(failure)
+
     def connect(self, client=None):
         self.service.startService()
-        d = Deferred()
-        r = self.login(client or self)
-        r.addCallback(self._logged_in)
-        r.addCallbacks(lambda _: d.callback(self), lambda x: d.errback(x))
-        return d
+        return self.login(client or self).addCallbacks(self._logged_in,
+                                                       self._error)
 
     def _logged_in(self, perspective):
         self.perspective = perspective

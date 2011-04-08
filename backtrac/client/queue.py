@@ -101,19 +101,20 @@ class BackupQueue(ConsumerQueue):
 
 class TransferQueue(BackupQueue):
     def consume(self, filepath):
-        if not filepath.is_file():
+        if not filepath.isfile():
             # we can't transfer something that isn't a file!
             return
         try:
             mtime = filepath.getModificationTime()
             size = filepath.getsize()
         except (OSError, IOError):
+            print "Error transferring file: %s" % filepath.path
             # returning will allow the queue to move on
             return
         d = Deferred()
         self.client.broker.put_file(filepath.path, mtime, size).addCallback(
             self._transfer, filepath, d
-        )
+        ).addErrback(lambda e: all( f(e) for f in [ self.error, d.errback ]))
         return d
 
     def error(self, fail):
