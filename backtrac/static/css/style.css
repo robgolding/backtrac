@@ -270,10 +270,8 @@ ul#nav-secondary li a:hover {
     text-decoration: none;
 }
 
-body#events ul#nav-secondary li.events a {
-    background-color: #eee;
-}
-
+body#search ul#nav-secondary li.search a,
+body#events ul#nav-secondary li.events a,
 body#config ul#nav-secondary li.config a {
     background-color: #eee;
 }

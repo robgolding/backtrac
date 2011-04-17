@@ -32,6 +32,8 @@ urlpatterns = patterns('',
 
     (r'^config/', include(config_patterns)),
 
+    (r'^search/', include('haystack.urls')),
+
 )
 
 handler500 = lambda x: direct_to_template(x, '500.html')

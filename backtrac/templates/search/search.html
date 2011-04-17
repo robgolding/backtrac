@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+
+{% block page_id %}search{% endblock page_id %}
+
+{% block content %}
+<div class="container">
+    <section class="span-18">
+        <h1>Search</h1>
+
+        <div class="content clearfix">
+            <form action="" method="get" class="standard-form">
+                <div class="field-wrapper clearfix">
+                    Search for<br />
+                    {% with form.q as field %}
+                    <div class="field">{{ field }}</div>
+                    <div class="field-errors">  
+                        {% if field.errors %}
+                            <span class="error">{{ field.errors.0 }}</span>
+                        {% endif %}
+                    </div>
+                    {% endwith %}
+                </div>
+                <button type="submit" class="button">
+                    <img src="{{ STATIC_URL }}css/blueprint/plugins/buttons/icons/tick.png" />
+                    Search
+                </button>
+            </form>
+
+            {% if query %}
+                <hr />
+                <h3>Results</h3>
+
+                <table class="object_list">
+                    <thead>
+                        <tr>
+                            <th class="icon"></th><th>Item</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for result in page.object_list %}
+                        {% with result.object as item %}
+                        {% with item.latest_version.backed_up_at|timesince as age %}
+                        <tr{% if item.deleted %} class="deleted"{% endif %}>
+                                <td class="icon">{% include 'catalog/item_icon.html' %}</td>
+                                <td class="name"><a href="{{ item.client.get_absolute_url }}">{{ item.client.hostname }}</a>:
+                                <a href="{{ item.get_absolute_url }}">{{ item.path }}{% ifequal item.type 'd' %}/{% endifequal %}</a></td>
+                            </tr>
+                        {% endwith %}
+                        {% endwith %}
+                        {% empty %}
+                        <tr class="info">
+                            <td colspan="6">
+                                There are no files in the selected directory.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+                {% if page.has_previous or page.has_next %}
+                    <div>
+                        {% if page.has_previous %}<a href="?q={{ query }}&amp;page={{ page.previous_page_number }}">{% endif %}&laquo; Previous{% if page.has_previous %}</a>{% endif %}
+                        |
+                        {% if page.has_next %}<a href="?q={{ query }}&amp;page={{ page.next_page_number }}">{% endif %}Next &raquo;{% if page.has_next %}</a>{% endif %}
+                    </div>
+                {% endif %}
+            {% else %}
+                {# Show some example queries to run, maybe query syntax, something else? #}
+            {% endif %}
+        </div>
+    </section>
+</div>
+{% endblock %}

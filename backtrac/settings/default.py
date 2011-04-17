@@ -127,6 +127,9 @@ INSTALLED_APPS = (
     'backtrac.apps.catalog',
     'backtrac.apps.clients',
     'backtrac.api',
+
+    # 3rd party apps
+    'haystack',
 )
 
 # A sample logging configuration. The only tangible logging
@@ -153,5 +156,8 @@ LOGGING = {
 }
 
 BACKTRAC_BACKUP_ROOT = '/var/lib/backtrac/backups/'
-
 BACKTRAC_TMP_DIR = '/tmp/backtrac/'
+
+HAYSTACK_SITECONF = 'backtrac.search_sites'
+HAYSTACK_SEARCH_ENGINE = 'whoosh'
+HAYSTACK_WHOOSH_PATH = '/var/lib/backtrac/whoosh_index/'
