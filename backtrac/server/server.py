@@ -1,24 +1,18 @@
-import os
-import random
-import datetime
 
 from zope.interface import implements
 
-from twisted.python import failure, log
-from twisted.internet import reactor
+from twisted.python import failure
 from twisted.cred import portal, checkers, error, credentials
 from twisted.spread import pb
 from twisted.spread.pb import PBServerFactory
-from twisted.application.service import Application
-from twisted.application.internet import TCPServer
-from twisted.spread.util import FilePager
+from twisted.application.internet import SSLServer
 from twisted.internet.task import LoopingCall
-from twisted.internet import defer
+from twisted.internet import defer, ssl
 
 from django.conf import settings
 
 from backtrac.server.storage import Storage
-from backtrac.api.client import Client, get_client
+from backtrac.api.client import get_client
 from backtrac.utils.transfer import PageCollector, TransferPager
 
 class BackupClientAuthChecker:
@@ -57,7 +51,8 @@ class BackupServer(object):
         checker = BackupClientAuthChecker()
         self.portal = portal.Portal(realm, [checker])
         self.factory = PBServerFactory(self.portal)
-        self.service = TCPServer(self.port, self.factory, interface=ip)
+        context = ssl.DefaultOpenSSLContextFactory("server.key", "server.crt")
+        self.service = SSLServer(self.port, self.factory, context, interface=ip)
         self.restore_loop = LoopingCall(self.execute_pending_restores)
         self.restore_loop.start(5)
 

@@ -1,14 +1,10 @@
-import sys
 import socket
 
 from twisted.spread import pb
-from twisted.spread.flavors import Referenceable
-from twisted.python.failure import Failure
-from twisted.internet.error import ConnectionRefusedError
-from twisted.internet.defer import Deferred
+from twisted.internet.ssl import ClientContextFactory
 from twisted import cred
 
-from twisted.application.internet import TCPClient
+from twisted.application.internet import SSLClient
 
 class ConnectionError(Exception):
     def __init__(self, value):
@@ -26,7 +22,8 @@ class BackupBroker(pb.Referenceable):
         self.secret_key = secret_key
         self.connected = False
         self.factory = pb.PBClientFactory()
-        self.service = TCPClient(self.server, self.port, self.factory)
+        self.service = SSLClient(self.server, self.port, self.factory,
+                                 ClientContextFactory())
 
     def get_paths(self):
         return self.perspective.callRemote('get_paths')

@@ -8,9 +8,9 @@ from twisted.python import usage
 from twisted.plugin import IPlugin
 from twisted.application import internet, service
 from twisted.application.service import IServiceMaker
-from twisted.web import server, resource, wsgi, static, client
+from twisted.web import server, resource, wsgi, static
 from twisted.python import threadpool
-from twisted.internet import reactor, defer, ssl
+from twisted.internet import reactor, ssl
 
 os.environ['DJANGO_SETTINGS_MODULE'] = 'backtrac.settings'
 from django.conf import settings
