@@ -158,6 +158,14 @@ LOGGING = {
 BACKTRAC_BACKUP_ROOT = '/var/lib/backtrac/backups/'
 BACKTRAC_TMP_DIR = '/tmp/backtrac/'
 
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
+        'LOCATION': os.path.join(BACKTRAC_TMP_DIR, 'cache'),
+        'TIMEOUT': 86400,
+    }
+}
+
 HAYSTACK_SITECONF = 'backtrac.search_sites'
 HAYSTACK_SEARCH_ENGINE = 'whoosh'
 HAYSTACK_WHOOSH_PATH = '/var/lib/backtrac/whoosh_index/'
