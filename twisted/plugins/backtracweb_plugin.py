@@ -10,7 +10,7 @@ from twisted.application import internet, service
 from twisted.application.service import IServiceMaker
 from twisted.web import server, resource, wsgi, static, client
 from twisted.python import threadpool
-from twisted.internet import reactor, defer
+from twisted.internet import reactor, defer, ssl
 
 os.environ['DJANGO_SETTINGS_MODULE'] = 'backtrac.settings'
 from django.conf import settings
@@ -85,7 +85,8 @@ class ServerServiceMaker(object):
 
             # create the site and a TCPServer service to serve it with
             site = server.Site(root)
-            ws = internet.TCPServer(port, site, interface=ip)
+            context = ssl.DefaultOpenSSLContextFactory("server.key", "server.crt")
+            ws = internet.SSLServer(port, site, context, interface=ip)
 
             # add the web server service to the multi service
             ws.setServiceParent(multi)
