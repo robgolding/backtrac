@@ -2,6 +2,7 @@ import os
 import uuid
 import magic
 import hashlib
+import datetime
 
 def generate_version_id():
     return str(uuid.uuid4())
@@ -35,3 +36,22 @@ def get_file_hash(filename):
             break
         md5.update(data)
     return md5.digest()
+
+def get_seconds_till_midnight():
+    """
+    Get the number of seconds remaining until midnight tonight. Pretty useful
+    for scheduling and whatnot.
+    """
+    now = datetime.datetime.now()
+    today = datetime.datetime(year=now.year, month=now.month, day=now.day)
+    tomorrow = now + datetime.timedelta(days=1)
+    return (tomorrow - today).seconds
+
+def get_seconds_since_midnight():
+    """
+    Get the number of seconds since midnight last night. Again, pretty useful
+    for scheduling.
+    """
+    now = datetime.datetime.now()
+    today = datetime.datetime(year=now.year, month=now.month, day=now.day)
+    return (now - today).seconds

@@ -1,4 +1,4 @@
-
+import sys
 from zope.interface import implements
 
 from twisted.python import failure
@@ -6,13 +6,15 @@ from twisted.cred import portal, checkers, error, credentials
 from twisted.spread import pb
 from twisted.spread.pb import PBServerFactory
 from twisted.application.internet import SSLServer
-from twisted.internet.task import LoopingCall
-from twisted.internet import defer, ssl
+from twisted.internet.task import LoopingCall, deferLater
+from twisted.internet import defer, reactor, ssl
 
+from django.core import management
 from django.conf import settings
 
 from backtrac.server.storage import Storage
 from backtrac.api.client import get_client
+from backtrac.utils import get_seconds_till_midnight
 from backtrac.utils.transfer import PageCollector, TransferPager
 
 class BackupClientAuthChecker:
@@ -55,10 +57,27 @@ class BackupServer(object):
         self.service = SSLServer(self.port, self.factory, context, interface=ip)
         self.restore_loop = LoopingCall(self.execute_pending_restores)
         self.restore_loop.start(5)
+        self.catalog_backup_loop = LoopingCall(self.backup_catalog)
+        deferLater(reactor, get_seconds_till_midnight(),
+                   self._start_catalog_backup_loop)
 
     def execute_pending_restores(self):
         for hostname, client in self.clients.items():
             client.execute_pending_restores()
+
+    def _start_catalog_backup_loop(self):
+        self.catalog_backup_loop.start(86400)
+
+    def backup_catalog(self):
+        reactor.callInThread(self._perform_catalog_backup)
+
+    def _perform_catalog_backup(self):
+        old_stdout = sys.stdout
+        sys.stdout = open(settings.BACKTRAC_CATALOG_BACKUP, 'w')
+        management.call_command('dumpdata', indent=2)
+        sys.stdout.close()
+        sys.stdout = old_stdout
+
 
     def start(self):
         self.service.startService()

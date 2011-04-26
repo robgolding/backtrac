@@ -17,6 +17,7 @@ from backtrac.server.storage import Storage
 from backtrac.apps.core.models import GlobalExclusion
 from backtrac.apps.core.forms import ExclusionFormSet
 from backtrac.apps.catalog.models import Version, Event
+from backtrac.utils import get_seconds_till_midnight
 
 CATALOG_SIZE_HISTORY_CACHE_KEY = 'catalog_size_history'
 
@@ -35,10 +36,7 @@ def get_catalog_graph_data():
     data = cache.get(CATALOG_SIZE_HISTORY_CACHE_KEY, None)
     if data is None:
         data = generate_catalog_graph_data()
-        now = datetime.datetime.now()
-        today = datetime.datetime(year=now.year, month=now.month, day=now.day)
-        tomorrow = today + datetime.timedelta(days=1)
-        timeout = (tomorrow - today()).seconds
+        timeout = get_seconds_till_midnight()
         cache.set(CATALOG_SIZE_HISTORY_CACHE_KEY, data, timeout)
     return data
 

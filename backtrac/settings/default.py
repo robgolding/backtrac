@@ -157,6 +157,7 @@ LOGGING = {
 
 BACKTRAC_BACKUP_ROOT = '/var/lib/backtrac/backups/'
 BACKTRAC_TMP_DIR = '/tmp/backtrac/'
+BACKTRAC_CATALOG_BACKUP = os.path.join(BACKTRAC_BACKUP_ROOT, 'catalog.json')
 
 CACHES = {
     'default': {
