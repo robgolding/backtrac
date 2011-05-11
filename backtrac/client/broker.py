@@ -66,3 +66,4 @@ class BackupBroker(pb.Referenceable):
     def _logged_in(self, perspective):
         self.perspective = perspective
         self.connected = True
+        return self
