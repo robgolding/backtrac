@@ -1,6 +1,6 @@
 import os
 
-PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 
 DEBUG = False
 TEMPLATE_DEBUG = DEBUG
@@ -56,7 +56,7 @@ MEDIA_URL = '/media/'
 
 # Absolute path to the directory that holds static files.
 # Example: "/home/media/media.lawrence.com/static/"
-STATIC_ROOT = os.path.join(PATH, 'static/')
+STATIC_ROOT = os.path.join(PROJECT_ROOT, 'staticfiles')
 
 # URL that handles the static files served from STATIC_ROOT.
 # Example: "http://media.lawrence.com/static/"
@@ -68,7 +68,9 @@ STATIC_URL = '/static/'
 ADMIN_MEDIA_PREFIX = '/static/admin/'
 
 # A list of locations of additional static files
-STATICFILES_DIRS = ()
+STATICFILES_DIRS = (
+    os.path.join(PROJECT_ROOT, 'static'),
+)
 
 # List of finder classes that know how to find static files in
 # various locations.
@@ -98,7 +100,7 @@ MIDDLEWARE_CLASSES = (
 ROOT_URLCONF = 'backtrac.urls'
 
 TEMPLATE_DIRS = (
-    os.path.join(PATH, 'templates'),
+    os.path.join(PROJECT_ROOT, 'templates'),
 )
 
 TEMPLATE_CONTEXT_PROCESSORS = (

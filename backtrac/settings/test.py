@@ -1,3 +1,5 @@
+ADMINS = () # Django issue #19172
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',

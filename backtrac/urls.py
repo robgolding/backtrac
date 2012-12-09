@@ -44,4 +44,4 @@ if settings.DEBUG:
         (r'^404/$', 'django.views.generic.simple.direct_to_template', {
             'template': '404.html'
         }),
-    )
+    ) + staticfiles_urlpatterns()
