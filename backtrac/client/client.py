@@ -108,23 +108,3 @@ class BackupClient(pb.Referenceable):
     def _startup_complete(self):
         #self.startup_queue.stop()
         pass
-
-def get_server_status():
-    broker = BackupBroker(server='localhost', secret_key=settings.SECRET_KEY,
-                          hostname='localhost')
-    d = broker.connect()
-
-    # Add an errback to redirect the failure into oblivion, so we don't get an
-    # exception if the server isn't running
-    d.addErrback(lambda x: None)
-
-    try:
-        result = utils.get_result_blocking(d)
-    except utils.TimoutExpiredException:
-        result = False
-
-    broker.factory.disconnect()
-
-    if isinstance(result, failure.Failure):
-        return False
-    return bool(d.result)

@@ -18,8 +18,6 @@ urlpatterns = patterns('',
 
     url(r'^dashboard/$', views.dashboard, name='dashboard'),
 
-    url(r'^status/', views.status, name='status'),
-
     url(r'^accounts/login/', 'django.contrib.auth.views.login',
                 name='auth_login'),
 

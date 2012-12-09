@@ -14,6 +14,7 @@ from django.conf import settings
 
 from backtrac.client import client
 from backtrac.server.storage import Storage
+from backtrac.apps.clients.models import Client
 from backtrac.apps.core.models import GlobalExclusion
 from backtrac.apps.core.forms import ExclusionFormSet
 from backtrac.apps.catalog.models import Version, Event
@@ -53,6 +54,9 @@ def dashboard(request, *args, **kwargs):
     catalog_size = Version.objects.aggregate(size=Sum('size'))['size']
     size_history = get_catalog_graph_data()
 
+    connected_clients = Client.objects.filter(status__connected=True).count()
+    num_clients = Client.objects.filter().count()
+
     events = Event.objects.select_related()[:10]
 
     stats = {
@@ -68,6 +72,8 @@ def dashboard(request, *args, **kwargs):
         'extra_context': {
             'stats': stats,
             'events': events,
+            'connected_clients': connected_clients,
+            'num_clients': num_clients,
         },
     })
 
@@ -97,9 +103,3 @@ def config(request, template_name='config.html'):
     }
     return render_to_response(template_name, data,
                               context_instance=RequestContext(request))
-
-@login_required
-def status(request):
-    running = client.get_server_status()
-    r, s = ('running', 200) if running else ('not running', 412)
-    return HttpResponse(r, status=s)
