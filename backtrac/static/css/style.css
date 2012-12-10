@@ -34,6 +34,11 @@ p {
     line-height: 1.5em;
 }
 
+p.last {
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
 #main a:link, #main a:visited {
     color: #3163B4;
     text-decoration: none;
@@ -454,29 +459,12 @@ section div.content {
 
 /* Dashboard */
 
-div#system-status {
-    padding-left: 35px;
-    background: none;
-    background-repeat: no-repeat;
-    background-position: 10px; center;
-    border: none;
-    margin: 0;
+div#system-status p {
+    margin-bottom: 0.5em;
 }
 
-div#system-status.notice {
-    background-image: url("../img/icons/famfamfam/error.png");
-}
-
-div#system-status.success {
-    background-image: url("../img/icons/famfamfam/accept.png");
-}
-
-div#system-status.error {
-    background-image: url("../img/icons/famfamfam/exclamation.png");
-}
-
-div#system-status.checking {
-    background-image: url("../img/ajax-loader.gif");
+div#system-status p.last {
+    margin-bottom: 0;
 }
 
 /* Object Lists */

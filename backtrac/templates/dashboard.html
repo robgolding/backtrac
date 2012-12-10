@@ -47,8 +47,13 @@
         <div class="span-6 last">
             <section>
                 <h1>System Status</h1>
-                <div class="content">
-                    {{ connected_clients }} of {{ num_clients }} clients connected.
+                <div class="content" id="system-status">
+                    <p>
+                        {{ connected_clients }} of {{ num_clients }} clients connected.
+                    </p>
+                    <p class="last">
+                        <a href="{% url clients_client_list %}">More details &rarr;</a>
+                    </p>
                 </div>
             </section>
             <section>
