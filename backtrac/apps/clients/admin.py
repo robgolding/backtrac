@@ -3,8 +3,7 @@ from django.contrib import admin
 from models import Client, Status, FilePath
 
 class ClientAdmin(admin.ModelAdmin):
-    list_display = ('id', 'hostname', 'active',)
-    list_display_links = ('id', 'hostname',)
+    list_display = ('hostname', 'active',)
     list_filter = ('active',)
 
 admin.site.register(Client, ClientAdmin)
