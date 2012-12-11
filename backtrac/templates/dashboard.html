@@ -48,11 +48,11 @@
             <section>
                 <h1>System Status</h1>
                 <div class="content" id="system-status">
+                    <span class="{% if server_online %}success{% else %}error{% endif %}">
+                        Server {% if server_online %}running{% else %}not running{% endif %}.
+                    </span>
                     <p>
                         {{ connected_clients }} of {{ num_clients }} clients connected.
-                    </p>
-                    <p class="last">
-                        <a href="{% url clients_client_list %}">More details &rarr;</a>
                     </p>
                 </div>
             </section>

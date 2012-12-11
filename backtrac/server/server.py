@@ -9,13 +9,16 @@ from twisted.application.internet import SSLServer
 from twisted.internet.task import LoopingCall, deferLater
 from twisted.internet import defer, reactor, ssl
 
-from django.core import management
 from django.conf import settings
+from django.core import management
+from django.core.cache import cache
 
 from backtrac.server.storage import Storage
 from backtrac.api.client import get_client
 from backtrac.utils import get_seconds_till_midnight
 from backtrac.utils.transfer import PageCollector, TransferPager
+
+SERVER_STATUS_CACHE_KEY = 'backtracd:status'
 
 class BackupClientAuthChecker:
     implements(checkers.ICredentialsChecker)
@@ -57,9 +60,14 @@ class BackupServer(object):
         self.service = SSLServer(self.port, self.factory, context, interface=ip)
         self.restore_loop = LoopingCall(self.execute_pending_restores)
         self.restore_loop.start(5)
+        self.server_loop = LoopingCall(self.update_server_status)
+        self.server_loop.start(5)
         self.catalog_backup_loop = LoopingCall(self.backup_catalog)
         deferLater(reactor, get_seconds_till_midnight(),
                    self._start_catalog_backup_loop)
+
+    def update_server_status(self):
+        cache.set(SERVER_STATUS_CACHE_KEY, True, timeout=10)
 
     def execute_pending_restores(self):
         for hostname, client in self.clients.items():

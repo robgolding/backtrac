@@ -459,11 +459,24 @@ section div.content {
 
 /* Dashboard */
 
-div#system-status p {
-    margin-bottom: 0.5em;
+div#system-status span {
+    display: block;
+    padding-left: 25px;
+    background: none;
+    background-repeat: no-repeat;
+    border: none;
+    margin: 15px 0 10px 0;
 }
 
-div#system-status p.last {
+div#system-status span.success {
+    background-image: url("../img/icons/famfamfam/accept.png");
+}
+
+div#system-status span.error {
+    background-image: url("../img/icons/famfamfam/exclamation.png");
+}
+
+div#system-status p {
     margin-bottom: 0;
 }
 

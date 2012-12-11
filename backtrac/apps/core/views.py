@@ -1,6 +1,6 @@
 import datetime
 
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from django.core.cache import cache
 from django.contrib.auth.decorators import login_required
@@ -12,7 +12,7 @@ from django.db import transaction
 from django.db.models import Sum
 from django.conf import settings
 
-from backtrac.client import client
+from backtrac.server.server import SERVER_STATUS_CACHE_KEY
 from backtrac.server.storage import Storage
 from backtrac.apps.clients.models import Client
 from backtrac.apps.core.models import GlobalExclusion
@@ -72,6 +72,7 @@ def dashboard(request, *args, **kwargs):
         'extra_context': {
             'stats': stats,
             'events': events,
+            'server_online': cache.get(SERVER_STATUS_CACHE_KEY, False),
             'connected_clients': connected_clients,
             'num_clients': num_clients,
         },
